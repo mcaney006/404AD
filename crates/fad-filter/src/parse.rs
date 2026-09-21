@@ -345,13 +345,16 @@ fn matching_paren(s: &str, open: usize) -> Option<usize> {
 }
 
 /// Find `needle` only where it is not already nested inside parentheses.
+///
+/// Walks characters rather than bytes. Filter lists carry non-ASCII selectors
+/// and hostnames routinely, and slicing a `str` at a raw byte offset panics the
+/// moment one of them lands mid-character.
 fn find_top_level(haystack: &str, needle: &str) -> Option<usize> {
-    let bytes = haystack.as_bytes();
     let mut depth = 0i32;
-    for i in 0..bytes.len() {
-        match bytes[i] {
-            b'(' => depth += 1,
-            b')' => depth -= 1,
+    for (i, c) in haystack.char_indices() {
+        match c {
+            '(' => depth += 1,
+            ')' => depth -= 1,
             _ => {}
         }
         if depth == 0 && haystack[i..].starts_with(needle) {
@@ -667,6 +670,31 @@ mod tests {
         match parse_line(line, src(), false).expect("parse") {
             ParsedLine::Cosmetic(r) => *r,
             other => panic!("expected cosmetic rule, got {other:?}"),
+        }
+    }
+
+    #[test]
+    fn a_non_ascii_cosmetic_selector_does_not_panic_the_parser() {
+        // Regression, found by the property test on CI with a different seed:
+        // `find_top_level` walked byte offsets and sliced the string with them,
+        // so any multi-byte character in a selector landed mid-character and
+        // panicked. A subscribed list is attacker-adjacent input, and a panic
+        // in the service worker takes the extension down until Chromium
+        // restarts it.
+        for line in [
+            "\u{12F90}##\u{a1}",
+            "example.com##.caf\u{e9}",
+            "\u{4f8b}.com##div:has-text(\u{5e83}\u{544a})",
+            "example.com##:upward(\u{e9})",
+            "example.com#?#div:has(> .\u{e9}):has-text(ad)",
+        ] {
+            let source = SourceRef {
+                list: "regression".into(),
+                line: 1,
+                raw: line.to_string(),
+            };
+            // Parsing may reject any of these. It may not panic on one.
+            let _ = parse_line(line, source, false);
         }
     }
 
