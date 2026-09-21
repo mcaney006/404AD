@@ -24,6 +24,27 @@ That path is deterministic. `bun run build` always produces it, and it is a plai
 the WXT output, so the two can never disagree. The directory is committed, so a fresh
 clone can be loaded without building anything first.
 
+### The archive
+
+The same build writes a zip beside it, for uploading or handing to someone:
+
+```
+dist/404ad-chrome-mv3-0.1.0.zip
+```
+
+It is a byte-identical rebuild of the directory, so it is not committed. Entries go in
+sorted order with a fixed timestamp, which means the same source produces the same
+archive with the same checksum — the compiler already proves that about the rule
+artifacts, and an archive whose hash moved on every build would throw it away.
+
+The suite can be pointed at an unpacked copy of the archive rather than the build tree,
+so what gets verified is what ships:
+
+```bash
+unzip -q dist/404ad-chrome-mv3-0.1.0.zip -d /tmp/404ad
+FAD_EXTENSION_PATH=/tmp/404ad bun run test:e2e
+```
+
 ## Two engines
 
 404AD is a generic content blocker with a **separate transport engine for
@@ -395,7 +416,7 @@ bun run verify
 bun run build:wasm        # cargo + wasm-pack -> src/wasm, public/wasm
 bun run build:filters     # fad-compile -> public/rules, public/generated
 bun run build:extension   # WXT -> packages/extension/.output/chrome-mv3
-bun run build             # all of the above, then package to dist/
+bun run build             # all of the above, then package to dist/ and zip it
 
 bun run test              # cargo test --workspace, then bun test
 bun run test:e2e          # Playwright against a real Chromium

@@ -33,3 +33,7 @@ node_modules/
 # Chromium writes verification metadata into an unpacked extension directory
 # when it loads one. It is browser state, not build output.
 dist/**/_metadata/
+
+# Build archives. The unpacked extension is committed; the zip is a
+# byte-identical rebuild of it, so keeping both would only bloat history.
+dist/*.zip

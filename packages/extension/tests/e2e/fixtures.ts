@@ -8,8 +8,14 @@ import { chromium, test as base, type BrowserContext, type Worker } from "@playw
  *
  * Testing the packaged output rather than the build directory is deliberate: a
  * packaging mistake is exactly the class of bug that only shows up here.
+ *
+ * `FAD_EXTENSION_PATH` points the whole suite somewhere else, which is how the
+ * released archive is verified by unpacking it and running against that rather
+ * than against the tree it was built from.
  */
-export const EXTENSION_PATH = resolve(import.meta.dirname, "../../../../dist/404ad-chrome-mv3");
+export const EXTENSION_PATH =
+  process.env.FAD_EXTENSION_PATH ??
+  resolve(import.meta.dirname, "../../../../dist/404ad-chrome-mv3");
 
 interface Fixtures {
   context: BrowserContext;
