@@ -1,29 +1,39 @@
 {
-  "build_id": "07aa047119fc923f16c8b06be6a59d2d",
+  "build_id": "def955c52ac4528f9ebd92538d4edafb",
   "selectors": [
+    ".ad-container",
+    "[class*=\"ad-banner\"]",
     "#sponsoredProducts2_feature_div",
     ".AdHolder",
     ".s-sponsored-list-item",
     "[data-component-type=\"sp-sponsored-result\"]",
     ".ad-content",
     ".bbccom_advert",
+    "[data-testid=\"sponsored-badge\"]",
     "#b_results > .b_ad",
     ".b_adSlug",
     ".b_ad",
     ".sb_adTA",
-    ".ad-container",
+    "[data-testid=\"sponsored\"]",
     ".promoted-result",
+    ".ad-wrapper",
+    ".c-adDisplay",
     ".ad-feedback-link-container",
     ".ad-slot-header__wrapper",
     ".mol-ads-cell",
     ".puff-slot",
+    ".crayons-story--ad",
     ".badge--ad",
     ".module--carousel--advertisement",
     ".result--ad",
     ".srp-river-answer--PROMOTED_LISTINGS",
     ".advert",
     ".mainline-ad",
+    ".ad-unit-container",
+    ".ad-slot-container",
+    "[id^=\"ad-\"]",
     "[data-ad-id]",
+    "[data-stid=\"sponsored\"]",
     "[data-pagelet^=\"FeedUnit\"]:has([aria-label=\"Sponsored\"])",
     "[role=\"complementary\"]:has(a[href*=\"ads/about\"])",
     ".fbs-ad",
@@ -44,11 +54,14 @@
     ".ads-container",
     "[data-id^=\"urn:li:sponsoredContent\"]",
     ".js-adPlaceholder",
-    ".ad-slot-container",
+    ".sponsored-item",
+    ".ad",
     "[data-testid=\"ad-banner\"]",
     "#sponsored-content",
-    ".ad",
+    ".ad-unit",
+    "[data-testid=\"ad-slot\"]",
     "[data-test-id=\"promoted-pin\"]",
+    ".c-ad",
     ".q-box:has(.AdRenderer)",
     "#ad_1",
     ".promotedlink",
@@ -56,6 +69,7 @@
     "shreddit-ad-post",
     "shreddit-comments-page-ad",
     "[data-testid=\"Ad\"]",
+    ".adbar",
     ".adswizz-ad-container",
     ".advertisement-container",
     ".everyonelovesstackoverflow",
@@ -64,17 +78,24 @@
     ".js-sidebar-ad",
     ".w-gl__result--ad",
     ".sponsored-post-banner",
+    "[data-test=\"sponsored-label\"]",
+    ".ad-unit-wrapper",
     ".top-banner-ad-container",
+    ".duet--ad--ad-wrapper",
     "[data-e2e=\"ad-card\"]",
+    "[data-test-target=\"commerce-ad\"]",
     ".post_container:has(.sponsored_badge)",
+    ".ad-banner",
     ".player-ad-notice",
     "[data-a-target=\"video-ad-label\"]",
     "[data-testid=\"placementTracking\"]",
+    "[class*=\"AdSlot\"]",
     "#adngin-leaderboard-0",
     "#adngin-sidebar1-0",
     "[data-item-id][aria-label*=\"Sponsored\"]",
     ".hide-for-print[data-qa=\"ad\"]",
     ".section_text:has(.ad_label)",
+    ".ad-stickyhero",
     ".wsj-ad",
     "#ysch-ads",
     ".ads",
@@ -230,7 +251,6 @@
     "#usercentrics-root",
     "#zergnet-widget",
     ".ad-banner-wrapper",
-    ".ad-banner",
     ".ad-block-container",
     ".ad-blocker-notice",
     ".ad-box",
@@ -261,9 +281,6 @@
     ".ad-sticky",
     ".ad-takeover",
     ".ad-tile",
-    ".ad-unit-wrapper",
-    ".ad-unit",
-    ".ad-wrapper",
     ".ad-zone",
     ".adblock-detected-modal",
     ".adblock-notice-overlay",
@@ -469,31 +486,31 @@
   ],
   "scriptlets": [
     {
-      "rule_id": 469,
+      "rule_id": 527,
       "name": "404ad-yt-player",
       "args": [],
       "shadow": false
     },
     {
-      "rule_id": 470,
+      "rule_id": 528,
       "name": "404ad-yt-transport",
       "args": [],
       "shadow": false
     },
     {
-      "rule_id": 471,
+      "rule_id": 529,
       "name": "404ad-yt-player",
       "args": [],
       "shadow": false
     },
     {
-      "rule_id": 472,
+      "rule_id": 530,
       "name": "404ad-yt-transport",
       "args": [],
       "shadow": false
     },
     {
-      "rule_id": 473,
+      "rule_id": 531,
       "name": "json-prune",
       "args": [
         "adPlacements",
@@ -504,7 +521,7 @@
       "shadow": false
     },
     {
-      "rule_id": 474,
+      "rule_id": 532,
       "name": "set-constant",
       "args": [
         "playerResponse.adPlacements",
@@ -513,7 +530,7 @@
       "shadow": false
     },
     {
-      "rule_id": 475,
+      "rule_id": 533,
       "name": "set-constant",
       "args": [
         "ytInitialPlayerResponse.adPlacements",
@@ -522,7 +539,7 @@
       "shadow": false
     },
     {
-      "rule_id": 476,
+      "rule_id": 534,
       "name": "set-constant",
       "args": [
         "ytInitialPlayerResponse.adSlots",
@@ -531,7 +548,7 @@
       "shadow": false
     },
     {
-      "rule_id": 477,
+      "rule_id": 535,
       "name": "set-constant",
       "args": [
         "ytInitialPlayerResponse.playerAds",
@@ -543,941 +560,1011 @@
   "procedural": [],
   "generic_by_token": {
     "#CybotCookiebotDialog": [
-      148
-    ],
-    "#ad-banner": [
-      149
-    ],
-    "#ad-block": [
-      150
-    ],
-    "#ad-container": [
-      151
-    ],
-    "#ad-content": [
-      152
-    ],
-    "#ad-footer": [
-      153
-    ],
-    "#ad-header": [
-      154
-    ],
-    "#ad-leaderboard": [
-      155
-    ],
-    "#ad-left": [
-      156
-    ],
-    "#ad-middle": [
-      157
-    ],
-    "#ad-right": [
-      158
-    ],
-    "#ad-sidebar": [
-      159
-    ],
-    "#ad-slot": [
-      160
-    ],
-    "#ad-space": [
-      161
-    ],
-    "#ad-top": [
-      162
-    ],
-    "#ad-unit": [
-      163
-    ],
-    "#ad-wrapper": [
-      164
-    ],
-    "#adblock-detected": [
-      165
-    ],
-    "#adblock-modal": [
-      166
-    ],
-    "#adblock-overlay": [
-      167
-    ],
-    "#adngin-container": [
-      168
-    ],
-    "#ads": [
-      173
-    ],
-    "#adsense": [
-      172
-    ],
-    "#adsense-block": [
       169
     ],
-    "#adsense-container": [
+    "#ad-banner": [
       170
     ],
-    "#adsense-leaderboard": [
+    "#ad-block": [
       171
     ],
-    "#advert": [
-      175
+    "#ad-container": [
+      172
     ],
-    "#advertisement": [
+    "#ad-content": [
+      173
+    ],
+    "#ad-footer": [
       174
     ],
-    "#amazon-native-container": [
+    "#ad-header": [
+      175
+    ],
+    "#ad-leaderboard": [
       176
     ],
-    "#app-banner": [
+    "#ad-left": [
       177
     ],
-    "#aswift_container": [
+    "#ad-middle": [
       178
     ],
-    "#banner-ad": [
+    "#ad-right": [
       179
     ],
-    "#cmpbox": [
+    "#ad-sidebar": [
       180
     ],
-    "#cookie-banner": [
+    "#ad-slot": [
       181
     ],
-    "#cookie-consent": [
+    "#ad-space": [
       182
     ],
-    "#cookie-law-info-bar": [
+    "#ad-top": [
       183
     ],
-    "#cookie-notice": [
+    "#ad-unit": [
       184
     ],
-    "#cookiescript_injected": [
+    "#ad-wrapper": [
       185
     ],
-    "#dfp-ad": [
+    "#adblock-detected": [
       186
     ],
-    "#dfp-billboard": [
+    "#adblock-modal": [
       187
     ],
-    "#dfp-leaderboard": [
+    "#adblock-overlay": [
       188
     ],
-    "#dfp-rectangle": [
+    "#adngin-container": [
       189
     ],
-    "#didomi-host": [
-      190
-    ],
-    "#div-gpt-ad": [
-      192
-    ],
-    "#div-gpt-ad-container": [
-      191
-    ],
-    "#gdpr-cookie-message": [
-      193
-    ],
-    "#google_ads_frame": [
+    "#ads": [
       194
     ],
-    "#google_ads_iframe": [
-      195
+    "#adsense": [
+      193
     ],
-    "#google_image_div": [
+    "#adsense-block": [
+      190
+    ],
+    "#adsense-container": [
+      191
+    ],
+    "#adsense-leaderboard": [
+      192
+    ],
+    "#advert": [
       196
     ],
-    "#gpt-leaderboard": [
+    "#advertisement": [
+      195
+    ],
+    "#amazon-native-container": [
       197
     ],
-    "#gpt-passback": [
+    "#app-banner": [
       198
     ],
-    "#gpt-rectangle": [
+    "#aswift_container": [
       199
     ],
-    "#gpt-skyscraper": [
+    "#banner-ad": [
       200
     ],
-    "#leaderboard-ad": [
+    "#cmpbox": [
       201
     ],
-    "#mgid-container": [
+    "#cookie-banner": [
       202
     ],
-    "#mgid-widget": [
+    "#cookie-consent": [
       203
     ],
-    "#newsletter-modal": [
+    "#cookie-law-info-bar": [
       204
     ],
-    "#onetrust-banner-sdk": [
+    "#cookie-notice": [
       205
     ],
-    "#onetrust-consent-sdk": [
+    "#cookiescript_injected": [
       206
     ],
-    "#outbrain-widget": [
+    "#dfp-ad": [
       207
     ],
-    "#outbrain_widget_0": [
+    "#dfp-billboard": [
       208
     ],
-    "#outbrain_widget_1": [
+    "#dfp-leaderboard": [
       209
     ],
-    "#prebid-container": [
+    "#dfp-rectangle": [
       210
     ],
-    "#qc-cmp2-container": [
+    "#didomi-host": [
       211
     ],
-    "#rev-content": [
-      212
-    ],
-    "#revcontent-widget": [
+    "#div-gpt-ad": [
       213
     ],
-    "#sidebar-ads": [
+    "#div-gpt-ad-container": [
+      212
+    ],
+    "#gdpr-cookie-message": [
       214
     ],
-    "#sky-ad": [
+    "#google_ads_frame": [
       215
     ],
-    "#smartbanner": [
+    "#google_ads_iframe": [
       216
     ],
-    "#sp_message_container_1": [
+    "#google_image_div": [
       217
     ],
-    "#sponsored-content": [
-      45
-    ],
-    "#subscribe-popup": [
+    "#gpt-leaderboard": [
       218
     ],
-    "#taboola-below-article": [
-      220
-    ],
-    "#taboola-below-article-thumbnails": [
+    "#gpt-passback": [
       219
     ],
-    "#taboola-mid-article-thumbnails": [
+    "#gpt-rectangle": [
+      220
+    ],
+    "#gpt-skyscraper": [
       221
     ],
-    "#taboola-right-rail-thumbnails": [
+    "#leaderboard-ad": [
       222
     ],
-    "#top-ad": [
+    "#mgid-container": [
       223
     ],
-    "#tracking-iframe": [
+    "#mgid-widget": [
       224
     ],
-    "#truste-consent-track": [
+    "#newsletter-modal": [
       225
     ],
-    "#usercentrics-root": [
+    "#onetrust-banner-sdk": [
       226
     ],
-    "#zergnet-widget": [
+    "#onetrust-consent-sdk": [
       227
     ],
-    ".ad-banner": [
-      229
-    ],
-    ".ad-banner-container": [
-      39
-    ],
-    ".ad-banner-wrapper": [
+    "#outbrain-widget": [
       228
     ],
-    ".ad-block-container": [
+    "#outbrain_widget_0": [
+      229
+    ],
+    "#outbrain_widget_1": [
       230
     ],
-    ".ad-blocker-notice": [
+    "#prebid-container": [
       231
     ],
-    ".ad-box": [
+    "#qc-cmp2-container": [
       232
     ],
-    ".ad-card": [
+    "#rev-content": [
       233
     ],
-    ".ad-cell": [
+    "#revcontent-widget": [
       234
     ],
-    ".ad-column": [
+    "#sidebar-ads": [
       235
     ],
-    ".ad-container": [
-      10
-    ],
-    ".ad-embed": [
+    "#sky-ad": [
       236
     ],
-    ".ad-footer": [
+    "#smartbanner": [
       237
     ],
-    ".ad-header": [
+    "#sp_message_container_1": [
       238
     ],
-    ".ad-inline": [
-      239
-    ],
-    ".ad-interstitial": [
-      240
-    ],
-    ".ad-label": [
-      241
-    ],
-    ".ad-leaderboard": [
-      242
-    ],
-    ".ad-module-container": [
-      243
-    ],
-    ".ad-mpu": [
-      244
-    ],
-    ".ad-overlay-container": [
-      245
-    ],
-    ".ad-panel": [
-      246
-    ],
-    ".ad-placeholder": [
-      248
-    ],
-    ".ad-placeholder-container": [
-      247
-    ],
-    ".ad-rail": [
-      249
-    ],
-    ".ad-rectangle": [
-      250
-    ],
-    ".ad-region": [
-      251
-    ],
-    ".ad-row": [
-      252
-    ],
-    ".ad-slot": [
-      255
-    ],
-    ".ad-slot-container": [
-      43
-    ],
-    ".ad-slot-inner": [
-      253
-    ],
-    ".ad-slot-wrapper": [
-      254
-    ],
-    ".ad-space": [
-      256
-    ],
-    ".ad-sticky": [
-      257
-    ],
-    ".ad-takeover": [
-      258
-    ],
-    ".ad-tile": [
-      259
-    ],
-    ".ad-unit": [
-      261
-    ],
-    ".ad-unit-wrapper": [
-      260
-    ],
-    ".ad-wrapper": [
-      262
-    ],
-    ".ad-zone": [
-      263
-    ],
-    ".adblock-detected-modal": [
-      264
-    ],
-    ".adblock-notice-overlay": [
-      265
-    ],
-    ".adblock-warning-banner": [
-      266
-    ],
-    ".adblocker-message": [
-      267
-    ],
-    ".ads-container": [
-      40
-    ],
-    ".ads-placeholder": [
-      268
-    ],
-    ".ads-wrapper": [
-      269
-    ],
-    ".adsbox": [
-      270
-    ],
-    ".adsbygoogle": [
-      272
-    ],
-    ".adsbygoogle-noablate": [
-      271
-    ],
-    ".adsense-block": [
-      273
-    ],
-    ".adszone": [
-      274
-    ],
-    ".adunitcontainer": [
-      275
-    ],
-    ".advert": [
-      20
-    ],
-    ".advert-container": [
-      276
-    ],
-    ".advert-placeholder": [
-      277
-    ],
-    ".advert-slot": [
-      278
-    ],
-    ".advert-wrapper": [
-      37
-    ],
-    ".advertisement": [
-      282
-    ],
-    ".advertisement-block": [
-      279
-    ],
-    ".advertisement-container": [
+    "#sponsored-content": [
       56
     ],
-    ".advertisement-label": [
+    "#subscribe-popup": [
+      239
+    ],
+    "#taboola-below-article": [
+      241
+    ],
+    "#taboola-below-article-thumbnails": [
+      240
+    ],
+    "#taboola-mid-article-thumbnails": [
+      242
+    ],
+    "#taboola-right-rail-thumbnails": [
+      243
+    ],
+    "#top-ad": [
+      244
+    ],
+    "#tracking-iframe": [
+      245
+    ],
+    "#truste-consent-track": [
+      246
+    ],
+    "#usercentrics-root": [
+      247
+    ],
+    "#zergnet-widget": [
+      248
+    ],
+    ".ad-banner": [
+      84
+    ],
+    ".ad-banner-container": [
+      49
+    ],
+    ".ad-banner-wrapper": [
+      249
+    ],
+    ".ad-block-container": [
+      250
+    ],
+    ".ad-blocker-notice": [
+      251
+    ],
+    ".ad-box": [
+      252
+    ],
+    ".ad-card": [
+      253
+    ],
+    ".ad-cell": [
+      254
+    ],
+    ".ad-column": [
+      255
+    ],
+    ".ad-container": [
+      0
+    ],
+    ".ad-embed": [
+      256
+    ],
+    ".ad-footer": [
+      257
+    ],
+    ".ad-header": [
+      258
+    ],
+    ".ad-inline": [
+      259
+    ],
+    ".ad-interstitial": [
+      260
+    ],
+    ".ad-label": [
+      261
+    ],
+    ".ad-leaderboard": [
+      262
+    ],
+    ".ad-module-container": [
+      263
+    ],
+    ".ad-mpu": [
+      264
+    ],
+    ".ad-overlay-container": [
+      265
+    ],
+    ".ad-panel": [
+      266
+    ],
+    ".ad-placeholder": [
+      268
+    ],
+    ".ad-placeholder-container": [
+      267
+    ],
+    ".ad-rail": [
+      269
+    ],
+    ".ad-rectangle": [
+      270
+    ],
+    ".ad-region": [
+      271
+    ],
+    ".ad-row": [
+      272
+    ],
+    ".ad-slot": [
+      275
+    ],
+    ".ad-slot-container": [
+      29
+    ],
+    ".ad-slot-inner": [
+      273
+    ],
+    ".ad-slot-wrapper": [
+      274
+    ],
+    ".ad-space": [
+      276
+    ],
+    ".ad-sticky": [
+      277
+    ],
+    ".ad-takeover": [
+      278
+    ],
+    ".ad-tile": [
+      279
+    ],
+    ".ad-unit": [
+      57
+    ],
+    ".ad-unit-wrapper": [
+      78
+    ],
+    ".ad-wrapper": [
+      15
+    ],
+    ".ad-zone": [
       280
     ],
-    ".advertisement-wrapper": [
+    ".adblock-detected-modal": [
       281
     ],
-    ".advertising": [
-      285
+    ".adblock-notice-overlay": [
+      282
     ],
-    ".advertising-container": [
+    ".adblock-warning-banner": [
       283
     ],
-    ".advertising-wrapper": [
+    ".adblocker-message": [
       284
     ],
-    ".advertorial": [
+    ".ads-container": [
+      50
+    ],
+    ".ads-placeholder": [
+      285
+    ],
+    ".ads-wrapper": [
       286
     ],
-    ".affiliate-banner": [
+    ".adsbox": [
       287
     ],
-    ".affiliate-disclosure-ad": [
-      288
-    ],
-    ".affiliate-link-widget": [
+    ".adsbygoogle": [
       289
     ],
-    ".affiliate-product-grid": [
+    ".adsbygoogle-noablate": [
+      288
+    ],
+    ".adsense-block": [
       290
     ],
-    ".analytics-pixel": [
+    ".adszone": [
       291
     ],
-    ".anchor-ad-container": [
+    ".adunitcontainer": [
       292
     ],
-    ".antiadblock-overlay": [
+    ".advert": [
+      26
+    ],
+    ".advert-container": [
       293
     ],
-    ".app-download-banner": [
+    ".advert-placeholder": [
       294
     ],
-    ".app-install-banner": [
+    ".advert-slot": [
       295
     ],
-    ".around-the-web-widget": [
-      296
+    ".advert-wrapper": [
+      47
     ],
-    ".banner-ad": [
+    ".advertisement": [
       299
     ],
-    ".banner-advert": [
-      298
+    ".advertisement-block": [
+      296
     ],
-    ".banner-advertisement": [
+    ".advertisement-container": [
+      70
+    ],
+    ".advertisement-label": [
       297
     ],
-    ".billboard-ad": [
-      301
+    ".advertisement-wrapper": [
+      298
     ],
-    ".billboard-advert": [
-      300
-    ],
-    ".chat-widget-launcher": [
+    ".advertising": [
       302
     ],
-    ".commerce-widget-ad": [
+    ".advertising-container": [
+      300
+    ],
+    ".advertising-wrapper": [
+      301
+    ],
+    ".advertorial": [
       303
     ],
-    ".consent-banner": [
+    ".affiliate-banner": [
       304
     ],
-    ".consent-modal": [
+    ".affiliate-disclosure-ad": [
       305
     ],
-    ".consent-overlay": [
+    ".affiliate-link-widget": [
       306
     ],
-    ".content-recommendation-widget": [
+    ".affiliate-product-grid": [
       307
     ],
-    ".cookie-banner": [
+    ".analytics-pixel": [
       308
     ],
-    ".cookie-bar": [
+    ".anchor-ad-container": [
       309
     ],
-    ".cookie-consent": [
+    ".antiadblock-overlay": [
       310
     ],
-    ".cookie-disclaimer": [
+    ".app-download-banner": [
       311
     ],
-    ".cookie-law": [
+    ".app-install-banner": [
       312
     ],
-    ".cookie-notice": [
+    ".around-the-web-widget": [
       313
     ],
-    ".cookie-overlay": [
-      314
-    ],
-    ".cookie-policy-banner": [
-      315
-    ],
-    ".cookie-popup": [
+    ".banner-ad": [
       316
     ],
-    ".cookie-warning": [
-      317
+    ".banner-advert": [
+      315
     ],
-    ".deals-widget-sponsored": [
+    ".banner-advertisement": [
+      314
+    ],
+    ".billboard-ad": [
       318
     ],
-    ".dfp-ad": [
+    ".billboard-advert": [
+      317
+    ],
+    ".chat-widget-launcher": [
       319
     ],
-    ".disable-adblock-modal": [
+    ".commerce-widget-ad": [
       320
     ],
-    ".display-ad": [
-      322
-    ],
-    ".display-advert": [
+    ".consent-banner": [
       321
     ],
-    ".email-capture-modal": [
+    ".consent-modal": [
+      322
+    ],
+    ".consent-overlay": [
       323
     ],
-    ".email-signup-modal": [
+    ".content-recommendation-widget": [
       324
     ],
-    ".exit-intent-overlay": [
+    ".cookie-banner": [
       325
     ],
-    ".exit-intent-popup": [
+    ".cookie-bar": [
       326
     ],
-    ".feedback-tab": [
+    ".cookie-consent": [
       327
     ],
-    ".floating-ad-container": [
+    ".cookie-disclaimer": [
       328
     ],
-    ".floating-share-bar": [
+    ".cookie-law": [
       329
     ],
-    ".follow-us-popup": [
+    ".cookie-notice": [
       330
     ],
-    ".footer-ad": [
+    ".cookie-overlay": [
       331
     ],
-    ".from-our-partners": [
+    ".cookie-policy-banner": [
       332
     ],
-    ".gdpr-banner": [
+    ".cookie-popup": [
       333
     ],
-    ".gdpr-consent": [
+    ".cookie-warning": [
       334
     ],
-    ".google-ad": [
+    ".deals-widget-sponsored": [
       335
     ],
-    ".gpt-ad": [
+    ".dfp-ad": [
       336
     ],
-    ".header-ad": [
+    ".disable-adblock-modal": [
       337
     ],
-    ".house-ad": [
-      338
-    ],
-    ".ima-ad-container": [
+    ".display-ad": [
       339
     ],
-    ".in-article-ad": [
+    ".display-advert": [
+      338
+    ],
+    ".email-capture-modal": [
       340
     ],
-    ".inline-advert": [
+    ".email-signup-modal": [
       341
     ],
-    ".install-prompt": [
+    ".exit-intent-overlay": [
       342
     ],
-    ".interstitial-ad": [
-      344
-    ],
-    ".interstitial-advert": [
+    ".exit-intent-popup": [
       343
     ],
-    ".jw-ad-container": [
+    ".feedback-tab": [
+      344
+    ],
+    ".floating-ad-container": [
       345
     ],
-    ".leaderboard-ad": [
-      347
-    ],
-    ".leaderboard-advert": [
+    ".floating-share-bar": [
       346
     ],
-    ".leaderboard-container-ad": [
+    ".follow-us-popup": [
+      347
+    ],
+    ".footer-ad": [
       348
     ],
-    ".mgid-widget": [
+    ".from-our-partners": [
       349
     ],
-    ".midroll-ad-container": [
+    ".gdpr-banner": [
       350
     ],
-    ".mobile-ad": [
+    ".gdpr-consent": [
       351
     ],
-    ".mpu-advert": [
+    ".google-ad": [
       352
     ],
-    ".mpu-container": [
+    ".gpt-ad": [
       353
     ],
-    ".native-ad": [
-      357
-    ],
-    ".native-ad-container": [
+    ".header-ad": [
       354
     ],
-    ".native-ad-wrapper": [
+    ".house-ad": [
       355
     ],
-    ".native-advertising": [
+    ".ima-ad-container": [
       356
     ],
-    ".newsletter-modal": [
+    ".in-article-ad": [
+      357
+    ],
+    ".inline-advert": [
       358
     ],
-    ".newsletter-overlay": [
+    ".install-prompt": [
       359
     ],
-    ".newsletter-popup": [
-      360
-    ],
-    ".newsletter-signup-overlay": [
+    ".interstitial-ad": [
       361
     ],
-    ".notification-opt-in": [
+    ".interstitial-advert": [
+      360
+    ],
+    ".jw-ad-container": [
       362
     ],
-    ".open-in-app-banner": [
-      363
-    ],
-    ".outbrain-container": [
+    ".leaderboard-ad": [
       364
     ],
-    ".outbrain-widget": [
+    ".leaderboard-advert": [
+      363
+    ],
+    ".leaderboard-container-ad": [
       365
     ],
-    ".paid-content-block": [
+    ".mgid-widget": [
       366
     ],
-    ".paid-partnership-label": [
+    ".midroll-ad-container": [
       367
     ],
-    ".paid-post": [
+    ".mobile-ad": [
       368
     ],
-    ".partner-content": [
-      370
-    ],
-    ".partner-content-block": [
+    ".mpu-advert": [
       369
     ],
-    ".partner-promo-block": [
-      371
+    ".mpu-container": [
+      370
     ],
-    ".paywall-overlay-dismissible": [
-      372
-    ],
-    ".player-ad-overlay": [
-      373
-    ],
-    ".please-disable-adblock": [
+    ".native-ad": [
       374
     ],
-    ".plyr-ads-container": [
+    ".native-ad-container": [
+      371
+    ],
+    ".native-ad-wrapper": [
+      372
+    ],
+    ".native-advertising": [
+      373
+    ],
+    ".newsletter-modal": [
       375
     ],
-    ".popup-ad": [
+    ".newsletter-overlay": [
       376
     ],
-    ".pre-roll-ad": [
+    ".newsletter-popup": [
       377
     ],
-    ".preroll-ad-container": [
+    ".newsletter-signup-overlay": [
       378
     ],
-    ".prestitial-overlay": [
+    ".notification-opt-in": [
       379
     ],
-    ".privacy-banner": [
+    ".open-in-app-banner": [
       380
     ],
-    ".privacy-notice-bar": [
+    ".outbrain-container": [
       381
     ],
-    ".promoted-content": [
-      383
-    ],
-    ".promoted-content-block": [
+    ".outbrain-widget": [
       382
     ],
-    ".promoted-listing": [
+    ".paid-content-block": [
+      383
+    ],
+    ".paid-partnership-label": [
       384
     ],
-    ".promoted-results": [
+    ".paid-post": [
       385
     ],
-    ".promoted-tweet": [
-      386
-    ],
-    ".push-notification-prompt": [
+    ".partner-content": [
       387
     ],
-    ".push-permission-prompt": [
+    ".partner-content-block": [
+      386
+    ],
+    ".partner-promo-block": [
       388
     ],
-    ".pushdown-ad": [
+    ".paywall-overlay-dismissible": [
       389
     ],
-    ".pwa-install-banner": [
+    ".player-ad-overlay": [
       390
     ],
-    ".recommended-by-outbrain": [
+    ".please-disable-adblock": [
       391
     ],
-    ".recommended-by-taboola": [
+    ".plyr-ads-container": [
       392
     ],
-    ".rectangle-ad-container": [
+    ".popup-ad": [
       393
     ],
-    ".related-posts-popup": [
+    ".pre-roll-ad": [
       394
     ],
-    ".revcontent-widget": [
+    ".preroll-ad-container": [
       395
     ],
-    ".shopping-recommendations-ad": [
+    ".prestitial-overlay": [
       396
     ],
-    ".sidebar-ad": [
-      398
-    ],
-    ".sidebar-advert": [
+    ".privacy-banner": [
       397
     ],
-    ".skimlinks-container": [
-      399
+    ".privacy-notice-bar": [
+      398
     ],
-    ".skyscraper-ad": [
+    ".promoted-content": [
       400
     ],
-    ".skyscraper-container": [
+    ".promoted-content-block": [
+      399
+    ],
+    ".promoted-listing": [
       401
     ],
-    ".smart-app-banner": [
+    ".promoted-results": [
       402
     ],
-    ".smart-banner": [
+    ".promoted-tweet": [
       403
     ],
-    ".social-share-sticky": [
+    ".push-notification-prompt": [
       404
     ],
-    ".sponsor-banner": [
+    ".push-permission-prompt": [
       405
     ],
-    ".sponsored-article-card": [
+    ".pushdown-ad": [
       406
     ],
-    ".sponsored-block": [
+    ".pwa-install-banner": [
       407
     ],
-    ".sponsored-card": [
+    ".recommended-by-outbrain": [
       408
     ],
-    ".sponsored-container": [
+    ".recommended-by-taboola": [
       409
     ],
-    ".sponsored-content-block": [
+    ".rectangle-ad-container": [
       410
     ],
-    ".sponsored-content-wrapper": [
+    ".related-posts-popup": [
       411
     ],
-    ".sponsored-link": [
+    ".revcontent-widget": [
       412
     ],
-    ".sponsored-listing": [
+    ".shopping-recommendations-ad": [
       413
     ],
-    ".sponsored-placeholder": [
-      414
-    ],
-    ".sponsored-post": [
+    ".sidebar-ad": [
       415
     ],
-    ".sponsored-recirc": [
+    ".sidebar-advert": [
+      414
+    ],
+    ".skimlinks-container": [
       416
     ],
-    ".sponsored-results": [
+    ".skyscraper-ad": [
       417
     ],
-    ".sponsored-story": [
-      419
-    ],
-    ".sponsored-story-card": [
+    ".skyscraper-container": [
       418
     ],
-    ".sponsored-wrapper": [
+    ".smart-app-banner": [
+      419
+    ],
+    ".smart-banner": [
       420
     ],
-    ".sticky-ad": [
-      424
-    ],
-    ".sticky-ad-container": [
+    ".social-share-sticky": [
       421
     ],
-    ".sticky-ad-wrapper": [
+    ".sponsor-banner": [
       422
     ],
-    ".sticky-advert": [
+    ".sponsored-article-card": [
       423
     ],
-    ".sticky-footer-ad": [
+    ".sponsored-block": [
+      424
+    ],
+    ".sponsored-card": [
       425
     ],
-    ".sticky-leaderboard": [
+    ".sponsored-container": [
       426
     ],
-    ".sticky-sidebar-ad": [
+    ".sponsored-content-block": [
       427
     ],
-    ".subscribe-modal": [
+    ".sponsored-content-wrapper": [
       428
     ],
-    ".subscription-overlay": [
+    ".sponsored-link": [
       429
     ],
-    ".survey-invitation": [
+    ".sponsored-listing": [
       430
     ],
-    ".taboola-container": [
+    ".sponsored-placeholder": [
       431
     ],
-    ".taboola-recommendations": [
+    ".sponsored-post": [
       432
     ],
-    ".taboola-widget": [
+    ".sponsored-recirc": [
       433
     ],
-    ".text-ad": [
+    ".sponsored-results": [
       434
     ],
-    ".textad-container": [
-      435
-    ],
-    ".top-banner-ad": [
+    ".sponsored-story": [
       436
     ],
-    ".tracking-pixel": [
+    ".sponsored-story-card": [
+      435
+    ],
+    ".sponsored-wrapper": [
       437
     ],
-    ".trc_related_container": [
-      438
-    ],
-    ".video-ad-container": [
-      439
-    ],
-    ".video-ad-overlay": [
+    ".sticky-ad": [
       441
     ],
-    ".video-ad-overlay-container": [
+    ".sticky-ad-container": [
+      438
+    ],
+    ".sticky-ad-wrapper": [
+      439
+    ],
+    ".sticky-advert": [
       440
     ],
-    ".video-advert-container": [
+    ".sticky-footer-ad": [
       442
     ],
-    ".vignette-ad": [
+    ".sticky-leaderboard": [
       443
     ],
-    ".vjs-ad-container": [
+    ".sticky-sidebar-ad": [
       444
     ],
-    ".wallpaper-ad": [
-      446
-    ],
-    ".wallpaper-advert": [
+    ".subscribe-modal": [
       445
     ],
-    ".welcome-ad-overlay": [
+    ".subscription-overlay": [
+      446
+    ],
+    ".survey-invitation": [
       447
     ],
-    ".you-may-also-like-ads": [
+    ".taboola-container": [
       448
+    ],
+    ".taboola-recommendations": [
+      449
+    ],
+    ".taboola-widget": [
+      450
+    ],
+    ".text-ad": [
+      451
+    ],
+    ".textad-container": [
+      452
+    ],
+    ".top-banner-ad": [
+      453
+    ],
+    ".tracking-pixel": [
+      454
+    ],
+    ".trc_related_container": [
+      455
+    ],
+    ".video-ad-container": [
+      456
+    ],
+    ".video-ad-overlay": [
+      458
+    ],
+    ".video-ad-overlay-container": [
+      457
+    ],
+    ".video-advert-container": [
+      459
+    ],
+    ".vignette-ad": [
+      460
+    ],
+    ".vjs-ad-container": [
+      461
+    ],
+    ".wallpaper-ad": [
+      463
+    ],
+    ".wallpaper-advert": [
+      462
+    ],
+    ".welcome-ad-overlay": [
+      464
+    ],
+    ".you-may-also-like-ads": [
+      465
     ]
   },
   "generic_unanchored": [],
   "hosts": {
+    "9to5mac.com": {
+      "hide": [
+        0
+      ],
+      "unhide": [],
+      "styles": [],
+      "scriptlets": [],
+      "unscriptlets": [],
+      "procedural": []
+    },
+    "accuweather.com": {
+      "hide": [
+        0
+      ],
+      "unhide": [],
+      "styles": [],
+      "scriptlets": [],
+      "unscriptlets": [],
+      "procedural": []
+    },
+    "aliexpress.com": {
+      "hide": [
+        1
+      ],
+      "unhide": [],
+      "styles": [],
+      "scriptlets": [],
+      "unscriptlets": [],
+      "procedural": []
+    },
+    "androidauthority.com": {
+      "hide": [
+        0
+      ],
+      "unhide": [],
+      "styles": [],
+      "scriptlets": [],
+      "unscriptlets": [],
+      "procedural": []
+    },
+    "arstechnica.com": {
+      "hide": [
+        0
+      ],
+      "unhide": [],
+      "styles": [],
+      "scriptlets": [],
+      "unscriptlets": [],
+      "procedural": []
+    },
+    "bestbuy.com": {
+      "hide": [
+        8
+      ],
+      "unhide": [],
+      "styles": [],
+      "scriptlets": [],
+      "unscriptlets": [],
+      "procedural": []
+    },
     "bing.com": {
       "hide": [
-        6,
-        7,
-        8,
-        9
+        9,
+        10,
+        11,
+        12
+      ],
+      "unhide": [],
+      "styles": [],
+      "scriptlets": [],
+      "unscriptlets": [],
+      "procedural": []
+    },
+    "bleacherreport.com": {
+      "hide": [
+        0
       ],
       "unhide": [],
       "styles": [],
@@ -1487,7 +1574,17 @@
     },
     "bloomberg.com": {
       "hide": [
-        10
+        0
+      ],
+      "unhide": [],
+      "styles": [],
+      "scriptlets": [],
+      "unscriptlets": [],
+      "procedural": []
+    },
+    "booking.com": {
+      "hide": [
+        13
       ],
       "unhide": [],
       "styles": [],
@@ -1497,7 +1594,7 @@
     },
     "brave.com": {
       "hide": [
-        11
+        14
       ],
       "unhide": [],
       "styles": [],
@@ -1507,7 +1604,27 @@
     },
     "businessinsider.com": {
       "hide": [
-        10
+        0
+      ],
+      "unhide": [],
+      "styles": [],
+      "scriptlets": [],
+      "unscriptlets": [],
+      "procedural": []
+    },
+    "buzzfeed.com": {
+      "hide": [
+        15
+      ],
+      "unhide": [],
+      "styles": [],
+      "scriptlets": [],
+      "unscriptlets": [],
+      "procedural": []
+    },
+    "cnet.com": {
+      "hide": [
+        16
       ],
       "unhide": [],
       "styles": [],
@@ -1517,29 +1634,6 @@
     },
     "cnn.com": {
       "hide": [
-        12,
-        13
-      ],
-      "unhide": [],
-      "styles": [],
-      "scriptlets": [],
-      "unscriptlets": [],
-      "procedural": []
-    },
-    "dailymail.co.uk": {
-      "hide": [
-        14,
-        15
-      ],
-      "unhide": [],
-      "styles": [],
-      "scriptlets": [],
-      "unscriptlets": [],
-      "procedural": []
-    },
-    "duckduckgo.com": {
-      "hide": [
-        16,
         17,
         18
       ],
@@ -1549,8 +1643,9 @@
       "unscriptlets": [],
       "procedural": []
     },
-    "economist.com": {
+    "dailymail.co.uk": {
       "hide": [
+        19,
         20
       ],
       "unhide": [],
@@ -1559,7 +1654,17 @@
       "unscriptlets": [],
       "procedural": []
     },
-    "ecosia.org": {
+    "dailymotion.com": {
+      "hide": [
+        0
+      ],
+      "unhide": [],
+      "styles": [],
+      "scriptlets": [],
+      "unscriptlets": [],
+      "procedural": []
+    },
+    "dev.to": {
       "hide": [
         21
       ],
@@ -1569,9 +1674,9 @@
       "unscriptlets": [],
       "procedural": []
     },
-    "etsy.com": {
+    "dictionary.com": {
       "hide": [
-        22
+        0
       ],
       "unhide": [],
       "styles": [],
@@ -1579,8 +1684,19 @@
       "unscriptlets": [],
       "procedural": []
     },
-    "facebook.com": {
+    "digitaltrends.com": {
       "hide": [
+        0
+      ],
+      "unhide": [],
+      "styles": [],
+      "scriptlets": [],
+      "unscriptlets": [],
+      "procedural": []
+    },
+    "duckduckgo.com": {
+      "hide": [
+        22,
         23,
         24
       ],
@@ -1590,27 +1706,7 @@
       "unscriptlets": [],
       "procedural": []
     },
-    "forbes.com": {
-      "hide": [
-        25
-      ],
-      "unhide": [],
-      "styles": [],
-      "scriptlets": [],
-      "unscriptlets": [],
-      "procedural": []
-    },
-    "foxnews.com": {
-      "hide": [
-        10
-      ],
-      "unhide": [],
-      "styles": [],
-      "scriptlets": [],
-      "unscriptlets": [],
-      "procedural": []
-    },
-    "ft.com": {
+    "economist.com": {
       "hide": [
         26
       ],
@@ -1620,17 +1716,7 @@
       "unscriptlets": [],
       "procedural": []
     },
-    "geeksforgeeks.org": {
-      "hide": [
-        10
-      ],
-      "unhide": [],
-      "styles": [],
-      "scriptlets": [],
-      "unscriptlets": [],
-      "procedural": []
-    },
-    "github.com": {
+    "ecosia.org": {
       "hide": [
         27
       ],
@@ -1640,9 +1726,90 @@
       "unscriptlets": [],
       "procedural": []
     },
-    "imdb.com": {
+    "engadget.com": {
       "hide": [
-        35,
+        28
+      ],
+      "unhide": [],
+      "styles": [],
+      "scriptlets": [],
+      "unscriptlets": [],
+      "procedural": []
+    },
+    "espn.com": {
+      "hide": [
+        29,
+        30
+      ],
+      "unhide": [],
+      "styles": [],
+      "scriptlets": [],
+      "unscriptlets": [],
+      "procedural": []
+    },
+    "etsy.com": {
+      "hide": [
+        31
+      ],
+      "unhide": [],
+      "styles": [],
+      "scriptlets": [],
+      "unscriptlets": [],
+      "procedural": []
+    },
+    "expedia.com": {
+      "hide": [
+        32
+      ],
+      "unhide": [],
+      "styles": [],
+      "scriptlets": [],
+      "unscriptlets": [],
+      "procedural": []
+    },
+    "facebook.com": {
+      "hide": [
+        33,
+        34
+      ],
+      "unhide": [],
+      "styles": [],
+      "scriptlets": [],
+      "unscriptlets": [],
+      "procedural": []
+    },
+    "forbes.com": {
+      "hide": [
+        35
+      ],
+      "unhide": [],
+      "styles": [],
+      "scriptlets": [],
+      "unscriptlets": [],
+      "procedural": []
+    },
+    "foxnews.com": {
+      "hide": [
+        0
+      ],
+      "unhide": [],
+      "styles": [],
+      "scriptlets": [],
+      "unscriptlets": [],
+      "procedural": []
+    },
+    "freecodecamp.org": {
+      "hide": [
+        0
+      ],
+      "unhide": [],
+      "styles": [],
+      "scriptlets": [],
+      "unscriptlets": [],
+      "procedural": []
+    },
+    "ft.com": {
+      "hide": [
         36
       ],
       "unhide": [],
@@ -1651,7 +1818,27 @@
       "unscriptlets": [],
       "procedural": []
     },
-    "independent.co.uk": {
+    "gamespot.com": {
+      "hide": [
+        0
+      ],
+      "unhide": [],
+      "styles": [],
+      "scriptlets": [],
+      "unscriptlets": [],
+      "procedural": []
+    },
+    "geeksforgeeks.org": {
+      "hide": [
+        0
+      ],
+      "unhide": [],
+      "styles": [],
+      "scriptlets": [],
+      "unscriptlets": [],
+      "procedural": []
+    },
+    "github.com": {
       "hide": [
         37
       ],
@@ -1661,9 +1848,9 @@
       "unscriptlets": [],
       "procedural": []
     },
-    "instagram.com": {
+    "gizmodo.com": {
       "hide": [
-        38
+        29
       ],
       "unhide": [],
       "styles": [],
@@ -1671,11 +1858,9 @@
       "unscriptlets": [],
       "procedural": []
     },
-    "linkedin.com": {
+    "hackernoon.com": {
       "hide": [
-        39,
-        40,
-        41
+        0
       ],
       "unhide": [],
       "styles": [],
@@ -1683,9 +1868,9 @@
       "unscriptlets": [],
       "procedural": []
     },
-    "medium.com": {
+    "hashnode.com": {
       "hide": [
-        42
+        0
       ],
       "unhide": [],
       "styles": [],
@@ -1693,9 +1878,9 @@
       "unscriptlets": [],
       "procedural": []
     },
-    "mirror.co.uk": {
+    "healthline.com": {
       "hide": [
-        43
+        0
       ],
       "unhide": [],
       "styles": [],
@@ -1703,9 +1888,9 @@
       "unscriptlets": [],
       "procedural": []
     },
-    "nbcnews.com": {
+    "howtogeek.com": {
       "hide": [
-        10
+        0
       ],
       "unhide": [],
       "styles": [],
@@ -1713,9 +1898,9 @@
       "unscriptlets": [],
       "procedural": []
     },
-    "npmjs.com": {
+    "ign.com": {
       "hide": [
-        44
+        0
       ],
       "unhide": [],
       "styles": [],
@@ -1723,7 +1908,7 @@
       "unscriptlets": [],
       "procedural": []
     },
-    "nytimes.com": {
+    "imdb.com": {
       "hide": [
         45,
         46
@@ -1734,7 +1919,7 @@
       "unscriptlets": [],
       "procedural": []
     },
-    "pinterest.com": {
+    "independent.co.uk": {
       "hide": [
         47
       ],
@@ -1744,7 +1929,7 @@
       "unscriptlets": [],
       "procedural": []
     },
-    "quora.com": {
+    "instagram.com": {
       "hide": [
         48
       ],
@@ -1754,12 +1939,130 @@
       "unscriptlets": [],
       "procedural": []
     },
-    "reddit.com": {
+    "investopedia.com": {
+      "hide": [
+        0
+      ],
+      "unhide": [],
+      "styles": [],
+      "scriptlets": [],
+      "unscriptlets": [],
+      "procedural": []
+    },
+    "kayak.com": {
+      "hide": [
+        0
+      ],
+      "unhide": [],
+      "styles": [],
+      "scriptlets": [],
+      "unscriptlets": [],
+      "procedural": []
+    },
+    "kotaku.com": {
+      "hide": [
+        29
+      ],
+      "unhide": [],
+      "styles": [],
+      "scriptlets": [],
+      "unscriptlets": [],
+      "procedural": []
+    },
+    "lifehacker.com": {
+      "hide": [
+        29
+      ],
+      "unhide": [],
+      "styles": [],
+      "scriptlets": [],
+      "unscriptlets": [],
+      "procedural": []
+    },
+    "linkedin.com": {
       "hide": [
         49,
         50,
-        51,
-        52,
+        51
+      ],
+      "unhide": [],
+      "styles": [],
+      "scriptlets": [],
+      "unscriptlets": [],
+      "procedural": []
+    },
+    "macrumors.com": {
+      "hide": [
+        0
+      ],
+      "unhide": [],
+      "styles": [],
+      "scriptlets": [],
+      "unscriptlets": [],
+      "procedural": []
+    },
+    "makeuseof.com": {
+      "hide": [
+        0
+      ],
+      "unhide": [],
+      "styles": [],
+      "scriptlets": [],
+      "unscriptlets": [],
+      "procedural": []
+    },
+    "mayoclinic.org": {
+      "hide": [
+        0
+      ],
+      "unhide": [],
+      "styles": [],
+      "scriptlets": [],
+      "unscriptlets": [],
+      "procedural": []
+    },
+    "medium.com": {
+      "hide": [
+        52
+      ],
+      "unhide": [],
+      "styles": [],
+      "scriptlets": [],
+      "unscriptlets": [],
+      "procedural": []
+    },
+    "merriam-webster.com": {
+      "hide": [
+        0
+      ],
+      "unhide": [],
+      "styles": [],
+      "scriptlets": [],
+      "unscriptlets": [],
+      "procedural": []
+    },
+    "mirror.co.uk": {
+      "hide": [
+        29
+      ],
+      "unhide": [],
+      "styles": [],
+      "scriptlets": [],
+      "unscriptlets": [],
+      "procedural": []
+    },
+    "nbcnews.com": {
+      "hide": [
+        0
+      ],
+      "unhide": [],
+      "styles": [],
+      "scriptlets": [],
+      "unscriptlets": [],
+      "procedural": []
+    },
+    "newegg.com": {
+      "hide": [
         53
       ],
       "unhide": [],
@@ -1768,7 +2071,7 @@
       "unscriptlets": [],
       "procedural": []
     },
-    "reuters.com": {
+    "newyorker.com": {
       "hide": [
         54
       ],
@@ -1778,7 +2081,7 @@
       "unscriptlets": [],
       "procedural": []
     },
-    "soundcloud.com": {
+    "npmjs.com": {
       "hide": [
         55
       ],
@@ -1788,8 +2091,9 @@
       "unscriptlets": [],
       "procedural": []
     },
-    "spotify.com": {
+    "nytimes.com": {
       "hide": [
+        54,
         56
       ],
       "unhide": [],
@@ -1798,7 +2102,7 @@
       "unscriptlets": [],
       "procedural": []
     },
-    "stackexchange.com": {
+    "pcgamer.com": {
       "hide": [
         57
       ],
@@ -1808,10 +2112,28 @@
       "unscriptlets": [],
       "procedural": []
     },
-    "stackoverflow.com": {
+    "pcmag.com": {
       "hide": [
-        58,
-        59,
+        58
+      ],
+      "unhide": [],
+      "styles": [],
+      "scriptlets": [],
+      "unscriptlets": [],
+      "procedural": []
+    },
+    "pinterest.com": {
+      "hide": [
+        59
+      ],
+      "unhide": [],
+      "styles": [],
+      "scriptlets": [],
+      "unscriptlets": [],
+      "procedural": []
+    },
+    "polygon.com": {
+      "hide": [
         60
       ],
       "unhide": [],
@@ -1820,7 +2142,7 @@
       "unscriptlets": [],
       "procedural": []
     },
-    "startpage.com": {
+    "quora.com": {
       "hide": [
         61
       ],
@@ -1830,9 +2152,13 @@
       "unscriptlets": [],
       "procedural": []
     },
-    "substack.com": {
+    "reddit.com": {
       "hide": [
-        62
+        62,
+        63,
+        64,
+        65,
+        66
       ],
       "unhide": [],
       "styles": [],
@@ -1840,60 +2166,8 @@
       "unscriptlets": [],
       "procedural": []
     },
-    "telegraph.co.uk": {
+    "reuters.com": {
       "hide": [
-        37
-      ],
-      "unhide": [],
-      "styles": [],
-      "scriptlets": [],
-      "unscriptlets": [],
-      "procedural": []
-    },
-    "theguardian.com": {
-      "hide": [
-        43,
-        63
-      ],
-      "unhide": [],
-      "styles": [],
-      "scriptlets": [],
-      "unscriptlets": [],
-      "procedural": []
-    },
-    "tiktok.com": {
-      "hide": [
-        64
-      ],
-      "unhide": [],
-      "styles": [],
-      "scriptlets": [],
-      "unscriptlets": [],
-      "procedural": []
-    },
-    "tumblr.com": {
-      "hide": [
-        65
-      ],
-      "unhide": [],
-      "styles": [],
-      "scriptlets": [],
-      "unscriptlets": [],
-      "procedural": []
-    },
-    "tutorialspoint.com": {
-      "hide": [
-        10
-      ],
-      "unhide": [],
-      "styles": [],
-      "scriptlets": [],
-      "unscriptlets": [],
-      "procedural": []
-    },
-    "twitch.tv": {
-      "hide": [
-        66,
         67
       ],
       "unhide": [],
@@ -1902,7 +2176,7 @@
       "unscriptlets": [],
       "procedural": []
     },
-    "twitter.com": {
+    "slashdot.org": {
       "hide": [
         68
       ],
@@ -1912,9 +2186,18 @@
       "unscriptlets": [],
       "procedural": []
     },
-    "w3schools.com": {
+    "soundcloud.com": {
       "hide": [
-        69,
+        69
+      ],
+      "unhide": [],
+      "styles": [],
+      "scriptlets": [],
+      "unscriptlets": [],
+      "procedural": []
+    },
+    "spotify.com": {
+      "hide": [
         70
       ],
       "unhide": [],
@@ -1923,7 +2206,7 @@
       "unscriptlets": [],
       "procedural": []
     },
-    "walmart.com": {
+    "stackexchange.com": {
       "hide": [
         71
       ],
@@ -1933,9 +2216,265 @@
       "unscriptlets": [],
       "procedural": []
     },
+    "stackoverflow.com": {
+      "hide": [
+        72,
+        73,
+        74
+      ],
+      "unhide": [],
+      "styles": [],
+      "scriptlets": [],
+      "unscriptlets": [],
+      "procedural": []
+    },
+    "startpage.com": {
+      "hide": [
+        75
+      ],
+      "unhide": [],
+      "styles": [],
+      "scriptlets": [],
+      "unscriptlets": [],
+      "procedural": []
+    },
+    "steamcommunity.com": {
+      "hide": [
+        0
+      ],
+      "unhide": [],
+      "styles": [],
+      "scriptlets": [],
+      "unscriptlets": [],
+      "procedural": []
+    },
+    "substack.com": {
+      "hide": [
+        76
+      ],
+      "unhide": [],
+      "styles": [],
+      "scriptlets": [],
+      "unscriptlets": [],
+      "procedural": []
+    },
+    "target.com": {
+      "hide": [
+        77
+      ],
+      "unhide": [],
+      "styles": [],
+      "scriptlets": [],
+      "unscriptlets": [],
+      "procedural": []
+    },
+    "techcrunch.com": {
+      "hide": [
+        57
+      ],
+      "unhide": [],
+      "styles": [],
+      "scriptlets": [],
+      "unscriptlets": [],
+      "procedural": []
+    },
+    "telegraph.co.uk": {
+      "hide": [
+        47
+      ],
+      "unhide": [],
+      "styles": [],
+      "scriptlets": [],
+      "unscriptlets": [],
+      "procedural": []
+    },
+    "theatlantic.com": {
+      "hide": [
+        78
+      ],
+      "unhide": [],
+      "styles": [],
+      "scriptlets": [],
+      "unscriptlets": [],
+      "procedural": []
+    },
+    "theguardian.com": {
+      "hide": [
+        29,
+        79
+      ],
+      "unhide": [],
+      "styles": [],
+      "scriptlets": [],
+      "unscriptlets": [],
+      "procedural": []
+    },
+    "thesaurus.com": {
+      "hide": [
+        0
+      ],
+      "unhide": [],
+      "styles": [],
+      "scriptlets": [],
+      "unscriptlets": [],
+      "procedural": []
+    },
+    "theverge.com": {
+      "hide": [
+        80
+      ],
+      "unhide": [],
+      "styles": [],
+      "scriptlets": [],
+      "unscriptlets": [],
+      "procedural": []
+    },
+    "tiktok.com": {
+      "hide": [
+        81
+      ],
+      "unhide": [],
+      "styles": [],
+      "scriptlets": [],
+      "unscriptlets": [],
+      "procedural": []
+    },
+    "tomshardware.com": {
+      "hide": [
+        57
+      ],
+      "unhide": [],
+      "styles": [],
+      "scriptlets": [],
+      "unscriptlets": [],
+      "procedural": []
+    },
+    "tripadvisor.com": {
+      "hide": [
+        82
+      ],
+      "unhide": [],
+      "styles": [],
+      "scriptlets": [],
+      "unscriptlets": [],
+      "procedural": []
+    },
+    "tumblr.com": {
+      "hide": [
+        83
+      ],
+      "unhide": [],
+      "styles": [],
+      "scriptlets": [],
+      "unscriptlets": [],
+      "procedural": []
+    },
+    "tutorialspoint.com": {
+      "hide": [
+        0
+      ],
+      "unhide": [],
+      "styles": [],
+      "scriptlets": [],
+      "unscriptlets": [],
+      "procedural": []
+    },
+    "twitch.tv": {
+      "hide": [
+        84,
+        85,
+        86
+      ],
+      "unhide": [],
+      "styles": [],
+      "scriptlets": [],
+      "unscriptlets": [],
+      "procedural": []
+    },
+    "twitter.com": {
+      "hide": [
+        87
+      ],
+      "unhide": [],
+      "styles": [],
+      "scriptlets": [],
+      "unscriptlets": [],
+      "procedural": []
+    },
+    "vice.com": {
+      "hide": [
+        88
+      ],
+      "unhide": [],
+      "styles": [],
+      "scriptlets": [],
+      "unscriptlets": [],
+      "procedural": []
+    },
+    "vimeo.com": {
+      "hide": [
+        0
+      ],
+      "unhide": [],
+      "styles": [],
+      "scriptlets": [],
+      "unscriptlets": [],
+      "procedural": []
+    },
+    "vox.com": {
+      "hide": [
+        60
+      ],
+      "unhide": [],
+      "styles": [],
+      "scriptlets": [],
+      "unscriptlets": [],
+      "procedural": []
+    },
+    "w3schools.com": {
+      "hide": [
+        89,
+        90
+      ],
+      "unhide": [],
+      "styles": [],
+      "scriptlets": [],
+      "unscriptlets": [],
+      "procedural": []
+    },
+    "walmart.com": {
+      "hide": [
+        91
+      ],
+      "unhide": [],
+      "styles": [],
+      "scriptlets": [],
+      "unscriptlets": [],
+      "procedural": []
+    },
     "washingtonpost.com": {
       "hide": [
-        72
+        92
+      ],
+      "unhide": [],
+      "styles": [],
+      "scriptlets": [],
+      "unscriptlets": [],
+      "procedural": []
+    },
+    "weather.com": {
+      "hide": [
+        15
+      ],
+      "unhide": [],
+      "styles": [],
+      "scriptlets": [],
+      "unscriptlets": [],
+      "procedural": []
+    },
+    "webmd.com": {
+      "hide": [
+        0
       ],
       "unhide": [],
       "styles": [],
@@ -1945,7 +2484,18 @@
     },
     "wikihow.com": {
       "hide": [
-        73
+        0,
+        93
+      ],
+      "unhide": [],
+      "styles": [],
+      "scriptlets": [],
+      "unscriptlets": [],
+      "procedural": []
+    },
+    "wired.com": {
+      "hide": [
+        94
       ],
       "unhide": [],
       "styles": [],
@@ -1955,7 +2505,7 @@
     },
     "wsj.com": {
       "hide": [
-        74
+        95
       ],
       "unhide": [],
       "styles": [],
@@ -1965,7 +2515,17 @@
     },
     "x.com": {
       "hide": [
-        68
+        87
+      ],
+      "unhide": [],
+      "styles": [],
+      "scriptlets": [],
+      "unscriptlets": [],
+      "procedural": []
+    },
+    "xda-developers.com": {
+      "hide": [
+        0
       ],
       "unhide": [],
       "styles": [],
@@ -1975,8 +2535,8 @@
     },
     "yahoo.com": {
       "hide": [
-        75,
-        76
+        96,
+        97
       ],
       "unhide": [],
       "styles": [],
@@ -1986,8 +2546,8 @@
     },
     "youtube-nocookie.com": {
       "hide": [
-        77,
-        78
+        98,
+        99
       ],
       "unhide": [],
       "styles": [],
@@ -2000,28 +2560,7 @@
     },
     "youtube.com": {
       "hide": [
-        10,
-        77,
-        78,
-        79,
-        80,
-        81,
-        82,
-        83,
-        84,
-        85,
-        86,
-        87,
-        88,
-        89,
-        90,
-        91,
-        92,
-        93,
-        94,
-        95,
-        96,
-        97,
+        0,
         98,
         99,
         100,
@@ -2071,7 +2610,28 @@
         144,
         145,
         146,
-        147
+        147,
+        148,
+        149,
+        150,
+        151,
+        152,
+        153,
+        154,
+        155,
+        156,
+        157,
+        158,
+        159,
+        160,
+        161,
+        162,
+        163,
+        164,
+        165,
+        166,
+        167,
+        168
       ],
       "unhide": [],
       "styles": [
@@ -2089,24 +2649,23 @@
       ],
       "unscriptlets": [],
       "procedural": []
-    }
-  },
-  "entities": {
-    "amazon": {
+    },
+    "zdnet.com": {
       "hide": [
-        0,
-        1,
-        2,
-        3
+        0
       ],
       "unhide": [],
       "styles": [],
       "scriptlets": [],
       "unscriptlets": [],
       "procedural": []
-    },
-    "bbc": {
+    }
+  },
+  "entities": {
+    "amazon": {
       "hide": [
+        2,
+        3,
         4,
         5
       ],
@@ -2116,9 +2675,20 @@
       "unscriptlets": [],
       "procedural": []
     },
+    "bbc": {
+      "hide": [
+        6,
+        7
+      ],
+      "unhide": [],
+      "styles": [],
+      "scriptlets": [],
+      "unscriptlets": [],
+      "procedural": []
+    },
     "ebay": {
       "hide": [
-        19
+        25
       ],
       "unhide": [],
       "styles": [],
@@ -2128,13 +2698,13 @@
     },
     "google": {
       "hide": [
-        28,
-        29,
-        30,
-        31,
-        32,
-        33,
-        34
+        38,
+        39,
+        40,
+        41,
+        42,
+        43,
+        44
       ],
       "unhide": [],
       "styles": [],
@@ -2144,454 +2714,471 @@
     }
   },
   "selector_origin": {
-    "0": 1,
-    "1": 2,
-    "2": 3,
-    "3": 4,
-    "4": 5,
-    "5": 6,
-    "6": 7,
-    "7": 8,
-    "8": 9,
-    "9": 10,
-    "10": 250,
-    "11": 12,
-    "12": 14,
-    "13": 15,
-    "14": 16,
-    "15": 17,
-    "16": 18,
-    "17": 19,
-    "18": 20,
-    "19": 21,
-    "20": 306,
-    "21": 23,
-    "22": 24,
-    "23": 25,
-    "24": 26,
-    "25": 27,
-    "26": 29,
-    "27": 31,
-    "28": 32,
-    "29": 33,
-    "30": 34,
-    "31": 35,
-    "32": 36,
-    "33": 37,
-    "34": 38,
-    "35": 39,
-    "36": 40,
-    "37": 296,
-    "38": 42,
-    "39": 241,
-    "40": 284,
-    "41": 45,
-    "42": 46,
-    "43": 268,
-    "44": 49,
-    "45": 230,
-    "46": 51,
-    "47": 52,
-    "48": 53,
-    "49": 54,
-    "50": 55,
-    "51": 56,
-    "52": 57,
-    "53": 58,
-    "54": 59,
-    "55": 60,
-    "56": 298,
-    "57": 62,
-    "58": 63,
-    "59": 64,
-    "60": 65,
-    "61": 66,
-    "62": 67,
-    "63": 70,
-    "64": 71,
-    "65": 72,
-    "66": 74,
-    "67": 75,
-    "68": 83,
-    "69": 77,
-    "70": 78,
-    "71": 79,
-    "72": 80,
-    "73": 81,
-    "74": 82,
-    "75": 84,
-    "76": 85,
-    "77": 96,
-    "78": 97,
-    "79": 88,
-    "80": 89,
-    "81": 90,
-    "82": 92,
-    "83": 93,
-    "84": 94,
-    "85": 95,
-    "86": 98,
-    "87": 99,
-    "88": 100,
-    "89": 101,
-    "90": 102,
-    "91": 103,
-    "92": 104,
-    "93": 105,
-    "94": 106,
-    "95": 107,
-    "96": 108,
-    "97": 109,
-    "98": 110,
-    "99": 111,
-    "100": 112,
-    "101": 113,
-    "102": 114,
-    "103": 115,
-    "104": 116,
-    "105": 117,
-    "106": 118,
-    "107": 119,
-    "108": 120,
-    "109": 121,
-    "110": 122,
-    "111": 123,
-    "112": 124,
-    "113": 125,
-    "114": 126,
-    "115": 127,
-    "116": 128,
-    "117": 129,
-    "118": 130,
-    "119": 131,
-    "120": 132,
-    "121": 133,
-    "122": 134,
-    "123": 135,
-    "124": 136,
-    "125": 137,
-    "126": 138,
-    "127": 139,
-    "128": 140,
-    "129": 141,
-    "130": 142,
-    "131": 143,
-    "132": 144,
-    "133": 145,
-    "134": 146,
-    "135": 147,
-    "136": 148,
-    "137": 149,
-    "138": 150,
-    "139": 151,
-    "140": 152,
-    "141": 153,
-    "142": 154,
-    "143": 155,
-    "144": 156,
-    "145": 157,
-    "146": 158,
-    "147": 159,
-    "148": 160,
-    "149": 161,
-    "150": 162,
-    "151": 163,
-    "152": 164,
-    "153": 165,
-    "154": 166,
-    "155": 167,
-    "156": 168,
-    "157": 169,
-    "158": 170,
-    "159": 171,
-    "160": 172,
-    "161": 173,
-    "162": 174,
-    "163": 175,
-    "164": 176,
-    "165": 177,
-    "166": 178,
-    "167": 179,
-    "168": 180,
-    "169": 181,
-    "170": 182,
-    "171": 183,
-    "172": 184,
-    "173": 185,
-    "174": 186,
-    "175": 187,
-    "176": 188,
-    "177": 189,
-    "178": 190,
-    "179": 191,
-    "180": 192,
-    "181": 193,
-    "182": 194,
-    "183": 195,
-    "184": 196,
-    "185": 197,
-    "186": 198,
-    "187": 199,
-    "188": 200,
-    "189": 201,
-    "190": 202,
-    "191": 203,
-    "192": 204,
-    "193": 205,
-    "194": 206,
-    "195": 207,
-    "196": 208,
-    "197": 209,
-    "198": 210,
-    "199": 211,
-    "200": 212,
-    "201": 213,
-    "202": 214,
-    "203": 215,
-    "204": 216,
-    "205": 217,
-    "206": 218,
-    "207": 219,
-    "208": 220,
-    "209": 221,
-    "210": 222,
-    "211": 223,
-    "212": 224,
-    "213": 225,
-    "214": 226,
-    "215": 227,
-    "216": 228,
-    "217": 229,
-    "218": 231,
-    "219": 232,
-    "220": 233,
-    "221": 234,
-    "222": 235,
-    "223": 236,
-    "224": 237,
-    "225": 238,
-    "226": 239,
-    "227": 240,
-    "228": 242,
-    "229": 243,
-    "230": 244,
-    "231": 245,
-    "232": 246,
-    "233": 247,
-    "234": 248,
-    "235": 249,
-    "236": 251,
-    "237": 252,
-    "238": 253,
-    "239": 254,
-    "240": 255,
-    "241": 256,
-    "242": 257,
-    "243": 258,
-    "244": 259,
-    "245": 260,
-    "246": 261,
-    "247": 262,
-    "248": 263,
-    "249": 264,
-    "250": 265,
-    "251": 266,
-    "252": 267,
-    "253": 269,
-    "254": 270,
-    "255": 271,
-    "256": 272,
-    "257": 273,
-    "258": 274,
-    "259": 275,
-    "260": 276,
-    "261": 277,
-    "262": 278,
-    "263": 279,
-    "264": 280,
-    "265": 281,
-    "266": 282,
-    "267": 283,
-    "268": 285,
-    "269": 286,
-    "270": 287,
-    "271": 288,
-    "272": 289,
-    "273": 290,
-    "274": 291,
-    "275": 292,
-    "276": 293,
-    "277": 294,
-    "278": 295,
-    "279": 297,
-    "280": 299,
-    "281": 300,
-    "282": 301,
-    "283": 302,
-    "284": 303,
-    "285": 304,
-    "286": 305,
-    "287": 307,
-    "288": 308,
-    "289": 309,
-    "290": 310,
-    "291": 311,
-    "292": 312,
-    "293": 313,
-    "294": 314,
-    "295": 315,
-    "296": 316,
-    "297": 317,
-    "298": 318,
-    "299": 319,
-    "300": 320,
-    "301": 321,
-    "302": 322,
-    "303": 323,
-    "304": 324,
-    "305": 325,
-    "306": 326,
-    "307": 327,
-    "308": 328,
-    "309": 329,
-    "310": 330,
-    "311": 331,
-    "312": 332,
-    "313": 333,
-    "314": 334,
-    "315": 335,
-    "316": 336,
-    "317": 337,
-    "318": 338,
-    "319": 339,
-    "320": 340,
-    "321": 341,
-    "322": 342,
-    "323": 343,
-    "324": 344,
-    "325": 345,
-    "326": 346,
-    "327": 347,
-    "328": 348,
-    "329": 349,
-    "330": 350,
-    "331": 351,
-    "332": 352,
-    "333": 353,
-    "334": 354,
-    "335": 355,
-    "336": 356,
-    "337": 357,
-    "338": 358,
-    "339": 359,
-    "340": 360,
-    "341": 361,
-    "342": 362,
-    "343": 363,
-    "344": 364,
-    "345": 365,
-    "346": 366,
-    "347": 367,
-    "348": 368,
-    "349": 369,
-    "350": 370,
-    "351": 371,
-    "352": 372,
-    "353": 373,
-    "354": 374,
-    "355": 375,
-    "356": 376,
-    "357": 377,
-    "358": 378,
-    "359": 379,
-    "360": 380,
-    "361": 381,
-    "362": 382,
-    "363": 383,
-    "364": 384,
-    "365": 385,
-    "366": 386,
-    "367": 387,
-    "368": 388,
-    "369": 389,
-    "370": 390,
-    "371": 391,
-    "372": 392,
-    "373": 393,
-    "374": 394,
-    "375": 395,
-    "376": 396,
-    "377": 397,
-    "378": 398,
-    "379": 399,
-    "380": 400,
-    "381": 401,
-    "382": 402,
-    "383": 403,
-    "384": 404,
-    "385": 405,
-    "386": 406,
-    "387": 407,
-    "388": 408,
-    "389": 409,
-    "390": 410,
-    "391": 411,
-    "392": 412,
-    "393": 413,
-    "394": 414,
-    "395": 415,
-    "396": 416,
-    "397": 417,
-    "398": 418,
-    "399": 419,
-    "400": 420,
-    "401": 421,
-    "402": 422,
-    "403": 423,
-    "404": 424,
-    "405": 425,
-    "406": 426,
-    "407": 427,
-    "408": 428,
-    "409": 429,
-    "410": 430,
-    "411": 431,
-    "412": 432,
-    "413": 433,
-    "414": 434,
-    "415": 435,
-    "416": 436,
-    "417": 437,
-    "418": 438,
-    "419": 439,
-    "420": 440,
-    "421": 441,
-    "422": 442,
-    "423": 443,
-    "424": 444,
-    "425": 445,
-    "426": 446,
-    "427": 447,
-    "428": 448,
-    "429": 449,
-    "430": 450,
-    "431": 451,
-    "432": 452,
-    "433": 453,
-    "434": 454,
-    "435": 455,
-    "436": 456,
-    "437": 457,
-    "438": 458,
-    "439": 459,
-    "440": 460,
-    "441": 461,
-    "442": 462,
-    "443": 463,
-    "444": 464,
-    "445": 465,
-    "446": 466,
-    "447": 467,
-    "448": 468
+    "0": 308,
+    "1": 3,
+    "2": 4,
+    "3": 5,
+    "4": 6,
+    "5": 7,
+    "6": 10,
+    "7": 11,
+    "8": 12,
+    "9": 13,
+    "10": 14,
+    "11": 15,
+    "12": 16,
+    "13": 19,
+    "14": 20,
+    "15": 336,
+    "16": 23,
+    "17": 24,
+    "18": 25,
+    "19": 26,
+    "20": 27,
+    "21": 29,
+    "22": 32,
+    "23": 33,
+    "24": 34,
+    "25": 35,
+    "26": 364,
+    "27": 37,
+    "28": 38,
+    "29": 326,
+    "30": 40,
+    "31": 41,
+    "32": 42,
+    "33": 43,
+    "34": 44,
+    "35": 45,
+    "36": 48,
+    "37": 51,
+    "38": 53,
+    "39": 54,
+    "40": 55,
+    "41": 56,
+    "42": 57,
+    "43": 58,
+    "44": 59,
+    "45": 65,
+    "46": 66,
+    "47": 354,
+    "48": 68,
+    "49": 299,
+    "50": 342,
+    "51": 75,
+    "52": 79,
+    "53": 83,
+    "54": 87,
+    "55": 85,
+    "56": 288,
+    "57": 335,
+    "58": 89,
+    "59": 90,
+    "60": 128,
+    "61": 92,
+    "62": 93,
+    "63": 94,
+    "64": 95,
+    "65": 96,
+    "66": 97,
+    "67": 98,
+    "68": 99,
+    "69": 100,
+    "70": 356,
+    "71": 102,
+    "72": 103,
+    "73": 104,
+    "74": 105,
+    "75": 106,
+    "76": 108,
+    "77": 109,
+    "78": 334,
+    "79": 114,
+    "80": 116,
+    "81": 117,
+    "82": 119,
+    "83": 120,
+    "84": 301,
+    "85": 123,
+    "86": 124,
+    "87": 139,
+    "88": 126,
+    "89": 129,
+    "90": 130,
+    "91": 131,
+    "92": 132,
+    "93": 136,
+    "94": 137,
+    "95": 138,
+    "96": 141,
+    "97": 142,
+    "98": 153,
+    "99": 154,
+    "100": 145,
+    "101": 146,
+    "102": 147,
+    "103": 149,
+    "104": 150,
+    "105": 151,
+    "106": 152,
+    "107": 155,
+    "108": 156,
+    "109": 157,
+    "110": 158,
+    "111": 159,
+    "112": 160,
+    "113": 161,
+    "114": 162,
+    "115": 163,
+    "116": 164,
+    "117": 165,
+    "118": 166,
+    "119": 167,
+    "120": 168,
+    "121": 169,
+    "122": 170,
+    "123": 171,
+    "124": 172,
+    "125": 173,
+    "126": 174,
+    "127": 175,
+    "128": 176,
+    "129": 177,
+    "130": 178,
+    "131": 179,
+    "132": 180,
+    "133": 181,
+    "134": 182,
+    "135": 183,
+    "136": 184,
+    "137": 185,
+    "138": 186,
+    "139": 187,
+    "140": 188,
+    "141": 189,
+    "142": 190,
+    "143": 191,
+    "144": 192,
+    "145": 193,
+    "146": 194,
+    "147": 195,
+    "148": 196,
+    "149": 197,
+    "150": 198,
+    "151": 199,
+    "152": 200,
+    "153": 201,
+    "154": 202,
+    "155": 203,
+    "156": 204,
+    "157": 205,
+    "158": 206,
+    "159": 207,
+    "160": 208,
+    "161": 209,
+    "162": 210,
+    "163": 211,
+    "164": 212,
+    "165": 213,
+    "166": 214,
+    "167": 215,
+    "168": 216,
+    "169": 218,
+    "170": 219,
+    "171": 220,
+    "172": 221,
+    "173": 222,
+    "174": 223,
+    "175": 224,
+    "176": 225,
+    "177": 226,
+    "178": 227,
+    "179": 228,
+    "180": 229,
+    "181": 230,
+    "182": 231,
+    "183": 232,
+    "184": 233,
+    "185": 234,
+    "186": 235,
+    "187": 236,
+    "188": 237,
+    "189": 238,
+    "190": 239,
+    "191": 240,
+    "192": 241,
+    "193": 242,
+    "194": 243,
+    "195": 244,
+    "196": 245,
+    "197": 246,
+    "198": 247,
+    "199": 248,
+    "200": 249,
+    "201": 250,
+    "202": 251,
+    "203": 252,
+    "204": 253,
+    "205": 254,
+    "206": 255,
+    "207": 256,
+    "208": 257,
+    "209": 258,
+    "210": 259,
+    "211": 260,
+    "212": 261,
+    "213": 262,
+    "214": 263,
+    "215": 264,
+    "216": 265,
+    "217": 266,
+    "218": 267,
+    "219": 268,
+    "220": 269,
+    "221": 270,
+    "222": 271,
+    "223": 272,
+    "224": 273,
+    "225": 274,
+    "226": 275,
+    "227": 276,
+    "228": 277,
+    "229": 278,
+    "230": 279,
+    "231": 280,
+    "232": 281,
+    "233": 282,
+    "234": 283,
+    "235": 284,
+    "236": 285,
+    "237": 286,
+    "238": 287,
+    "239": 289,
+    "240": 290,
+    "241": 291,
+    "242": 292,
+    "243": 293,
+    "244": 294,
+    "245": 295,
+    "246": 296,
+    "247": 297,
+    "248": 298,
+    "249": 300,
+    "250": 302,
+    "251": 303,
+    "252": 304,
+    "253": 305,
+    "254": 306,
+    "255": 307,
+    "256": 309,
+    "257": 310,
+    "258": 311,
+    "259": 312,
+    "260": 313,
+    "261": 314,
+    "262": 315,
+    "263": 316,
+    "264": 317,
+    "265": 318,
+    "266": 319,
+    "267": 320,
+    "268": 321,
+    "269": 322,
+    "270": 323,
+    "271": 324,
+    "272": 325,
+    "273": 327,
+    "274": 328,
+    "275": 329,
+    "276": 330,
+    "277": 331,
+    "278": 332,
+    "279": 333,
+    "280": 337,
+    "281": 338,
+    "282": 339,
+    "283": 340,
+    "284": 341,
+    "285": 343,
+    "286": 344,
+    "287": 345,
+    "288": 346,
+    "289": 347,
+    "290": 348,
+    "291": 349,
+    "292": 350,
+    "293": 351,
+    "294": 352,
+    "295": 353,
+    "296": 355,
+    "297": 357,
+    "298": 358,
+    "299": 359,
+    "300": 360,
+    "301": 361,
+    "302": 362,
+    "303": 363,
+    "304": 365,
+    "305": 366,
+    "306": 367,
+    "307": 368,
+    "308": 369,
+    "309": 370,
+    "310": 371,
+    "311": 372,
+    "312": 373,
+    "313": 374,
+    "314": 375,
+    "315": 376,
+    "316": 377,
+    "317": 378,
+    "318": 379,
+    "319": 380,
+    "320": 381,
+    "321": 382,
+    "322": 383,
+    "323": 384,
+    "324": 385,
+    "325": 386,
+    "326": 387,
+    "327": 388,
+    "328": 389,
+    "329": 390,
+    "330": 391,
+    "331": 392,
+    "332": 393,
+    "333": 394,
+    "334": 395,
+    "335": 396,
+    "336": 397,
+    "337": 398,
+    "338": 399,
+    "339": 400,
+    "340": 401,
+    "341": 402,
+    "342": 403,
+    "343": 404,
+    "344": 405,
+    "345": 406,
+    "346": 407,
+    "347": 408,
+    "348": 409,
+    "349": 410,
+    "350": 411,
+    "351": 412,
+    "352": 413,
+    "353": 414,
+    "354": 415,
+    "355": 416,
+    "356": 417,
+    "357": 418,
+    "358": 419,
+    "359": 420,
+    "360": 421,
+    "361": 422,
+    "362": 423,
+    "363": 424,
+    "364": 425,
+    "365": 426,
+    "366": 427,
+    "367": 428,
+    "368": 429,
+    "369": 430,
+    "370": 431,
+    "371": 432,
+    "372": 433,
+    "373": 434,
+    "374": 435,
+    "375": 436,
+    "376": 437,
+    "377": 438,
+    "378": 439,
+    "379": 440,
+    "380": 441,
+    "381": 442,
+    "382": 443,
+    "383": 444,
+    "384": 445,
+    "385": 446,
+    "386": 447,
+    "387": 448,
+    "388": 449,
+    "389": 450,
+    "390": 451,
+    "391": 452,
+    "392": 453,
+    "393": 454,
+    "394": 455,
+    "395": 456,
+    "396": 457,
+    "397": 458,
+    "398": 459,
+    "399": 460,
+    "400": 461,
+    "401": 462,
+    "402": 463,
+    "403": 464,
+    "404": 465,
+    "405": 466,
+    "406": 467,
+    "407": 468,
+    "408": 469,
+    "409": 470,
+    "410": 471,
+    "411": 472,
+    "412": 473,
+    "413": 474,
+    "414": 475,
+    "415": 476,
+    "416": 477,
+    "417": 478,
+    "418": 479,
+    "419": 480,
+    "420": 481,
+    "421": 482,
+    "422": 483,
+    "423": 484,
+    "424": 485,
+    "425": 486,
+    "426": 487,
+    "427": 488,
+    "428": 489,
+    "429": 490,
+    "430": 491,
+    "431": 492,
+    "432": 493,
+    "433": 494,
+    "434": 495,
+    "435": 496,
+    "436": 497,
+    "437": 498,
+    "438": 499,
+    "439": 500,
+    "440": 501,
+    "441": 502,
+    "442": 503,
+    "443": 504,
+    "444": 505,
+    "445": 506,
+    "446": 507,
+    "447": 508,
+    "448": 509,
+    "449": 510,
+    "450": 511,
+    "451": 512,
+    "452": 513,
+    "453": 514,
+    "454": 515,
+    "455": 516,
+    "456": 517,
+    "457": 518,
+    "458": 519,
+    "459": 520,
+    "460": 521,
+    "461": 522,
+    "462": 523,
+    "463": 524,
+    "464": 525,
+    "465": 526
   }
 }

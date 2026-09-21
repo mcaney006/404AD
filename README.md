@@ -320,6 +320,43 @@ Measured on a synthetic index of 20,000 generic selectors and 2,000 hosts
 to decode than the JSON that was already in the build. That is the whole justification;
 the human-readable `cosmetic.json` is still emitted for debugging.
 
+### Budgets are enforced, not just measured
+
+`cargo test --workspace` runs them. Every ceiling sits roughly an order of
+magnitude above the measurement, so machine variance never fails a build but a
+real regression always does.
+
+| | Measured | Budget |
+| --- | --- | --- |
+| Compile 3.2 MB of filters (51k network + 50k cosmetic) | **297 ms** | < 10 s |
+| Lower 48,000 rules to DNR | **5.8 ms** | < 3 s |
+| Compile the shipped lists | **2.8 ms** | < 2 s |
+| `select_generic` over 30k generics, 400 page tokens | **32.7 µs** | < 2 ms |
+| `lookup_host` | **390 ns** | < 500 µs |
+| Decode the cosmetic index on worker start | **8.7 ms** | < 250 ms |
+| Transport parsing, 10 min of 8 Mbps media | **6,072 MB/s** | > 50 MB/s |
+| Bytes retained by the UMP parser over 114 MB | **26 bytes** | < 8 KB |
+
+## Remote subscriptions
+
+A subscription is **data only**, by construction. A list is fetched as text,
+parsed by the same Rust parser the bundled lists use, and lowered to dynamic
+rules plus a cosmetic index. No filter syntax 404AD supports can express
+execution, so there is no path from a subscription to running code.
+
+* Only `http` and `https`. A `file:`, `data:` or `chrome-extension:` URL would
+  let a subscription reach the local disk or inside the extension.
+* Fetches omit credentials, cap at 8 MB and time out at 20 seconds.
+* A failed refresh keeps the previous text: a list that cannot be reached today
+  should keep working with yesterday's rules.
+* Refresh is pull-based. No alarm and no periodic wakeup: lists refresh on
+  worker start and on request, and only when already stale. Waking a service
+  worker on a timer to re-download a file nobody is looking at is a cost with
+  no benefit.
+* Dynamic rules are budgeted against Chromium's 5,000 ceiling. Exceeding it
+  fails the whole `updateDynamicRules` call, which would silently drop *every*
+  user rule, so the surplus is dropped and reported instead.
+
 ## Determinism
 
 The same inputs always produce byte-identical output, including rule ids. Rule ids are

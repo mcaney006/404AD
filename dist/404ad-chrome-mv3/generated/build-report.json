@@ -1,5 +1,5 @@
 {
-  "buildId": "07aa047119fc923f16c8b06be6a59d2d",
+  "buildId": "def955c52ac4528f9ebd92538d4edafb",
   "compilerVersion": "0.1.0",
   "lists": [
     {
@@ -7,7 +7,7 @@
       "title": "404AD Ads Extended",
       "category": "ads",
       "enabled": true,
-      "bytes": 11046
+      "bytes": 14017
     },
     {
       "id": "404ad-annoyances",
@@ -35,7 +35,7 @@
       "title": "404AD Cosmetic",
       "category": "ads",
       "enabled": true,
-      "bytes": 9410
+      "bytes": 11427
     },
     {
       "id": "404ad-privacy-extended",
@@ -60,9 +60,9 @@
     }
   ],
   "parsed": {
-    "network": 1108,
-    "cosmetic": 491,
-    "ignored": 359,
+    "network": 1195,
+    "cosmetic": 549,
+    "ignored": 378,
     "errors": 0
   },
   "dedup": {
@@ -76,8 +76,8 @@
     "droppedPatternSubsumed": 0
   },
   "dnr": {
-    "rules": 1108,
-    "enabledRules": 1079,
+    "rules": 1195,
+    "enabledRules": 1166,
     "regexRules": 0,
     "shadowRules": 49,
     "rulesets": [
@@ -108,7 +108,7 @@
       }
     ],
     "perCategory": {
-      "ads": 548,
+      "ads": 635,
       "annoyances": 29,
       "shadow": 49,
       "tracking": 455,
@@ -117,15 +117,15 @@
   },
   "cosmetic": {
     "genericSelectors": 309,
-    "hosts": 51,
+    "hosts": 106,
     "entities": 4,
     "scriptlets": 9,
     "procedural": 0,
-    "indexBytesPostcard": 19921,
-    "indexBytesJson": 46872
+    "indexBytesPostcard": 21503,
+    "indexBytesJson": 57475
   },
   "budgets": {
-    "staticRulesUsed": 1079,
+    "staticRulesUsed": 1166,
     "staticRulesLimit": 30000,
     "regexRulesUsed": 0,
     "regexRulesLimit": 1000,

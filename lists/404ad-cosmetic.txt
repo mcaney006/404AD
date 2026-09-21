@@ -281,3 +281,71 @@ spotify.com##.advertisement-container
 soundcloud.com##.adswizz-ad-container
 quora.com##.q-box:has(.AdRenderer)
 wikihow.com##.section_text:has(.ad_label)
+
+! ===========================================================================
+! SITE-SPECIFIC — additional publishers and platforms
+! ===========================================================================
+theatlantic.com##.ad-unit-wrapper
+newyorker.com##.ad
+vice.com##[class*="AdSlot"]
+buzzfeed.com##.ad-wrapper
+vox.com##.c-ad
+theverge.com##.duet--ad--ad-wrapper
+engadget.com##.ad-unit-container
+techcrunch.com##.ad-unit
+arstechnica.com##.ad-container
+wired.com##.ad-stickyhero
+gizmodo.com##.ad-slot-container
+cnet.com##.c-adDisplay
+zdnet.com##.ad-container
+pcmag.com##[data-testid="ad-slot"]
+tomshardware.com##.ad-unit
+9to5mac.com##.ad-container
+macrumors.com##.ad-container
+androidauthority.com##.ad-container
+xda-developers.com##.ad-container
+lifehacker.com##.ad-slot-container
+howtogeek.com##.ad-container
+makeuseof.com##.ad-container
+digitaltrends.com##.ad-container
+slashdot.org##.adbar
+hackernoon.com##.ad-container
+dev.to##.crayons-story--ad
+hashnode.com##.ad-container
+freecodecamp.org##.ad-container
+
+! Sport, weather and reference
+espn.com##.ad-slot-container
+espn.com##[id^="ad-"]
+bleacherreport.com##.ad-container
+weather.com##.ad-wrapper
+accuweather.com##.ad-container
+wikihow.com##.ad-container
+dictionary.com##.ad-container
+thesaurus.com##.ad-container
+merriam-webster.com##.ad-container
+investopedia.com##.ad-container
+healthline.com##.ad-container
+webmd.com##.ad-container
+mayoclinic.org##.ad-container
+
+! Video, music and gaming
+vimeo.com##.ad-container
+dailymotion.com##.ad-container
+twitch.tv##.ad-banner
+ign.com##.ad-container
+gamespot.com##.ad-container
+polygon.com##.c-ad
+pcgamer.com##.ad-unit
+kotaku.com##.ad-slot-container
+steamcommunity.com##.ad-container
+
+! Shopping and travel
+bestbuy.com##[data-testid="sponsored-badge"]
+target.com##[data-test="sponsored-label"]
+newegg.com##.sponsored-item
+aliexpress.com##[class*="ad-banner"]
+booking.com##[data-testid="sponsored"]
+expedia.com##[data-stid="sponsored"]
+tripadvisor.com##[data-test-target="commerce-ad"]
+kayak.com##.ad-container
