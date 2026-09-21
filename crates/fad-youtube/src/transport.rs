@@ -515,6 +515,7 @@ impl TransportState {
             return;
         }
         let interval = Self::bounded_ad_interval(start, end);
+        let verdict_was_ad = self.verdict == Verdict::Ad;
         let decision = EpochDecision {
             epoch: self.epoch,
             interval,
@@ -522,8 +523,8 @@ impl TransportState {
             log_lr: self.sprt.log_lr(),
             evidence: self.sprt.evidence().to_vec(),
         };
-        if decision.verdict == Verdict::Ad {
-            self.timeline.ads_mut().insert(interval);
+        if verdict_was_ad {
+            self.insert_ad(interval.start_us, interval.end_us);
         }
         self.decisions.push(decision);
         if self.decisions.len() > Self::MAX_DECISIONS {
@@ -611,10 +612,32 @@ impl TransportState {
             return;
         };
         if self.epoch_end_us > start {
-            self.timeline
-                .ads_mut()
-                .insert(Self::bounded_ad_interval(start, self.epoch_end_us));
+            self.insert_ad(start, self.epoch_end_us);
         }
+    }
+
+    /// Record an ad interval, refusing to grow a refused region past the cap.
+    ///
+    /// Merging is what makes repeated evidence about one ad idempotent, and it
+    /// is also how adjacent intervals compound: two capped insertions that
+    /// touch become one interval twice the cap, and enough of them silence the
+    /// video the bound existed to protect. So the cap is enforced on the
+    /// contiguous region, not on the insertion.
+    ///
+    /// The trade is deliberate. Past six minutes of continuously refused media
+    /// the classifier is wrong far more often than YouTube is running a
+    /// six-minute pod, and showing an ad is recoverable where silence is not.
+    fn insert_ad(&mut self, start: Micros, end: Micros) {
+        let interval = Self::bounded_ad_interval(start, end);
+        if interval.is_empty() {
+            return;
+        }
+        // Merging absorbs neighbours on both sides, so the bound is checked
+        // against what the insertion would actually produce.
+        if self.timeline.ads().merged_extent(interval).duration_us() > Self::MAX_AD_INTERVAL_US {
+            return;
+        }
+        self.timeline.ads_mut().insert(interval);
     }
 
     /// An ad interval, never longer than [`Self::MAX_AD_INTERVAL_US`].
@@ -698,8 +721,13 @@ impl TransportState {
     /// avoiding; showing an ad is the error worth tolerating.
     pub fn policy_at(&self, transport_us: Micros) -> Policy {
         if let Some(interval) = self.timeline.ads().covering(transport_us) {
+            // Never ask playback to jump further than the cap in one step. A
+            // region that somehow grew longer is skipped in hops, and each hop
+            // re-consults the classifier rather than trusting a stale extent.
             return Policy::Skip {
-                until_us: interval.end_us,
+                until_us: interval
+                    .end_us
+                    .min(transport_us.saturating_add(Self::MAX_AD_INTERVAL_US)),
             };
         }
         match self.verdict {
@@ -1196,6 +1224,37 @@ mod tests {
         assert!(
             state.should_append(11 * 60 * SEC_US),
             "media past the cap must still play"
+        );
+    }
+
+    #[test]
+    fn adjacent_ad_intervals_cannot_compound_past_the_cap() {
+        // Regression, found by `scripts/fuzz.sh sabr_stream`: each insertion
+        // was capped, then two capped intervals that touched merged into one
+        // twice as long, and the bound that was supposed to keep the video
+        // playing did not hold.
+        let mut state = TransportState::new();
+        state.set_requested_video("abc");
+        state.observe(Signal::PlayerReportsAd);
+        state.observe(Signal::AdPlacementMetadata);
+        assert_eq!(state.verdict(), Verdict::Ad);
+
+        let cap = TransportState::MAX_AD_INTERVAL_US;
+        // Both orders: an insertion can be absorbed from either side.
+        state.insert_ad(80_000, cap + 80_000);
+        state.insert_ad(0, 80_000);
+        state.insert_ad(cap + 80_000, cap * 2);
+
+        for interval in state.ads().as_slice() {
+            assert!(
+                interval.duration_us() <= cap,
+                "{interval:?} would silence the video"
+            );
+        }
+        assert_eq!(state.ads().len(), 1, "{:?}", state.ads().as_slice());
+        assert!(
+            state.should_append(cap + 80_001),
+            "media past the refused region has to play"
         );
     }
 

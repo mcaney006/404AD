@@ -111,7 +111,24 @@ impl IntervalSet {
         if interval.is_empty() {
             return;
         }
-        // Find the first interval that could touch this one.
+        let (range, merged) = self.merge_range(interval);
+        self.intervals.splice(range, [merged]);
+    }
+
+    /// What [`Self::insert`] would produce, without inserting it.
+    ///
+    /// Merging is not local: an insertion can be absorbed by neighbours on
+    /// either side, so a caller enforcing a bound on the result has to ask
+    /// rather than inspect one side of it.
+    pub fn merged_extent(&self, interval: Interval) -> Interval {
+        if interval.is_empty() {
+            return interval;
+        }
+        self.merge_range(interval).1
+    }
+
+    fn merge_range(&self, interval: Interval) -> (std::ops::Range<usize>, Interval) {
+        // The first interval that could touch this one.
         let start = self
             .intervals
             .partition_point(|i| i.end_us < interval.start_us);
@@ -122,7 +139,7 @@ impl IntervalSet {
             merged.end_us = merged.end_us.max(self.intervals[end].end_us);
             end += 1;
         }
-        self.intervals.splice(start..end, [merged]);
+        (start..end, merged)
     }
 
     /// The interval containing `at_us`, in `O(log n)`.

@@ -249,7 +249,7 @@ with a regression test naming it:
 | An audio format alongside a video one | a mid-roll format switch | tracked per track, so only a replacement counts |
 | The viewer scrubs | a timeline discontinuity | the seek partitions the timeline and charges nothing |
 | A header that decodes to an impossible segment | an ad interval hours long | implausible headers are counted and dropped |
-| A classified epoch that runs away | every later segment refused | one ad interval can never exceed six minutes |
+| A classified epoch that runs away | every later segment refused | no contiguous refused region may exceed six minutes |
 
 The last two are the ones that matter most. Every other failure shows an ad;
 those two stop the video.

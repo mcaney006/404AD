@@ -11,6 +11,12 @@
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
+# Homebrew's cargo does not understand `+toolchain`; rustup's shim does. Prefer
+# whichever can actually select nightly rather than whichever is first on PATH.
+if [ -x "$HOME/.cargo/bin/rustup" ]; then
+  export PATH="$HOME/.cargo/bin:$PATH"
+fi
+
 TARGET="${1:-parse_line}"
 shift || true
 
