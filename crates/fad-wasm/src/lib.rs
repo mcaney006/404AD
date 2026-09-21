@@ -102,6 +102,12 @@ impl CosmeticEngine {
         self.index.select_generic(&tokens, &unhide_ids)
     }
 
+    /// Selector strings cancelled on this host, for merging two indexes.
+    #[wasm_bindgen(js_name = unhideSelectors)]
+    pub fn unhide_selectors(&self, hostname: &str) -> Vec<String> {
+        self.index.unhide_selectors(hostname)
+    }
+
     /// One call for the common case: everything a content script needs on load.
     #[wasm_bindgen(js_name = resolveDocument)]
     pub fn resolve_document(
@@ -379,9 +385,13 @@ pub fn validate_filters(text: &str) -> Result<JsValue, JsValue> {
     to_js(&result)
 }
 
-/// Compile user filters into DNR rules the extension can register dynamically.
+/// Compile user filters into DNR rules the extension can register dynamically,
+/// plus a cosmetic index the service worker can load like any other.
 ///
 /// Ids start at `id_base` so they cannot collide with the static rulesets.
+/// The cosmetic index comes back as postcard bytes rather than a JS object so
+/// the caller can hand it straight to [`CosmeticEngine`], which is the same
+/// path the compiled lists take.
 #[wasm_bindgen(js_name = compileUserFilters)]
 pub fn compile_user_filters(text: &str, id_base: u32, shadow: bool) -> Result<JsValue, JsValue> {
     let mut out = parse::ParseOutput::default();
@@ -394,33 +404,49 @@ pub fn compile_user_filters(text: &str, id_base: u32, shadow: bool) -> Result<Js
         rule.shadow = shadow || rule.shadow;
     }
 
-    let lowered = fad_dnr_lower(&network, id_base);
+    let mut lowered = fad_dnr::lower(&network);
+    for rule in &mut lowered.rules {
+        rule.id += id_base;
+    }
+
     let cosmetic = fad_filter::optimize::assign_cosmetic_ids(cosmetic);
     let index = CosmeticIndex::build(&cosmetic, "user");
+    let cosmetic_bin = postcard::to_allocvec(&index)
+        .map_err(|e| JsValue::from_str(&format!("cosmetic index failed to serialize: {e}")))?;
 
     #[derive(Serialize)]
     #[serde(rename_all = "camelCase")]
     struct UserCompile {
         rules: Vec<fad_dnr::DnrRule>,
         unsupported: Vec<fad_dnr::Unsupported>,
-        cosmetic: CosmeticIndex,
+        cosmetic_bin: Vec<u8>,
+        network_rules: usize,
+        cosmetic_rules: usize,
+        parse_errors: Vec<ParseErrorReport>,
+    }
+
+    #[derive(Serialize)]
+    #[serde(rename_all = "camelCase")]
+    struct ParseErrorReport {
+        line: u32,
+        raw: String,
+        error: String,
     }
 
     to_js(&UserCompile {
-        rules: lowered.0,
-        unsupported: lowered.1,
-        cosmetic: index,
+        network_rules: lowered.rules.len(),
+        cosmetic_rules: cosmetic.len(),
+        rules: lowered.rules,
+        unsupported: lowered.unsupported,
+        cosmetic_bin,
+        parse_errors: out
+            .errors
+            .iter()
+            .map(|(_, line, raw, e)| ParseErrorReport {
+                line: *line,
+                raw: raw.clone(),
+                error: e.to_string(),
+            })
+            .collect(),
     })
-}
-
-/// Lower and re-base ids so dynamic rules never collide with static ones.
-fn fad_dnr_lower(
-    rules: &[NetworkRule],
-    id_base: u32,
-) -> (Vec<fad_dnr::DnrRule>, Vec<fad_dnr::Unsupported>) {
-    let mut lowered = fad_dnr::lower(rules);
-    for rule in &mut lowered.rules {
-        rule.id += id_base;
-    }
-    (lowered.rules, lowered.unsupported)
 }

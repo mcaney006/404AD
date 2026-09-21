@@ -3,7 +3,12 @@ import { useEffect } from "preact/hooks";
 import { signal, useSignal } from "@preact/signals";
 import "../../src/ui/styles.css";
 import { send } from "../../src/core/messaging";
-import type { SiteMode, ValidationResult } from "../../src/core/protocol";
+import type {
+  SiteMode,
+  Subscription,
+  UserFilterStatus,
+  ValidationResult,
+} from "../../src/core/protocol";
 import {
   error,
   formatCount,
@@ -18,11 +23,12 @@ import {
   status,
 } from "../../src/ui/state";
 
-type TabId = "overview" | "lists" | "filters" | "sites" | "stats" | "shadow";
+type TabId = "overview" | "lists" | "subs" | "filters" | "sites" | "stats" | "shadow";
 
 const TABS: Array<{ id: TabId; label: string }> = [
   { id: "overview", label: "Overview" },
   { id: "lists", label: "Filter lists" },
+  { id: "subs", label: "Subscriptions" },
   { id: "filters", label: "Custom filters" },
   { id: "sites", label: "Sites" },
   { id: "stats", label: "Statistics" },
@@ -199,12 +205,171 @@ function Lists() {
   );
 }
 
+function relativeTime(epoch: number): string {
+  if (!epoch) return "never";
+  const minutes = Math.round((Date.now() - epoch) / 60_000);
+  if (minutes < 1) return "just now";
+  if (minutes < 60) return `${minutes}m ago`;
+  const hours = Math.round(minutes / 60);
+  if (hours < 24) return `${hours}h ago`;
+  return `${Math.round(hours / 24)}d ago`;
+}
+
+function Subscriptions() {
+  const list = useSignal<Subscription[]>([]);
+  const url = useSignal("");
+  const busy = useSignal(false);
+  const problem = useSignal<string | null>(null);
+
+  const reload = async (): Promise<void> => {
+    list.value = await send({ type: "subs:list" });
+  };
+
+  useEffect(() => {
+    void reload();
+  }, []);
+
+  const run = async (action: () => Promise<Subscription[]>): Promise<void> => {
+    busy.value = true;
+    problem.value = null;
+    try {
+      list.value = await action();
+    } catch (e) {
+      problem.value = e instanceof Error ? e.message : String(e);
+    } finally {
+      busy.value = false;
+    }
+  };
+
+  return (
+    <div class="col">
+      <div class="card col">
+        <h3>Remote filter lists</h3>
+        <p class="muted" style="margin:0">
+          A subscription is <strong>data only</strong>. The list is fetched as text, parsed by the
+          same Rust parser the bundled lists use, and lowered to dynamic rules. Nothing in a
+          subscription is executed, and no filter syntax 404AD supports can express execution. Lists
+          refresh when you ask and when the extension starts, never on a timer: waking a service
+          worker to re-download a file nobody is looking at is a cost with no benefit.
+        </p>
+        <div class="row">
+          <input
+            type="text"
+            class="grow"
+            placeholder="https://example.org/filters.txt"
+            value={url.value}
+            onInput={(e) => {
+              url.value = (e.target as HTMLInputElement).value;
+            }}
+          />
+          <button
+            disabled={busy.value || !url.value.trim()}
+            onClick={() =>
+              void run(async () => {
+                const next = await send({ type: "subs:add", url: url.value.trim() });
+                url.value = "";
+                return next;
+              })
+            }
+          >
+            Subscribe
+          </button>
+          <button
+            disabled={busy.value || list.value.length === 0}
+            onClick={() => void run(() => send({ type: "subs:refresh" }))}
+          >
+            Refresh all
+          </button>
+        </div>
+        {problem.value && (
+          <p style="margin:0">
+            <span class="badge critical">error</span> <span class="mono">{problem.value}</span>
+          </p>
+        )}
+      </div>
+
+      <div class="card">
+        {list.value.length === 0 ? (
+          <p class="empty" style="margin:0">
+            No subscriptions. 404AD ships with its own compiled lists; a subscription adds to them.
+          </p>
+        ) : (
+          <table>
+            <thead>
+              <tr>
+                <th>List</th>
+                <th class="num">Network</th>
+                <th class="num">Cosmetic</th>
+                <th class="num">Updated</th>
+                <th />
+              </tr>
+            </thead>
+            <tbody>
+              {list.value.map((subscription) => (
+                <tr key={subscription.id}>
+                  <td>
+                    <div class="col" style="gap:2px">
+                      <span>{subscription.title}</span>
+                      <span class="muted mono truncate" style="max-width:300px">
+                        {subscription.url}
+                      </span>
+                      {subscription.error && <span class="badge high">{subscription.error}</span>}
+                    </div>
+                  </td>
+                  <td class="num mono">{formatCount(subscription.networkRules)}</td>
+                  <td class="num mono">{formatCount(subscription.cosmeticRules)}</td>
+                  <td class="num muted">{relativeTime(subscription.updatedAt)}</td>
+                  <td class="num">
+                    <div class="row" style="justify-content:flex-end">
+                      <button
+                        aria-pressed={subscription.enabled}
+                        disabled={busy.value}
+                        onClick={() =>
+                          void run(() =>
+                            send({
+                              type: "subs:enable",
+                              id: subscription.id,
+                              enabled: !subscription.enabled,
+                            }),
+                          )
+                        }
+                      >
+                        {subscription.enabled ? "On" : "Off"}
+                      </button>
+                      <button
+                        disabled={busy.value}
+                        onClick={() =>
+                          void run(() => send({ type: "subs:refresh", id: subscription.id }))
+                        }
+                      >
+                        Refresh
+                      </button>
+                      <button
+                        disabled={busy.value}
+                        onClick={() =>
+                          void run(() => send({ type: "subs:remove", id: subscription.id }))
+                        }
+                      >
+                        Remove
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+      </div>
+    </div>
+  );
+}
+
 function CustomFilters() {
   const s = settings.value;
   const text = useSignal<string | null>(null);
   const result = useSignal<ValidationResult | null>(null);
   const busy = useSignal(false);
-  const applied = useSignal<string | null>(null);
+  const status = useSignal<UserFilterStatus | null>(null);
 
   useEffect(() => {
     if (s && text.value === null) text.value = s.userFilters;
@@ -225,12 +390,11 @@ function CustomFilters() {
   const apply = async (): Promise<void> => {
     busy.value = true;
     try {
-      const outcome = await send({
+      status.value = await send({
         type: "filters:apply",
         text: text.value ?? "",
         confirmed: [...confirmed],
       });
-      applied.value = `${outcome.applied} enforced, ${outcome.shadowed} held in shadow mode, ${outcome.unsupported} not expressible in MV3, ${outcome.errors} errors`;
       await refreshSettings();
     } finally {
       busy.value = false;
@@ -269,8 +433,34 @@ function CustomFilters() {
           <button disabled={busy.value} onClick={() => void apply()}>
             Apply
           </button>
-          {applied.value && <span class="muted">{applied.value}</span>}
         </div>
+        {status.value && (
+          <div class="col" style="gap:4px">
+            <div class="row between">
+              <span class="muted">
+                {status.value.applied} enforced · {status.value.shadowed} in shadow mode ·{" "}
+                {status.value.unsupported} not expressible in MV3 · {status.value.errors} errors
+              </span>
+              <span class="mono">
+                {status.value.applied + status.value.shadowed}/{status.value.limit} dynamic rules
+              </span>
+            </div>
+            <div class="bar">
+              <span
+                style={`width:${Math.min(100, ((status.value.applied + status.value.shadowed) / status.value.limit) * 100)}%`}
+              />
+            </div>
+            {status.value.dropped > 0 && (
+              <span>
+                <span class="badge high">budget</span>{" "}
+                <span class="muted">
+                  {status.value.dropped} rules were dropped. Chromium caps dynamic rules at{" "}
+                  {status.value.limit}; disable a subscription to make room.
+                </span>
+              </span>
+            )}
+          </div>
+        )}
       </div>
 
       {result.value && (
@@ -627,6 +817,7 @@ function App() {
 
       {active.value === "overview" && <Overview />}
       {active.value === "lists" && <Lists />}
+      {active.value === "subs" && <Subscriptions />}
       {active.value === "filters" && <CustomFilters />}
       {active.value === "sites" && <Sites />}
       {active.value === "stats" && <Statistics />}

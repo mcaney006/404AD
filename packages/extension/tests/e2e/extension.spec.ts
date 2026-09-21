@@ -321,6 +321,233 @@ test.describe("youtube adapter", () => {
   });
 });
 
+/**
+ * Put the extension back to a clean slate so tests cannot leak into each other.
+ *
+ * Driven from an extension page rather than the worker: a service worker is not
+ * a recipient of its own `runtime.sendMessage`.
+ */
+async function resetUserState(page: import("@playwright/test").Page): Promise<void> {
+  await page.evaluate(async () => {
+    const subs = (await chrome.runtime.sendMessage({ type: "subs:list" })) as {
+      data: Array<{ id: string }>;
+    };
+    for (const s of subs.data) {
+      await chrome.runtime.sendMessage({ type: "subs:remove", id: s.id });
+    }
+    await chrome.runtime.sendMessage({ type: "filters:apply", text: "", confirmed: [] });
+  });
+}
+
+test.describe("custom user filters", () => {
+  test("a user cosmetic rule hides an element no bundled list touches", async ({
+    context,
+    extensionId,
+  }) => {
+    const options = await context.newPage();
+    await options.goto(`chrome-extension://${extensionId}/options.html`);
+    await options.evaluate(() =>
+      chrome.runtime.sendMessage({
+        type: "filters:apply",
+        text: "##.user-filtered-box",
+        confirmed: [],
+      }),
+    );
+
+    const page = await context.newPage();
+    await page.goto("/");
+    await expect(page.locator("#user-target")).toBeAttached();
+    await expect(page.locator("#user-target")).toBeHidden({ timeout: 10_000 });
+
+    await page.close();
+    await options.close();
+  });
+
+  test("a user exception cancels a bundled generic rule", async ({ context, extensionId }) => {
+    const options = await context.newPage();
+    await options.goto(`chrome-extension://${extensionId}/options.html`);
+    // `.sponsored-link` is hidden by 404ad-base. A user `#@#` must win.
+    await options.evaluate(() =>
+      chrome.runtime.sendMessage({
+        type: "filters:apply",
+        text: "#@#.sponsored-link",
+        confirmed: [],
+      }),
+    );
+
+    const page = await context.newPage();
+    await page.goto("/");
+    await expect(page.locator("#unhide-target")).toBeVisible({ timeout: 10_000 });
+
+    await page.close();
+    await options.close();
+  });
+
+  test("a user network rule becomes an enforced dynamic rule", async ({
+    context,
+    extensionId,
+    serviceWorker,
+  }) => {
+    const options = await context.newPage();
+    await options.goto(`chrome-extension://${extensionId}/options.html`);
+    await options.evaluate(() =>
+      chrome.runtime.sendMessage({
+        type: "filters:apply",
+        text: "||user-blocked.test^$third-party",
+        confirmed: [],
+      }),
+    );
+
+    const outcome = await testMatch(serviceWorker, {
+      url: "https://user-blocked.test/x.js",
+      initiator: "https://news.example.com",
+      type: "script",
+    });
+    expect(outcome.matchedRules.length).toBeGreaterThan(0);
+
+    await resetUserState(options);
+    await options.close();
+  });
+
+  test("a risky user filter is held in shadow mode until confirmed", async ({
+    context,
+    extensionId,
+    serviceWorker,
+  }) => {
+    const options = await context.newPage();
+    await options.goto(`chrome-extension://${extensionId}/options.html`);
+
+    const held = await options.evaluate(
+      async () =>
+        (
+          (await chrome.runtime.sendMessage({
+            type: "filters:apply",
+            // A bare document block: the broadest, most dangerous shape there is.
+            text: "||risky.test^$document",
+            confirmed: [],
+          })) as { data: { applied: number; shadowed: number } }
+        ).data,
+    );
+    expect(held.shadowed).toBeGreaterThan(0);
+    expect(held.applied).toBe(0);
+
+    const confirmed = await options.evaluate(
+      async () =>
+        (
+          (await chrome.runtime.sendMessage({
+            type: "filters:apply",
+            text: "||risky.test^$document",
+            confirmed: ["||risky.test^$document"],
+          })) as { data: { applied: number; shadowed: number } }
+        ).data,
+    );
+    expect(confirmed.applied).toBeGreaterThan(0);
+    expect(confirmed.shadowed).toBe(0);
+
+    await resetUserState(options);
+    await options.close();
+  });
+});
+
+test.describe("remote subscriptions", () => {
+  test("a subscribed list contributes network and cosmetic rules", async ({
+    context,
+    extensionId,
+    serviceWorker,
+    baseURL,
+  }) => {
+    const options = await context.newPage();
+    await options.goto(`chrome-extension://${extensionId}/options.html`);
+
+    const list = await options.evaluate(
+      async (url) =>
+        (
+          (await chrome.runtime.sendMessage({ type: "subs:add", url })) as {
+            data: Array<{ title: string; networkRules: number; error: string | null }>;
+          }
+        ).data,
+      `${baseURL}/sub-list.txt`,
+    );
+    expect(list).toHaveLength(1);
+    expect(list[0]?.title).toBe("404AD E2E Subscription");
+    expect(list[0]?.error).toBeNull();
+
+    // Its network rule is enforced through Chromium's own matcher.
+    const outcome = await testMatch(serviceWorker, {
+      url: "https://subscribed-ads.test/banner.js",
+      initiator: "https://news.example.com",
+      type: "script",
+    });
+    expect(outcome.matchedRules.length).toBeGreaterThan(0);
+
+    // And its cosmetic rule reaches the page.
+    const page = await context.newPage();
+    await page.goto("/");
+    await expect(page.locator("#subscribed-target")).toBeAttached();
+    await expect(page.locator("#subscribed-target")).toBeHidden({ timeout: 10_000 });
+    await page.close();
+
+    await resetUserState(options);
+    await options.close();
+  });
+
+  test("a subscription refuses a scheme that is not http or https", async ({
+    context,
+    extensionId,
+  }) => {
+    const options = await context.newPage();
+    await options.goto(`chrome-extension://${extensionId}/options.html`);
+
+    const reply = await options.evaluate(
+      async () =>
+        (await chrome.runtime.sendMessage({
+          type: "subs:add",
+          url: "chrome-extension://abc/generated/diagnostics.json",
+        })) as { ok: boolean; error?: string },
+    );
+    expect(reply.ok).toBe(false);
+    expect(reply.error).toContain("unsupported scheme");
+
+    await options.close();
+  });
+
+  test("disabling a subscription withdraws its rules", async ({
+    context,
+    extensionId,
+    serviceWorker,
+    baseURL,
+  }) => {
+    const options = await context.newPage();
+    await options.goto(`chrome-extension://${extensionId}/options.html`);
+
+    const added = await options.evaluate(
+      async (url) =>
+        (
+          (await chrome.runtime.sendMessage({ type: "subs:add", url })) as {
+            data: Array<{ id: string }>;
+          }
+        ).data,
+      `${baseURL}/sub-list.txt`,
+    );
+    const id = added[0]!.id;
+
+    await options.evaluate(
+      (subId) => chrome.runtime.sendMessage({ type: "subs:enable", id: subId, enabled: false }),
+      id,
+    );
+
+    const outcome = await testMatch(serviceWorker, {
+      url: "https://subscribed-ads.test/banner.js",
+      initiator: "https://news.example.com",
+      type: "script",
+    });
+    expect(outcome.matchedRules).toEqual([]);
+
+    await resetUserState(options);
+    await options.close();
+  });
+});
+
 test.describe("control plane", () => {
   test("the popup renders the current site and its controls", async ({ context, extensionId }) => {
     const page = await context.newPage();

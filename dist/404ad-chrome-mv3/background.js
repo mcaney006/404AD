@@ -195,6 +195,26 @@ var background = (function() {
 				wasm.__wbindgen_add_to_stack_pointer(16);
 			}
 		}
+		/**
+		* Selector strings cancelled on this host, for merging two indexes.
+		* @param {string} hostname
+		* @returns {string[]}
+		*/
+		unhideSelectors(hostname) {
+			try {
+				const retptr = wasm.__wbindgen_add_to_stack_pointer(-16);
+				const ptr0 = passStringToWasm0(hostname, wasm.__wbindgen_export, wasm.__wbindgen_export2);
+				const len0 = WASM_VECTOR_LEN;
+				wasm.cosmeticengine_unhideSelectors(retptr, this.__wbg_ptr, ptr0, len0);
+				var r0 = getDataViewMemory0().getInt32(retptr + 0, true);
+				var r1 = getDataViewMemory0().getInt32(retptr + 4, true);
+				var v2 = getArrayJsValueFromWasm0(r0, r1);
+				wasm.__wbindgen_export3(r0, r1 * 4, 4);
+				return v2;
+			} finally {
+				wasm.__wbindgen_add_to_stack_pointer(16);
+			}
+		}
 	};
 	if (Symbol.dispose) CosmeticEngine.prototype[Symbol.dispose] = CosmeticEngine.prototype.free;
 	var DiagnosticsEngine = class {
@@ -265,9 +285,13 @@ var background = (function() {
 	};
 	if (Symbol.dispose) DiagnosticsEngine.prototype[Symbol.dispose] = DiagnosticsEngine.prototype.free;
 	/**
-	* Compile user filters into DNR rules the extension can register dynamically.
+	* Compile user filters into DNR rules the extension can register dynamically,
+	* plus a cosmetic index the service worker can load like any other.
 	*
 	* Ids start at `id_base` so they cannot collide with the static rulesets.
+	* The cosmetic index comes back as postcard bytes rather than a JS object so
+	* the caller can hand it straight to [`CosmeticEngine`], which is the same
+	* path the compiled lists take.
 	* @param {string} text
 	* @param {number} id_base
 	* @param {boolean} shadow
@@ -323,9 +347,6 @@ var background = (function() {
 					getDataViewMemory0().setInt32(arg0 + 4, len1, true);
 					getDataViewMemory0().setInt32(arg0 + 0, ptr1, true);
 				},
-				__wbg___wbindgen_is_string_c4f7cb494a2a21f1: function(arg0) {
-					return typeof getObject(arg0) === "string";
-				},
 				__wbg___wbindgen_string_get_92ab86bb19cbc12f: function(arg0, arg1) {
 					const obj = getObject(arg1);
 					const ret = typeof obj === "string" ? obj : void 0;
@@ -340,9 +361,6 @@ var background = (function() {
 				__wbg_error_15c7318d411c8128: function(arg0, arg1) {
 					console.error(getStringFromWasm0(arg0, arg1));
 				},
-				__wbg_new_8d36e20aa758e411: function() {
-					return addHeapObject(/* @__PURE__ */ new Map());
-				},
 				__wbg_new_bebc3f4757acf305: function() {
 					return addHeapObject(/* @__PURE__ */ new Object());
 				},
@@ -354,9 +372,6 @@ var background = (function() {
 				},
 				__wbg_set_6be42768c690e380: function(arg0, arg1, arg2) {
 					getObject(arg0)[takeObject(arg1)] = takeObject(arg2);
-				},
-				__wbg_set_bf6dde4923b9b059: function(arg0, arg1, arg2) {
-					return addHeapObject(getObject(arg0).set(getObject(arg1), getObject(arg2)));
 				},
 				__wbindgen_generic_0000000000000001: function(arg0) {
 					return addHeapObject(arg0);
@@ -576,6 +591,8 @@ var background = (function() {
 	*/
 	var ready = null;
 	var cosmetic = null;
+	/** Cosmetic rules from user filters and subscriptions, compiled at runtime. */
+	var userCosmetic = null;
 	var diagnostics = null;
 	var diagnosticsReady = null;
 	var lastError = null;
@@ -619,19 +636,55 @@ var background = (function() {
 		})();
 		return diagnosticsReady;
 	}
-	/** Everything a content script needs for one document, in one WASM call. */
+	/**
+	* Install the cosmetic index compiled from user filters and subscriptions.
+	*
+	* A second engine rather than a merged one: the two are compiled at different
+	* times from different inputs, and rebuilding the bundled index every time the
+	* user edits a line would cost far more than querying two indexes does.
+	*/
+	function setUserCosmetic(bytes) {
+		userCosmetic = bytes && bytes.length > 0 ? new CosmeticEngine(bytes) : null;
+	}
+	function dedupe(values) {
+		return [...new Set(values)];
+	}
+	/**
+	* Everything a content script needs for one document.
+	*
+	* Results from both indexes are merged, and the user index gets the last word:
+	* a `#@#` rule the user wrote cancels a bundled selector. That is the whole
+	* point of an exception, and it only works if cancellation is matched on the
+	* selector text rather than on index-local ids.
+	*/
 	async function resolveDocument(host, tokens) {
-		return (await cosmeticEngine()).resolveDocument(host, tokens);
+		const base = (await cosmeticEngine()).resolveDocument(host, tokens);
+		if (!userCosmetic) return base;
+		const extra = userCosmetic.resolveDocument(host, tokens);
+		const cancelled = new Set(userCosmetic.unhideSelectors(host));
+		const keep = (selector) => !cancelled.has(selector);
+		return {
+			specific: dedupe([...base.specific, ...extra.specific]).filter(keep),
+			generic: dedupe([...base.generic, ...extra.generic]).filter(keep),
+			styles: dedupe([...base.styles, ...extra.styles]),
+			scriptlets: [...base.scriptlets, ...extra.scriptlets],
+			procedural: [...base.procedural, ...extra.procedural],
+			unhideIds: base.unhideIds
+		};
 	}
 	/**
 	* Second-pass generic selection.
 	*
 	* The first pass runs at `document_start`, when the DOM is empty and no tokens
-	* exist yet. This is called once the document has content, and again when a
-	* mutation introduces tokens that were not present before.
+	* exist yet. This runs once the document has content, and again when a mutation
+	* introduces tokens that were not present before.
 	*/
-	async function selectGeneric(tokens, unhideIds) {
-		return (await cosmeticEngine()).selectGeneric(tokens, new Uint32Array(unhideIds));
+	async function selectGeneric(tokens, unhideIds, host) {
+		const base = (await cosmeticEngine()).selectGeneric(tokens, new Uint32Array(unhideIds));
+		if (!userCosmetic || host === void 0) return base;
+		const extra = userCosmetic.selectGeneric(tokens, new Uint32Array([]));
+		const cancelled = new Set(userCosmetic.unhideSelectors(host));
+		return dedupe([...base, ...extra]).filter((selector) => !cancelled.has(selector));
 	}
 	async function explain(url, initiator, resourceType) {
 		return (await diagnosticsEngine()).explain(url, initiator, resourceType);
@@ -1022,17 +1075,195 @@ var background = (function() {
 		await flush();
 	}
 	//#endregion
+	//#region src/core/subscriptions.ts
+	/**
+	* Remote filter-list subscriptions.
+	*
+	* Subscriptions are **data only**. A list is fetched as text, parsed by the
+	* same Rust parser the bundled lists use, and lowered to dynamic
+	* `declarativeNetRequest` rules plus a cosmetic index. Nothing in a subscription
+	* is executed, and no filter syntax 404AD supports can express execution: there
+	* is no include directive, no script directive and no remote resource
+	* reference. That is what keeps remote subscriptions compatible with MV3's ban
+	* on remote code.
+	*
+	* Refresh is deliberately pull-based. There is no alarm and no periodic wakeup:
+	* lists refresh on worker start and when the user asks, and a list is only
+	* considered stale after {@link STALE_AFTER_MS}. Waking a service worker on a
+	* timer to re-download a file nobody is looking at is exactly the kind of cost
+	* this design is trying not to pay.
+	*/
+	var META_KEY = "subscriptions";
+	var TEXT_PREFIX = "subscription:";
+	/** Refuse anything larger than this. A filter list is text, not a payload. */
+	var MAX_LIST_BYTES = 8388608;
+	var FETCH_TIMEOUT_MS = 2e4;
+	var SubscriptionError = class extends Error {};
+	/** Stable id for a URL, so the same list added twice collapses to one entry. */
+	function subscriptionId(url) {
+		let hash = 2166136261;
+		const normalized = url.trim().toLowerCase();
+		for (let i = 0; i < normalized.length; i += 1) {
+			hash ^= normalized.charCodeAt(i);
+			hash = Math.imul(hash, 16777619) >>> 0;
+		}
+		return hash.toString(16).padStart(8, "0");
+	}
+	/**
+	* Only `https:` and `http:` are accepted.
+	*
+	* A `chrome-extension:`, `data:` or `file:` URL would let a subscription reach
+	* inside the extension or the local disk, which is not what subscribing to a
+	* filter list means.
+	*/
+	function assertFetchableUrl(url) {
+		let parsed;
+		try {
+			parsed = new URL(url);
+		} catch {
+			throw new SubscriptionError(`not a URL: ${url}`);
+		}
+		if (parsed.protocol !== "https:" && parsed.protocol !== "http:") throw new SubscriptionError(`unsupported scheme ${parsed.protocol} (use http or https)`);
+		return parsed;
+	}
+	async function loadSubscriptions() {
+		return (await chrome.storage.local.get(META_KEY))[META_KEY] ?? [];
+	}
+	async function saveSubscriptions(list) {
+		const sorted = [...list].sort((a, b) => a.title.localeCompare(b.title));
+		await chrome.storage.local.set({ [META_KEY]: sorted });
+	}
+	async function subscriptionText(id) {
+		const key = `${TEXT_PREFIX}${id}`;
+		return (await chrome.storage.local.get(key))[key] ?? "";
+	}
+	/** Concatenated text of every enabled subscription, oldest first. */
+	async function enabledSubscriptionText() {
+		const subscriptions = await loadSubscriptions();
+		const parts = [];
+		for (const subscription of subscriptions) {
+			if (!subscription.enabled) continue;
+			const text = await subscriptionText(subscription.id);
+			if (text) parts.push(`! source: ${subscription.title}\n${text}`);
+		}
+		return parts.join("\n");
+	}
+	/**
+	* Fetch a list and store its text.
+	*
+	* Returns the metadata, including any error. A failed refresh never removes the
+	* previously stored text: a subscription that cannot be reached today should
+	* keep working with yesterday's rules.
+	*/
+	async function fetchSubscription(url, existing) {
+		const parsed = assertFetchableUrl(url);
+		const id = existing?.id ?? subscriptionId(parsed.href);
+		const now = Date.now();
+		const base = existing ?? {
+			id,
+			url: parsed.href,
+			title: parsed.hostname + parsed.pathname,
+			enabled: true,
+			addedAt: now,
+			updatedAt: 0,
+			networkRules: 0,
+			cosmeticRules: 0,
+			bytes: 0,
+			error: null
+		};
+		const controller = new AbortController();
+		const timer = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
+		try {
+			const response = await fetch(parsed.href, {
+				signal: controller.signal,
+				credentials: "omit",
+				redirect: "follow",
+				cache: "no-cache"
+			});
+			if (!response.ok) throw new SubscriptionError(`${response.status} ${response.statusText}`);
+			const text = await response.text();
+			if (text.length > 8388608) throw new SubscriptionError(`list is ${Math.round(text.length / 1024)} KB, over the ${MAX_LIST_BYTES / 1024 / 1024} MB limit`);
+			await chrome.storage.local.set({ [`${TEXT_PREFIX}${id}`]: text });
+			return {
+				...base,
+				url: parsed.href,
+				title: titleOf(text) ?? base.title,
+				updatedAt: now,
+				bytes: text.length,
+				error: null
+			};
+		} catch (error) {
+			const message = error instanceof Error ? error.message : String(error);
+			return {
+				...base,
+				error: controller.signal.aborted ? "timed out" : message
+			};
+		} finally {
+			clearTimeout(timer);
+		}
+	}
+	/** `! Title: EasyList` — the convention every major list follows. */
+	function titleOf(text) {
+		for (const line of text.slice(0, 4e3).split("\n")) {
+			const match = /^!\s*Title:\s*(.+?)\s*$/i.exec(line);
+			if (match?.[1]) return match[1];
+		}
+		return null;
+	}
+	async function addSubscription(url) {
+		const parsed = assertFetchableUrl(url);
+		const subscriptions = await loadSubscriptions();
+		const id = subscriptionId(parsed.href);
+		if (subscriptions.some((s) => s.id === id)) throw new SubscriptionError("already subscribed to that list");
+		const fetched = await fetchSubscription(parsed.href);
+		await saveSubscriptions([...subscriptions, fetched]);
+		return loadSubscriptions();
+	}
+	async function removeSubscription(id) {
+		await saveSubscriptions((await loadSubscriptions()).filter((s) => s.id !== id));
+		await chrome.storage.local.remove(`${TEXT_PREFIX}${id}`);
+		return loadSubscriptions();
+	}
+	async function setSubscriptionEnabled(id, enabled) {
+		await saveSubscriptions((await loadSubscriptions()).map((s) => s.id === id ? {
+			...s,
+			enabled
+		} : s));
+		return loadSubscriptions();
+	}
+	/** Refresh one subscription, or every stale one when no id is given. */
+	async function refreshSubscriptions(id) {
+		const subscriptions = await loadSubscriptions();
+		const now = Date.now();
+		await saveSubscriptions(await Promise.all(subscriptions.map(async (subscription) => {
+			if (!(id ? subscription.id === id : now - subscription.updatedAt > 3456e5)) return subscription;
+			return fetchSubscription(subscription.url, subscription);
+		})));
+		return loadSubscriptions();
+	}
+	/** Record what the compiler made of a subscription, for the options page. */
+	async function recordCounts(counts) {
+		if (counts.size === 0) return;
+		await saveSubscriptions((await loadSubscriptions()).map((s) => {
+			const count = counts.get(s.id);
+			return count ? {
+				...s,
+				...count
+			} : s;
+		}));
+	}
+	//#endregion
 	//#region src/core/userfilters.ts
 	/**
-	* Custom user filters.
+	* Custom filters and subscriptions, compiled into dynamic rules.
 	*
 	* Two things make this more than "append text to a list":
 	*
 	*  * Every line is parsed and scored before it is applied, so a typo is
 	*    reported with a reason instead of silently doing nothing.
 	*  * A line the risk model rates High or above is compiled into **shadow mode**
-	*    until the user explicitly confirms it. It still matches, it still shows up
-	*    in diagnostics, but it cannot change a single request until confirmed.
+	*    until the user confirms it. It still matches and still appears in
+	*    diagnostics, but it cannot change a single request until confirmed.
 	*
 	* That turns the most dangerous thing a user can do — hand-write a broad
 	* blocking rule — into something observable first and enforced second.
@@ -1042,11 +1273,24 @@ var background = (function() {
 	*
 	* Dynamic and static rules live in separate id namespaces, so this is not
 	* required for correctness. It is required for *legibility*: a rule id above
-	* this line in a diagnostics dump is unambiguously the user's own.
+	* this line in a diagnostics dump is unambiguously not from a bundled list.
 	*/
 	var USER_RULE_ID_BASE = 1e6;
+	var lastStatus = {
+		networkRules: 0,
+		cosmeticRules: 0,
+		applied: 0,
+		shadowed: 0,
+		unsupported: 0,
+		errors: 0,
+		dropped: 0,
+		limit: 4800
+	};
+	function userFilterStatus() {
+		return lastStatus;
+	}
 	/** Split filter text into the lines that may be enforced and those that may not. */
-	function partition(text, validation, confirmed) {
+	function partition(validation, confirmed) {
 		const enforced = [];
 		const shadowed = [];
 		for (const line of validation.lines) {
@@ -1059,35 +1303,89 @@ var background = (function() {
 			shadowed: shadowed.join("\n")
 		};
 	}
-	async function applyUserFilters(text, confirmedRiskyFilters) {
-		const validation = await validateFilters(text);
-		const { enforced, shadowed } = partition(text, validation, new Set(confirmedRiskyFilters));
+	/**
+	* Compile user filters plus every enabled subscription and register the result.
+	*
+	* Subscriptions are trusted less than hand-written filters in exactly one way:
+	* they are not offered the risk-confirmation prompt, because a user cannot
+	* reasonably confirm ten thousand lines. Instead they are enforced as written,
+	* which is what subscribing to a list means, and the options page reports what
+	* each one contributed.
+	*/
+	async function applyUserFilters(userText, confirmedRiskyFilters) {
+		const validation = await validateFilters(userText);
+		const { enforced, shadowed } = partition(validation, new Set(confirmedRiskyFilters));
+		const enforcedText = [enforced, await enabledSubscriptionText()].filter((t) => t.trim()).join("\n");
 		const rules = [];
+		const cosmeticChunks = [];
 		let unsupported = 0;
-		if (enforced.trim()) {
-			const compiled = await compileUserFilters(enforced, USER_RULE_ID_BASE, false);
+		let networkRules = 0;
+		let cosmeticRules = 0;
+		if (enforcedText.trim()) {
+			const compiled = await compileUserFilters(enforcedText, USER_RULE_ID_BASE, false);
 			rules.push(...compiled.rules);
+			cosmeticChunks.push(compiled.cosmeticBin);
 			unsupported += compiled.unsupported.length;
+			networkRules += compiled.networkRules;
+			cosmeticRules += compiled.cosmeticRules;
 		}
 		if (shadowed.trim()) {
 			const compiled = await compileUserFilters(shadowed, 15e5, true);
 			rules.push(...compiled.rules);
 			unsupported += compiled.unsupported.length;
+			networkRules += compiled.networkRules;
 		}
+		setUserCosmetic(cosmeticChunks[0] ?? null);
+		const limit = 4800;
+		const accepted = rules.slice(0, limit);
+		const dropped = rules.length - accepted.length;
 		const existing = await chrome.declarativeNetRequest.getDynamicRules();
 		await chrome.declarativeNetRequest.updateDynamicRules({
 			removeRuleIds: existing.map((r) => r.id),
-			addRules: rules
+			addRules: accepted
 		});
-		return {
-			applied: rules.filter((r) => r.priority !== 1).length,
-			shadowed: rules.filter((r) => r.priority === 1).length,
+		lastStatus = {
+			networkRules,
+			cosmeticRules,
+			applied: accepted.filter((r) => r.priority !== 1).length,
+			shadowed: accepted.filter((r) => r.priority === 1).length,
 			unsupported,
-			errors: validation.errors
+			errors: validation.errors,
+			dropped,
+			limit
 		};
+		return lastStatus;
+	}
+	/** Per-subscription rule counts, for the options page. */
+	async function measureSubscriptions() {
+		const counts = /* @__PURE__ */ new Map();
+		for (const subscription of await loadSubscriptions()) {
+			if (!subscription.enabled) {
+				counts.set(subscription.id, {
+					networkRules: 0,
+					cosmeticRules: 0
+				});
+				continue;
+			}
+			const text = await subscriptionText(subscription.id);
+			if (!text.trim()) continue;
+			const compiled = await compileUserFilters(text, USER_RULE_ID_BASE, false);
+			counts.set(subscription.id, {
+				networkRules: compiled.networkRules,
+				cosmeticRules: compiled.cosmeticRules
+			});
+		}
+		return counts;
 	}
 	/** Remove every dynamic rule. Used when the master switch goes off. */
 	async function clearUserFilters() {
+		setUserCosmetic(null);
+		lastStatus = {
+			...lastStatus,
+			applied: 0,
+			shadowed: 0,
+			dropped: 0
+		};
 		const existing = await chrome.declarativeNetRequest.getDynamicRules();
 		if (existing.length === 0) return;
 		await chrome.declarativeNetRequest.updateDynamicRules({
@@ -1116,7 +1414,22 @@ var background = (function() {
 			]);
 			shadowIds = await shadowRuleIds().catch(() => /* @__PURE__ */ new Set());
 			const settings = await loadSettings();
-			if (settings.enabled && settings.userFilters.trim()) await applyUserFilters(settings.userFilters, settings.confirmedRiskyFilters).catch((e) => console.error("404AD: user filters failed to apply", e));
+			if (settings.enabled) {
+				await applyUserFilters(settings.userFilters, settings.confirmedRiskyFilters).catch((e) => console.error("404AD: user filters failed to apply", e));
+				refreshStaleSubscriptions();
+			}
+		}
+		/** Refresh stale subscriptions, then recompile if anything changed. */
+		async function refreshStaleSubscriptions() {
+			try {
+				const before = await loadSubscriptions();
+				if (!(await refreshSubscriptions()).some((s, i) => s.updatedAt !== before[i]?.updatedAt || s.bytes !== before[i]?.bytes)) return;
+				const settings = await loadSettings();
+				await applyUserFilters(settings.userFilters, settings.confirmedRiskyFilters);
+				await recordCounts(await measureSubscriptions());
+			} catch (error) {
+				console.warn("404AD: subscription refresh failed", error);
+			}
 		}
 		chrome.runtime.onInstalled.addListener((details) => {
 			if (details.reason === "install") chrome.storage.local.set({ settings: DEFAULT_SETTINGS });
@@ -1202,7 +1515,7 @@ var background = (function() {
 					const settings = await loadSettings();
 					const mode = await resolveMode(message.host);
 					if (!settings.enabled || !settings.cosmeticFiltering || mode !== "default") return { generic: [] };
-					return { generic: await selectGeneric(message.tokens, message.unhideIds) };
+					return { generic: await selectGeneric(message.tokens, message.unhideIds, message.host) };
 				}
 				case "content:hidden": {
 					const tabId = sender.tab?.id;
@@ -1218,9 +1531,7 @@ var background = (function() {
 				case "settings:set": {
 					const next = await saveSettings(message.patch);
 					await syncRulesets();
-					if (!next.enabled) await clearUserFilters();
-					else if (next.userFilters.trim()) await applyUserFilters(next.userFilters, next.confirmedRiskyFilters);
-					else await clearUserFilters();
+					await recompileFromStorage();
 					shadowIds = await shadowRuleIds().catch(() => shadowIds);
 					return next;
 				}
@@ -1258,7 +1569,38 @@ var background = (function() {
 					});
 					return await applyUserFilters(settings.userFilters, settings.confirmedRiskyFilters);
 				}
+				case "filters:status": return userFilterStatus();
+				case "subs:list": return await loadSubscriptions();
+				case "subs:add": {
+					const list = await addSubscription(message.url);
+					await recompileFromStorage();
+					return list;
+				}
+				case "subs:remove": {
+					const list = await removeSubscription(message.id);
+					await recompileFromStorage();
+					return list;
+				}
+				case "subs:enable": {
+					const list = await setSubscriptionEnabled(message.id, message.enabled);
+					await recompileFromStorage();
+					return list;
+				}
+				case "subs:refresh":
+					await refreshSubscriptions(message.id);
+					await recompileFromStorage();
+					return await loadSubscriptions();
 			}
+		}
+		/** Recompile dynamic rules from whatever is currently in storage. */
+		async function recompileFromStorage() {
+			const settings = await loadSettings();
+			if (!settings.enabled) {
+				await clearUserFilters();
+				return;
+			}
+			await applyUserFilters(settings.userFilters, settings.confirmedRiskyFilters);
+			await recordCounts(await measureSubscriptions());
 		}
 		async function tabState(tabId) {
 			const settings = await loadSettings();

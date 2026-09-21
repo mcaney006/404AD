@@ -25,7 +25,20 @@ import { syncRulesets } from "../src/core/rulesets";
 import { DEFAULT_SETTINGS, loadSettings, saveSettings } from "../src/core/settings";
 import { loadSites, resolveMode, setSiteMode, syncSessionRules } from "../src/core/sites";
 import { flush, recordBlock, recordShadow, reset, snapshot } from "../src/core/stats";
-import { applyUserFilters, clearUserFilters } from "../src/core/userfilters";
+import {
+  applyUserFilters,
+  clearUserFilters,
+  measureSubscriptions,
+  userFilterStatus,
+} from "../src/core/userfilters";
+import {
+  addSubscription,
+  loadSubscriptions,
+  recordCounts,
+  refreshSubscriptions,
+  removeSubscription,
+  setSubscriptionEnabled,
+} from "../src/core/subscriptions";
 
 /**
  * The 404AD service worker: the control plane.
@@ -52,10 +65,32 @@ export default defineBackground(() => {
     shadowIds = await shadowRuleIds().catch(() => new Set<number>());
 
     const settings = await loadSettings();
-    if (settings.enabled && settings.userFilters.trim()) {
+    if (settings.enabled) {
+      // Compiled on every worker start rather than persisted: dynamic rules
+      // survive restarts anyway, and recompiling is what installs the user
+      // cosmetic index, which does not.
       await applyUserFilters(settings.userFilters, settings.confirmedRiskyFilters).catch((e) =>
         console.error("404AD: user filters failed to apply", e),
       );
+      // Pull-based refresh, no alarm: only lists that are already stale.
+      void refreshStaleSubscriptions();
+    }
+  }
+
+  /** Refresh stale subscriptions, then recompile if anything changed. */
+  async function refreshStaleSubscriptions(): Promise<void> {
+    try {
+      const before = await loadSubscriptions();
+      const after = await refreshSubscriptions();
+      const changed = after.some(
+        (s, i) => s.updatedAt !== before[i]?.updatedAt || s.bytes !== before[i]?.bytes,
+      );
+      if (!changed) return;
+      const settings = await loadSettings();
+      await applyUserFilters(settings.userFilters, settings.confirmedRiskyFilters);
+      await recordCounts(await measureSubscriptions());
+    } catch (error) {
+      console.warn("404AD: subscription refresh failed", error);
     }
   }
 
@@ -182,7 +217,9 @@ export default defineBackground(() => {
         if (!settings.enabled || !settings.cosmeticFiltering || mode !== "default") {
           return { generic: [] };
         }
-        return { generic: await selectGeneric(message.tokens, message.unhideIds) };
+        return {
+          generic: await selectGeneric(message.tokens, message.unhideIds, message.host),
+        };
       }
 
       case "content:hidden": {
@@ -212,13 +249,7 @@ export default defineBackground(() => {
       case "settings:set": {
         const next = await saveSettings(message.patch);
         await syncRulesets();
-        if (!next.enabled) {
-          await clearUserFilters();
-        } else if (next.userFilters.trim()) {
-          await applyUserFilters(next.userFilters, next.confirmedRiskyFilters);
-        } else {
-          await clearUserFilters();
-        }
+        await recompileFromStorage();
         shadowIds = await shadowRuleIds().catch(() => shadowIds);
         return next;
       }
@@ -269,7 +300,48 @@ export default defineBackground(() => {
         });
         return await applyUserFilters(settings.userFilters, settings.confirmedRiskyFilters);
       }
+
+      case "filters:status":
+        return userFilterStatus();
+
+      case "subs:list":
+        return await loadSubscriptions();
+
+      case "subs:add": {
+        const list = await addSubscription(message.url);
+        await recompileFromStorage();
+        return list;
+      }
+
+      case "subs:remove": {
+        const list = await removeSubscription(message.id);
+        await recompileFromStorage();
+        return list;
+      }
+
+      case "subs:enable": {
+        const list = await setSubscriptionEnabled(message.id, message.enabled);
+        await recompileFromStorage();
+        return list;
+      }
+
+      case "subs:refresh": {
+        await refreshSubscriptions(message.id);
+        await recompileFromStorage();
+        return await loadSubscriptions();
+      }
     }
+  }
+
+  /** Recompile dynamic rules from whatever is currently in storage. */
+  async function recompileFromStorage(): Promise<void> {
+    const settings = await loadSettings();
+    if (!settings.enabled) {
+      await clearUserFilters();
+      return;
+    }
+    await applyUserFilters(settings.userFilters, settings.confirmedRiskyFilters);
+    await recordCounts(await measureSubscriptions());
   }
 
   async function tabState(tabId: number): Promise<TabState> {

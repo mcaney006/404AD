@@ -324,6 +324,19 @@ impl CosmeticIndex {
             .collect()
     }
 
+    /// Selector strings cancelled on this host.
+    ///
+    /// Needed when two indexes are merged: user filters have to be able to
+    /// cancel a bundled rule, and the ids in [`HostResult::unhide_ids`] are
+    /// local to the index that produced them.
+    pub fn unhide_selectors(&self, hostname: &str) -> Vec<String> {
+        self.lookup_host(hostname)
+            .unhide_ids
+            .iter()
+            .filter_map(|id| self.selectors.get(*id as usize).cloned())
+            .collect()
+    }
+
     pub fn generic_count(&self) -> usize {
         self.generic_by_token.values().map(Vec::len).sum::<usize>() + self.generic_unanchored.len()
     }
@@ -460,6 +473,20 @@ mod tests {
         let p = &idx.lookup_host("example.com").procedural;
         assert_eq!(p.len(), 1);
         assert_eq!(p[0].prefix.as_deref(), Some("div"));
+    }
+
+    #[test]
+    fn unhide_selectors_are_reported_as_strings_for_cross_index_merging() {
+        let idx = index("example.com#@#.promo\n~other.com##.banner-advert");
+        let mut cancelled = idx.unhide_selectors("example.com");
+        cancelled.sort();
+        assert_eq!(cancelled, vec![".promo".to_string()]);
+
+        assert_eq!(
+            idx.unhide_selectors("other.com"),
+            vec![".banner-advert".to_string()]
+        );
+        assert!(idx.unhide_selectors("unrelated.test").is_empty());
     }
 
     #[test]

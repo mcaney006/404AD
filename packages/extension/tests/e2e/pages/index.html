@@ -23,6 +23,15 @@
     <div class="block article-body" id="content">real page content</div>
     <div class="block header-banner" id="not-an-ad">a banner that is not an ad</div>
 
+    <!-- Hidden only by a user filter, never by a bundled list. -->
+    <div class="block user-filtered-box" id="user-target">hidden by a custom filter</div>
+
+    <!-- Hidden by a bundled generic rule, and un-hidden by a user #@# rule. -->
+    <div class="block sponsored-link" id="unhide-target">cancelled by a user exception</div>
+
+    <!-- Hidden only by a subscribed remote list. -->
+    <div class="block subscribed-ad-container" id="subscribed-target">from a subscription</div>
+
     <!-- Injected late, to exercise the incremental token pass. -->
     <div id="late"></div>
     <script>

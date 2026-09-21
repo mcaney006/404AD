@@ -23,6 +23,37 @@ export interface SiteRule {
   updatedAt: number;
 }
 
+/** A remote filter list the user subscribed to. Data only: never executed. */
+export interface Subscription {
+  id: string;
+  url: string;
+  title: string;
+  enabled: boolean;
+  addedAt: number;
+  /** Epoch millis of the last successful fetch. Zero means never. */
+  updatedAt: number;
+  networkRules: number;
+  cosmeticRules: number;
+  bytes: number;
+  /** Last fetch error, or null. A failed refresh keeps the previous text. */
+  error: string | null;
+}
+
+/** What the last user-filter compile produced. */
+export interface UserFilterStatus {
+  networkRules: number;
+  cosmeticRules: number;
+  /** Enforced dynamic rules actually registered with Chromium. */
+  applied: number;
+  /** Rules held in shadow mode pending confirmation. */
+  shadowed: number;
+  unsupported: number;
+  errors: number;
+  /** Dynamic rules dropped because Chromium's ceiling was reached. */
+  dropped: number;
+  limit: number;
+}
+
 export interface Settings {
   /** Master switch. */
   enabled: boolean;
@@ -204,7 +235,13 @@ export type Request =
   | { type: "diagnostics:explain"; url: string; initiator: string; resourceType: string }
   | { type: "diagnostics:rule"; ruleId: number }
   | { type: "filters:validate"; text: string }
-  | { type: "filters:apply"; text: string; confirmed: string[] };
+  | { type: "filters:apply"; text: string; confirmed: string[] }
+  | { type: "filters:status" }
+  | { type: "subs:list" }
+  | { type: "subs:add"; url: string }
+  | { type: "subs:remove"; id: string }
+  | { type: "subs:enable"; id: string; enabled: boolean }
+  | { type: "subs:refresh"; id?: string };
 
 export interface ResponseMap {
   "document:resolve": DocumentPayload;
@@ -222,7 +259,13 @@ export interface ResponseMap {
   "diagnostics:explain": Explanation;
   "diagnostics:rule": RuleDiagnostic | null;
   "filters:validate": ValidationResult;
-  "filters:apply": { applied: number; shadowed: number; unsupported: number; errors: number };
+  "filters:apply": UserFilterStatus;
+  "filters:status": UserFilterStatus;
+  "subs:list": Subscription[];
+  "subs:add": Subscription[];
+  "subs:remove": Subscription[];
+  "subs:enable": Subscription[];
+  "subs:refresh": Subscription[];
 }
 
 export type Response<T extends Request["type"]> = ResponseMap[T];

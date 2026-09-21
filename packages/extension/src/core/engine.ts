@@ -19,6 +19,8 @@ import type { DocumentPayload, Explanation, ValidationResult } from "./protocol"
 
 let ready: Promise<void> | null = null;
 let cosmetic: CosmeticEngine | null = null;
+/** Cosmetic rules from user filters and subscriptions, compiled at runtime. */
+let userCosmetic: CosmeticEngine | null = null;
 let diagnostics: DiagnosticsEngine | null = null;
 let diagnosticsReady: Promise<DiagnosticsEngine> | null = null;
 let lastError: string | null = null;
@@ -80,22 +82,71 @@ export interface ResolvedDocument {
   unhideIds: number[];
 }
 
-/** Everything a content script needs for one document, in one WASM call. */
+/**
+ * Install the cosmetic index compiled from user filters and subscriptions.
+ *
+ * A second engine rather than a merged one: the two are compiled at different
+ * times from different inputs, and rebuilding the bundled index every time the
+ * user edits a line would cost far more than querying two indexes does.
+ */
+export function setUserCosmetic(bytes: Uint8Array | null): void {
+  userCosmetic = bytes && bytes.length > 0 ? new CosmeticEngine(bytes) : null;
+}
+
+export function hasUserCosmetic(): boolean {
+  return userCosmetic !== null;
+}
+
+function dedupe(values: string[]): string[] {
+  return [...new Set(values)];
+}
+
+/**
+ * Everything a content script needs for one document.
+ *
+ * Results from both indexes are merged, and the user index gets the last word:
+ * a `#@#` rule the user wrote cancels a bundled selector. That is the whole
+ * point of an exception, and it only works if cancellation is matched on the
+ * selector text rather than on index-local ids.
+ */
 export async function resolveDocument(host: string, tokens: string[]): Promise<ResolvedDocument> {
   const engine = await cosmeticEngine();
-  return engine.resolveDocument(host, tokens) as ResolvedDocument;
+  const base = engine.resolveDocument(host, tokens) as ResolvedDocument;
+  if (!userCosmetic) return base;
+
+  const extra = userCosmetic.resolveDocument(host, tokens) as ResolvedDocument;
+  const cancelled = new Set(userCosmetic.unhideSelectors(host));
+  const keep = (selector: string): boolean => !cancelled.has(selector);
+
+  return {
+    specific: dedupe([...base.specific, ...extra.specific]).filter(keep),
+    generic: dedupe([...base.generic, ...extra.generic]).filter(keep),
+    styles: dedupe([...base.styles, ...extra.styles]),
+    scriptlets: [...base.scriptlets, ...extra.scriptlets],
+    procedural: [...base.procedural, ...extra.procedural],
+    unhideIds: base.unhideIds,
+  };
 }
 
 /**
  * Second-pass generic selection.
  *
  * The first pass runs at `document_start`, when the DOM is empty and no tokens
- * exist yet. This is called once the document has content, and again when a
- * mutation introduces tokens that were not present before.
+ * exist yet. This runs once the document has content, and again when a mutation
+ * introduces tokens that were not present before.
  */
-export async function selectGeneric(tokens: string[], unhideIds: number[]): Promise<string[]> {
+export async function selectGeneric(
+  tokens: string[],
+  unhideIds: number[],
+  host?: string,
+): Promise<string[]> {
   const engine = await cosmeticEngine();
-  return engine.selectGeneric(tokens, new Uint32Array(unhideIds));
+  const base = engine.selectGeneric(tokens, new Uint32Array(unhideIds));
+  if (!userCosmetic || host === undefined) return base;
+
+  const extra = userCosmetic.selectGeneric(tokens, new Uint32Array([]));
+  const cancelled = new Set(userCosmetic.unhideSelectors(host));
+  return dedupe([...base, ...extra]).filter((selector) => !cancelled.has(selector));
 }
 
 export async function explain(
@@ -115,7 +166,11 @@ export async function validateFilters(text: string): Promise<ValidationResult> {
 export interface CompiledUserFilters {
   rules: chrome.declarativeNetRequest.Rule[];
   unsupported: Array<{ ruleId: number; raw: string; line: number; reason: string }>;
-  cosmetic: unknown;
+  /** Postcard bytes, loadable by `CosmeticEngine`. */
+  cosmeticBin: Uint8Array;
+  networkRules: number;
+  cosmeticRules: number;
+  parseErrors: Array<{ line: number; raw: string; error: string }>;
 }
 
 export async function compileUserFilters(

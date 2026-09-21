@@ -1,0 +1,7 @@
+[Adblock Plus 2.0]
+! Title: 404AD E2E Subscription
+! A remote list used by the end-to-end suite. Data only, like every subscription.
+||subscribed-tracker.test^$third-party
+||subscribed-ads.test^$third-party
+##.subscribed-ad-container
+example.test##.site-scoped-promo

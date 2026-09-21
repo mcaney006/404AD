@@ -10,6 +10,10 @@ var TABS = [
 		label: "Filter lists"
 	},
 	{
+		id: "subs",
+		label: "Subscriptions"
+	},
+	{
 		id: "filters",
 		label: "Custom filters"
 	},
@@ -210,12 +214,193 @@ function Lists() {
 		})]
 	});
 }
+function relativeTime(epoch) {
+	if (!epoch) return "never";
+	const minutes = Math.round((Date.now() - epoch) / 6e4);
+	if (minutes < 1) return "just now";
+	if (minutes < 60) return `${minutes}m ago`;
+	const hours = Math.round(minutes / 60);
+	if (hours < 24) return `${hours}h ago`;
+	return `${Math.round(hours / 24)}d ago`;
+}
+function Subscriptions() {
+	const list = useSignal([]);
+	const url = useSignal("");
+	const busy = useSignal(false);
+	const problem = useSignal(null);
+	const reload = async () => {
+		list.value = await send({ type: "subs:list" });
+	};
+	h(() => {
+		reload();
+	}, []);
+	const run = async (action) => {
+		busy.value = true;
+		problem.value = null;
+		try {
+			list.value = await action();
+		} catch (e) {
+			problem.value = e instanceof Error ? e.message : String(e);
+		} finally {
+			busy.value = false;
+		}
+	};
+	return /* @__PURE__ */ u("div", {
+		class: "col",
+		children: [/* @__PURE__ */ u("div", {
+			class: "card col",
+			children: [
+				/* @__PURE__ */ u("h3", { children: "Remote filter lists" }),
+				/* @__PURE__ */ u("p", {
+					class: "muted",
+					style: "margin:0",
+					children: [
+						"A subscription is ",
+						/* @__PURE__ */ u("strong", { children: "data only" }),
+						". The list is fetched as text, parsed by the same Rust parser the bundled lists use, and lowered to dynamic rules. Nothing in a subscription is executed, and no filter syntax 404AD supports can express execution. Lists refresh when you ask and when the extension starts, never on a timer: waking a service worker to re-download a file nobody is looking at is a cost with no benefit."
+					]
+				}),
+				/* @__PURE__ */ u("div", {
+					class: "row",
+					children: [
+						/* @__PURE__ */ u("input", {
+							type: "text",
+							class: "grow",
+							placeholder: "https://example.org/filters.txt",
+							value: url.value,
+							onInput: (e) => {
+								url.value = e.target.value;
+							}
+						}),
+						/* @__PURE__ */ u("button", {
+							disabled: busy.value || !url.value.trim(),
+							onClick: () => void run(async () => {
+								const next = await send({
+									type: "subs:add",
+									url: url.value.trim()
+								});
+								url.value = "";
+								return next;
+							}),
+							children: "Subscribe"
+						}),
+						/* @__PURE__ */ u("button", {
+							disabled: busy.value || list.value.length === 0,
+							onClick: () => void run(() => send({ type: "subs:refresh" })),
+							children: "Refresh all"
+						})
+					]
+				}),
+				problem.value && /* @__PURE__ */ u("p", {
+					style: "margin:0",
+					children: [
+						/* @__PURE__ */ u("span", {
+							class: "badge critical",
+							children: "error"
+						}),
+						" ",
+						/* @__PURE__ */ u("span", {
+							class: "mono",
+							children: problem.value
+						})
+					]
+				})
+			]
+		}), /* @__PURE__ */ u("div", {
+			class: "card",
+			children: list.value.length === 0 ? /* @__PURE__ */ u("p", {
+				class: "empty",
+				style: "margin:0",
+				children: "No subscriptions. 404AD ships with its own compiled lists; a subscription adds to them."
+			}) : /* @__PURE__ */ u("table", { children: [/* @__PURE__ */ u("thead", { children: /* @__PURE__ */ u("tr", { children: [
+				/* @__PURE__ */ u("th", { children: "List" }),
+				/* @__PURE__ */ u("th", {
+					class: "num",
+					children: "Network"
+				}),
+				/* @__PURE__ */ u("th", {
+					class: "num",
+					children: "Cosmetic"
+				}),
+				/* @__PURE__ */ u("th", {
+					class: "num",
+					children: "Updated"
+				}),
+				/* @__PURE__ */ u("th", {})
+			] }) }), /* @__PURE__ */ u("tbody", { children: list.value.map((subscription) => /* @__PURE__ */ u("tr", { children: [
+				/* @__PURE__ */ u("td", { children: /* @__PURE__ */ u("div", {
+					class: "col",
+					style: "gap:2px",
+					children: [
+						/* @__PURE__ */ u("span", { children: subscription.title }),
+						/* @__PURE__ */ u("span", {
+							class: "muted mono truncate",
+							style: "max-width:300px",
+							children: subscription.url
+						}),
+						subscription.error && /* @__PURE__ */ u("span", {
+							class: "badge high",
+							children: subscription.error
+						})
+					]
+				}) }),
+				/* @__PURE__ */ u("td", {
+					class: "num mono",
+					children: formatCount(subscription.networkRules)
+				}),
+				/* @__PURE__ */ u("td", {
+					class: "num mono",
+					children: formatCount(subscription.cosmeticRules)
+				}),
+				/* @__PURE__ */ u("td", {
+					class: "num muted",
+					children: relativeTime(subscription.updatedAt)
+				}),
+				/* @__PURE__ */ u("td", {
+					class: "num",
+					children: /* @__PURE__ */ u("div", {
+						class: "row",
+						style: "justify-content:flex-end",
+						children: [
+							/* @__PURE__ */ u("button", {
+								"aria-pressed": subscription.enabled,
+								disabled: busy.value,
+								onClick: () => void run(() => send({
+									type: "subs:enable",
+									id: subscription.id,
+									enabled: !subscription.enabled
+								})),
+								children: subscription.enabled ? "On" : "Off"
+							}),
+							/* @__PURE__ */ u("button", {
+								disabled: busy.value,
+								onClick: () => void run(() => send({
+									type: "subs:refresh",
+									id: subscription.id
+								})),
+								children: "Refresh"
+							}),
+							/* @__PURE__ */ u("button", {
+								disabled: busy.value,
+								onClick: () => void run(() => send({
+									type: "subs:remove",
+									id: subscription.id
+								})),
+								children: "Remove"
+							})
+						]
+					})
+				})
+			] }, subscription.id)) })] })
+		})]
+	});
+}
 function CustomFilters() {
 	const s = settings.value;
 	const text = useSignal(null);
 	const result = useSignal(null);
 	const busy = useSignal(false);
-	const applied = useSignal(null);
+	const status = useSignal(null);
 	h(() => {
 		if (s && text.value === null) text.value = s.userFilters;
 	}, [s]);
@@ -238,12 +423,11 @@ function CustomFilters() {
 	const apply = async () => {
 		busy.value = true;
 		try {
-			const outcome = await send({
+			status.value = await send({
 				type: "filters:apply",
 				text: text.value ?? "",
 				confirmed: [...confirmed]
 			});
-			applied.value = `${outcome.applied} enforced, ${outcome.shadowed} held in shadow mode, ${outcome.unsupported} not expressible in MV3, ${outcome.errors} errors`;
 			await refreshSettings();
 		} finally {
 			busy.value = false;
@@ -284,21 +468,66 @@ function CustomFilters() {
 				}),
 				/* @__PURE__ */ u("div", {
 					class: "row",
+					children: [/* @__PURE__ */ u("button", {
+						disabled: busy.value,
+						onClick: () => void validate(),
+						children: "Check"
+					}), /* @__PURE__ */ u("button", {
+						disabled: busy.value,
+						onClick: () => void apply(),
+						children: "Apply"
+					})]
+				}),
+				status.value && /* @__PURE__ */ u("div", {
+					class: "col",
+					style: "gap:4px",
 					children: [
-						/* @__PURE__ */ u("button", {
-							disabled: busy.value,
-							onClick: () => void validate(),
-							children: "Check"
+						/* @__PURE__ */ u("div", {
+							class: "row between",
+							children: [/* @__PURE__ */ u("span", {
+								class: "muted",
+								children: [
+									status.value.applied,
+									" enforced · ",
+									status.value.shadowed,
+									" in shadow mode ·",
+									" ",
+									status.value.unsupported,
+									" not expressible in MV3 · ",
+									status.value.errors,
+									" errors"
+								]
+							}), /* @__PURE__ */ u("span", {
+								class: "mono",
+								children: [
+									status.value.applied + status.value.shadowed,
+									"/",
+									status.value.limit,
+									" dynamic rules"
+								]
+							})]
 						}),
-						/* @__PURE__ */ u("button", {
-							disabled: busy.value,
-							onClick: () => void apply(),
-							children: "Apply"
+						/* @__PURE__ */ u("div", {
+							class: "bar",
+							children: /* @__PURE__ */ u("span", { style: `width:${Math.min(100, (status.value.applied + status.value.shadowed) / status.value.limit * 100)}%` })
 						}),
-						applied.value && /* @__PURE__ */ u("span", {
-							class: "muted",
-							children: applied.value
-						})
+						status.value.dropped > 0 && /* @__PURE__ */ u("span", { children: [
+							/* @__PURE__ */ u("span", {
+								class: "badge high",
+								children: "budget"
+							}),
+							" ",
+							/* @__PURE__ */ u("span", {
+								class: "muted",
+								children: [
+									status.value.dropped,
+									" rules were dropped. Chromium caps dynamic rules at",
+									" ",
+									status.value.limit,
+									"; disable a subscription to make room."
+								]
+							})
+						] })
 					]
 				})
 			]
@@ -708,6 +937,7 @@ function App() {
 			}),
 			active.value === "overview" && /* @__PURE__ */ u(Overview, {}),
 			active.value === "lists" && /* @__PURE__ */ u(Lists, {}),
+			active.value === "subs" && /* @__PURE__ */ u(Subscriptions, {}),
 			active.value === "filters" && /* @__PURE__ */ u(CustomFilters, {}),
 			active.value === "sites" && /* @__PURE__ */ u(Sites, {}),
 			active.value === "stats" && /* @__PURE__ */ u(Statistics, {}),
