@@ -133,6 +133,8 @@ function observeBody(
     const reader = toEngine.getReader();
     let total = 0;
     try {
+      // Sequential by necessity: a stream is consumed in order, and the parser
+      // is a state machine over that order.
       for (;;) {
         const { done, value } = await reader.read();
         if (done || !value) break;

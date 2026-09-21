@@ -193,6 +193,9 @@ export async function setSubscriptionEnabled(
   enabled: boolean,
 ): Promise<Subscription[]> {
   const subscriptions = await loadSubscriptions();
+  // Copied rather than mutated: these objects are the cached list other
+  // callers may still be holding, and storage takes the new one.
+  // eslint-disable-next-line oxc/no-map-spread
   await saveSubscriptions(subscriptions.map((s) => (s.id === id ? { ...s, enabled } : s)));
   return loadSubscriptions();
 }
@@ -220,6 +223,7 @@ export async function recordCounts(
   if (counts.size === 0) return;
   const subscriptions = await loadSubscriptions();
   await saveSubscriptions(
+    // eslint-disable-next-line oxc/no-map-spread
     subscriptions.map((s) => {
       const count = counts.get(s.id);
       return count ? { ...s, ...count } : s;

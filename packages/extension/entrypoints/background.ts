@@ -79,23 +79,6 @@ export default defineBackground(() => {
     }
   }
 
-  /** Refresh stale subscriptions, then recompile if anything changed. */
-  async function refreshStaleSubscriptions(): Promise<void> {
-    try {
-      const before = await loadSubscriptions();
-      const after = await refreshSubscriptions();
-      const changed = after.some(
-        (s, i) => s.updatedAt !== before[i]?.updatedAt || s.bytes !== before[i]?.bytes,
-      );
-      if (!changed) return;
-      const settings = await loadSettings();
-      await applyUserFilters(settings.userFilters, settings.confirmedRiskyFilters);
-      await recordCounts(await measureSubscriptions());
-    } catch (error) {
-      console.warn("404AD: subscription refresh failed", error);
-    }
-  }
-
   chrome.runtime.onInstalled.addListener((details) => {
     if (details.reason === "install") {
       void chrome.storage.local.set({ settings: DEFAULT_SETTINGS });
@@ -370,17 +353,6 @@ export default defineBackground(() => {
     }
   }
 
-  /** Recompile dynamic rules from whatever is currently in storage. */
-  async function recompileFromStorage(): Promise<void> {
-    const settings = await loadSettings();
-    if (!settings.enabled) {
-      await clearUserFilters();
-      return;
-    }
-    await applyUserFilters(settings.userFilters, settings.confirmedRiskyFilters);
-    await recordCounts(await measureSubscriptions());
-  }
-
   async function tabState(tabId: number): Promise<TabState> {
     const settings = await loadSettings();
     let host = "";
@@ -407,6 +379,34 @@ export default defineBackground(() => {
     };
   }
 });
+
+/** Refresh stale subscriptions, then recompile if anything changed. */
+async function refreshStaleSubscriptions(): Promise<void> {
+  try {
+    const before = await loadSubscriptions();
+    const after = await refreshSubscriptions();
+    const changed = after.some(
+      (s, i) => s.updatedAt !== before[i]?.updatedAt || s.bytes !== before[i]?.bytes,
+    );
+    if (!changed) return;
+    const settings = await loadSettings();
+    await applyUserFilters(settings.userFilters, settings.confirmedRiskyFilters);
+    await recordCounts(await measureSubscriptions());
+  } catch (error) {
+    console.warn("404AD: subscription refresh failed", error);
+  }
+}
+
+/** Recompile dynamic rules from whatever is currently in storage. */
+async function recompileFromStorage(): Promise<void> {
+  const settings = await loadSettings();
+  if (!settings.enabled) {
+    await clearUserFilters();
+    return;
+  }
+  await applyUserFilters(settings.userFilters, settings.confirmedRiskyFilters);
+  await recordCounts(await measureSubscriptions());
+}
 
 async function activeTabId(): Promise<number> {
   const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });

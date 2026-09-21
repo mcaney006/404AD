@@ -231,13 +231,17 @@ test.describe("cosmetic filtering", () => {
  * touching the network, so the content script applies exactly the rules it
  * would in production.
  */
-async function openYouTubeFixture(context: import("@playwright/test").BrowserContext) {
+async function openYouTubeFixture(
+  context: import("@playwright/test").BrowserContext,
+  fixture = "youtube.html",
+  path = "/watch?v=test",
+) {
   const page = await context.newPage();
-  const html = await readFile(resolve(import.meta.dirname, "pages/youtube.html"), "utf8");
+  const html = await readFile(resolve(import.meta.dirname, `pages/${fixture}`), "utf8");
   await page.route("https://www.youtube.com/**", (route) =>
     route.fulfill({ status: 200, contentType: "text/html; charset=utf-8", body: html }),
   );
-  await page.goto("https://www.youtube.com/watch?v=test");
+  await page.goto(`https://www.youtube.com${path}`);
   return page;
 }
 
@@ -298,6 +302,21 @@ test.describe("youtube adapter", () => {
       ),
     );
     expect(stripped).toEqual({ streamingData: { formats: [] } });
+    await page.close();
+  });
+
+  test("an advertising reel is removed from the Shorts rotation, not merely hidden", async ({
+    context,
+  }) => {
+    const page = await openYouTubeFixture(context, "shorts.html", "/shorts/xyz");
+    await waitForAdapter(page);
+
+    // Removed from the DOM: a hidden reel stays in the carousel's sequence and
+    // the viewer swipes into a blank screen.
+    await expect(page.locator("#reel-ad")).toHaveCount(0, { timeout: 10_000 });
+    // The real shorts must survive.
+    await expect(page.locator("#reel-real-1")).toBeVisible();
+    await expect(page.locator("#reel-real-2")).toBeVisible();
     await page.close();
   });
 
@@ -371,6 +390,8 @@ async function resetUserState(page: import("@playwright/test").Page): Promise<vo
     const subs = (await chrome.runtime.sendMessage({ type: "subs:list" })) as {
       data: Array<{ id: string }>;
     };
+    // Sequential on purpose: each removal recompiles the dynamic rule set, and
+    // two concurrent recompiles would race each other's `updateDynamicRules`.
     for (const s of subs.data) {
       await chrome.runtime.sendMessage({ type: "subs:remove", id: s.id });
     }
@@ -516,11 +537,7 @@ test.describe("diagnostics", () => {
 });
 
 test.describe("shadow promotion", () => {
-  test("promoting a shadow rule enforces it as a user filter", async ({
-    context,
-    extensionId,
-    serviceWorker,
-  }) => {
+  test("promoting a shadow rule enforces it as a user filter", async ({ context, extensionId }) => {
     const options = await context.newPage();
     await options.goto(`chrome-extension://${extensionId}/options.html`);
 
@@ -560,7 +577,6 @@ test.describe("shadow promotion", () => {
 
     await resetUserState(options);
     await options.close();
-    void serviceWorker;
   });
 });
 
@@ -637,7 +653,6 @@ test.describe("custom user filters", () => {
   test("a risky user filter is held in shadow mode until confirmed", async ({
     context,
     extensionId,
-    serviceWorker,
   }) => {
     const options = await context.newPage();
     await options.goto(`chrome-extension://${extensionId}/options.html`);

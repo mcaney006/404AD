@@ -343,6 +343,46 @@
 	* The adapter is SPA-aware: YouTube never reloads, so everything re-arms on
 	* `yt-navigate-finish` and tears down on `pagehide`.
 	*/
+	function detectSurface(href) {
+		let url;
+		try {
+			url = new URL(href);
+		} catch {
+			return "other";
+		}
+		const { hostname, pathname } = url;
+		if (hostname.endsWith("youtube-nocookie.com") || pathname.startsWith("/embed/")) return "embed";
+		if (hostname.startsWith("music.")) return "music";
+		if (pathname.startsWith("/shorts/")) return "shorts";
+		if (pathname === "/watch") return "watch";
+		if (pathname === "/results") return "search";
+		if (pathname === "/playlist") return "playlist";
+		if (pathname === "/" || pathname === "/feed/subscriptions" || pathname.startsWith("/feed/")) return "home";
+		if (pathname.startsWith("/@") || pathname.startsWith("/channel/") || pathname.startsWith("/c/")) return "channel";
+		return "other";
+	}
+	/**
+	* Player elements on this surface.
+	*
+	* Several can exist at once: a Shorts page keeps `#shorts-player` alongside a
+	* hidden `#movie_player`, and a channel page has an inline trailer player.
+	*/
+	function findPlayers() {
+		const selectors = [
+			"#movie_player",
+			"#shorts-player",
+			"ytd-reel-video-renderer[is-active] #shorts-player",
+			"ytmusic-player #movie_player",
+			".html5-video-player"
+		];
+		const found = /* @__PURE__ */ new Set();
+		for (const selector of selectors) for (const element of document.querySelectorAll(selector)) found.add(element);
+		return [...found];
+	}
+	/** The `<video>` inside a player, or the page's only one. */
+	function videoOf(player) {
+		return player?.querySelector("video") ?? document.querySelector("video.html5-main-video");
+	}
 	var AD_KEYS = [
 		"adPlacements",
 		"playerAds",
@@ -524,14 +564,20 @@
 		const dismissSelectors = [
 			".ytp-ad-overlay-close-button",
 			".ytp-ad-overlay-close-container",
-			".ytp-suggested-action-badge-dismiss-button-icon"
+			".ytp-suggested-action-badge-dismiss-button-icon",
+			".ytp-ad-visit-advertiser-button-dismiss"
 		];
-		const tick = () => {
-			const player = document.querySelector("#movie_player");
-			const video = document.querySelector("video.html5-main-video");
-			for (const selector of dismissSelectors) document.querySelector(selector)?.click();
-			dismissEnforcementModal(video);
-			if (!player || !video) return;
+		/**
+		* Handle one player.
+		*
+		* Every surface with a player gets the same treatment, because the ad
+		* mechanism is the same even when the wrapper is not. What differs is how the
+		* surface is *entered*, which is why re-arming is driven by URL changes
+		* rather than by any one player element's lifetime.
+		*/
+		const handlePlayer = (player) => {
+			const video = videoOf(player);
+			if (!video) return;
 			if (!player.classList.contains("ad-showing")) {
 				if (restoreMuted !== null) {
 					video.muted = restoreMuted;
@@ -546,7 +592,7 @@
 			if (restoreMuted === null) restoreMuted = video.muted;
 			if (restoreRate === null) restoreRate = video.playbackRate;
 			for (const selector of skipSelectors) {
-				const button = document.querySelector(selector);
+				const button = player.querySelector(selector) ?? document.querySelector(selector);
 				if (button && button.offsetParent !== null) {
 					button.click();
 					return;
@@ -558,17 +604,86 @@
 				if (video.paused) video.play().catch(() => void 0);
 			}
 		};
+		const tick = () => {
+			for (const selector of dismissSelectors) document.querySelector(selector)?.click();
+			const players = findPlayers();
+			dismissEnforcementModal(videoOf(players[0] ?? null));
+			for (const player of players) handlePlayer(player);
+			if (detectSurface(location.href) === "shorts") removeShortsAds();
+		};
 		tick();
 		const observer = new MutationObserver(tick);
 		observer.observe(document.documentElement, {
 			childList: true,
 			subtree: true,
 			attributes: true,
-			attributeFilter: ["class"]
+			attributeFilter: [
+				"class",
+				"is-active",
+				"hidden"
+			]
 		});
 		const timer = setInterval(tick, 400);
 		return () => {
 			observer.disconnect();
+			clearInterval(timer);
+		};
+	}
+	/**
+	* Remove advertisement reels from the Shorts feed.
+	*
+	* Hiding one is not enough: the reel carousel keeps it in the rotation, so the
+	* viewer swipes into a blank screen. Removing the node takes it out of the
+	* sequence entirely.
+	*/
+	function removeShortsAds() {
+		const selectors = [
+			"ytd-reel-video-renderer:has(ytd-ad-slot-renderer)",
+			"ytd-reel-video-renderer:has(ytd-display-ad-renderer)",
+			"ytm-reel-item-renderer:has(ytm-promoted-video-renderer)",
+			"ytd-reel-video-renderer:has(.ytp-ad-module)"
+		];
+		let removed = 0;
+		for (const selector of selectors) {
+			let matches;
+			try {
+				matches = document.querySelectorAll(selector);
+			} catch {
+				continue;
+			}
+			for (const element of matches) {
+				element.remove();
+				removed += 1;
+			}
+		}
+		return removed;
+	}
+	/**
+	* Watch for navigation.
+	*
+	* `yt-navigate-finish` covers most transitions, but not all: swiping between
+	* Shorts, a Music queue advance and a back-button navigation each change the
+	* URL without firing it reliably. Polling `location.href` is crude and it is
+	* also the only thing that catches every case, so both are used and the
+	* callback is idempotent.
+	*/
+	function watchNavigation(onNavigate) {
+		let previous = location.href;
+		const check = () => {
+			if (location.href === previous) return;
+			previous = location.href;
+			onNavigate(detectSurface(location.href));
+		};
+		const events = [
+			"yt-navigate-finish",
+			"yt-page-data-updated",
+			"popstate",
+			"hashchange"
+		];
+		for (const event of events) globalThis.addEventListener(event, check);
+		const timer = setInterval(check, 500);
+		return () => {
+			for (const event of events) globalThis.removeEventListener(event, check);
 			clearInterval(timer);
 		};
 	}
@@ -582,12 +697,14 @@
 		patchJsonParse();
 		patchFetch();
 		let teardown = installPlayerWatcher();
-		const rearm = () => {
+		const stopNavigation = watchNavigation(() => {
 			teardown();
 			teardown = installPlayerWatcher();
-		};
-		globalThis.addEventListener("yt-navigate-finish", rearm);
-		globalThis.addEventListener("pagehide", () => teardown(), { once: true });
+		});
+		globalThis.addEventListener("pagehide", () => {
+			teardown();
+			stopNavigation();
+		}, { once: true });
 	}
 	//#endregion
 	//#region src/wasm/fad_yt_wasm.js

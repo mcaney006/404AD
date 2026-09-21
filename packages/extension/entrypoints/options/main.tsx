@@ -369,7 +369,7 @@ function CustomFilters() {
   const text = useSignal<string | null>(null);
   const result = useSignal<ValidationResult | null>(null);
   const busy = useSignal(false);
-  const status = useSignal<UserFilterStatus | null>(null);
+  const outcome = useSignal<UserFilterStatus | null>(null);
 
   useEffect(() => {
     if (s && text.value === null) text.value = s.userFilters;
@@ -390,7 +390,7 @@ function CustomFilters() {
   const apply = async (): Promise<void> => {
     busy.value = true;
     try {
-      status.value = await send({
+      outcome.value = await send({
         type: "filters:apply",
         text: text.value ?? "",
         confirmed: [...confirmed],
@@ -434,28 +434,28 @@ function CustomFilters() {
             Apply
           </button>
         </div>
-        {status.value && (
+        {outcome.value && (
           <div class="col" style="gap:4px">
             <div class="row between">
               <span class="muted">
-                {status.value.applied} enforced · {status.value.shadowed} in shadow mode ·{" "}
-                {status.value.unsupported} not expressible in MV3 · {status.value.errors} errors
+                {outcome.value.applied} enforced · {outcome.value.shadowed} in shadow mode ·{" "}
+                {outcome.value.unsupported} not expressible in MV3 · {outcome.value.errors} errors
               </span>
               <span class="mono">
-                {status.value.applied + status.value.shadowed}/{status.value.limit} dynamic rules
+                {outcome.value.applied + outcome.value.shadowed}/{outcome.value.limit} dynamic rules
               </span>
             </div>
             <div class="bar">
               <span
-                style={`width:${Math.min(100, ((status.value.applied + status.value.shadowed) / status.value.limit) * 100)}%`}
+                style={`width:${Math.min(100, ((outcome.value.applied + outcome.value.shadowed) / outcome.value.limit) * 100)}%`}
               />
             </div>
-            {status.value.dropped > 0 && (
+            {outcome.value.dropped > 0 && (
               <span>
                 <span class="badge high">budget</span>{" "}
                 <span class="muted">
-                  {status.value.dropped} rules were dropped. Chromium caps dynamic rules at{" "}
-                  {status.value.limit}; disable a subscription to make room.
+                  {outcome.value.dropped} rules were dropped. Chromium caps dynamic rules at{" "}
+                  {outcome.value.limit}; disable a subscription to make room.
                 </span>
               </span>
             )}

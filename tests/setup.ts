@@ -1,6 +1,8 @@
 import { GlobalRegistrator } from "@happy-dom/global-registrator";
 
-GlobalRegistrator.register({ url: "https://test.404ad.local/" });
+// Registered as youtube.com so the adapter's surface tests can exercise real
+// same-origin history navigation. Nothing else asserts on the origin.
+GlobalRegistrator.register({ url: "https://www.youtube.com/" });
 
 /**
  * A minimal `chrome` stand-in for unit tests.

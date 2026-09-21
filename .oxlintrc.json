@@ -15,7 +15,11 @@
     "eslint/no-underscore-dangle": "off",
     // Every flagged sort runs on an array this code just built. `toSorted()`
     // would allocate a second copy to avoid mutating something nobody holds.
-    "unicorn/no-array-sort": "off"
+    "unicorn/no-array-sort": "off",
+    // The rule's advice is Promise.all, which is wrong wherever the loop is
+    // ordered by necessity: reading a stream, or recompiling the dynamic rule
+    // set once per removal so two updateDynamicRules calls cannot race.
+    "eslint/no-await-in-loop": "off"
   },
   "ignorePatterns": [
     "packages/extension/src/wasm/**",

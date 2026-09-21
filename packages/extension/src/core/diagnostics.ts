@@ -94,18 +94,18 @@ export async function annotatedMatches(tabId: number): Promise<RuleMatch[]> {
   if (matches.length === 0) return matches;
 
   const file = await loadDiagnostics().catch(() => null);
-  return matches.map((match) => {
+  for (const match of matches) {
     const meta = file?.network[String(match.ruleId)];
-    if (!meta) return match;
-    return {
-      ...match,
-      raw: meta.raw,
-      list: meta.list,
-      line: meta.line,
-      riskScore: meta.riskScore,
-      riskBand: meta.riskBand,
-    };
-  });
+    if (!meta) continue;
+    // Mutated in place: `matches` is a fresh array this function just built,
+    // so copying every entry to change five fields buys nothing.
+    match.raw = meta.raw;
+    match.list = meta.list;
+    match.line = meta.line;
+    match.riskScore = meta.riskScore;
+    match.riskBand = meta.riskBand;
+  }
+  return matches;
 }
 
 /**

@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>404AD Shorts fixture</title>
+    <style>
+      ytd-reel-video-renderer {
+        display: block;
+        min-height: 30px;
+        border: 1px solid #ccc;
+      }
+      ytd-ad-slot-renderer,
+      ytm-promoted-video-renderer {
+        display: block;
+        min-height: 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>shorts</h1>
+    <div id="shorts-player" class="html5-video-player"><video></video></div>
+
+    <div id="reel-carousel">
+      <ytd-reel-video-renderer id="reel-real-1">a real short</ytd-reel-video-renderer>
+      <!-- An advertising reel. Hiding it is not enough: the carousel keeps a
+           hidden reel in the rotation and the viewer swipes into a blank
+           screen, so the node has to leave the DOM. -->
+      <ytd-reel-video-renderer id="reel-ad">
+        <ytd-ad-slot-renderer>sponsored</ytd-ad-slot-renderer>
+      </ytd-reel-video-renderer>
+      <ytd-reel-video-renderer id="reel-real-2">another real short</ytd-reel-video-renderer>
+    </div>
+  </body>
+</html>

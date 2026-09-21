@@ -400,7 +400,7 @@ function CustomFilters() {
 	const text = useSignal(null);
 	const result = useSignal(null);
 	const busy = useSignal(false);
-	const status = useSignal(null);
+	const outcome = useSignal(null);
 	h(() => {
 		if (s && text.value === null) text.value = s.userFilters;
 	}, [s]);
@@ -423,7 +423,7 @@ function CustomFilters() {
 	const apply = async () => {
 		busy.value = true;
 		try {
-			status.value = await send({
+			outcome.value = await send({
 				type: "filters:apply",
 				text: text.value ?? "",
 				confirmed: [...confirmed]
@@ -478,7 +478,7 @@ function CustomFilters() {
 						children: "Apply"
 					})]
 				}),
-				status.value && /* @__PURE__ */ u("div", {
+				outcome.value && /* @__PURE__ */ u("div", {
 					class: "col",
 					style: "gap:4px",
 					children: [
@@ -487,31 +487,31 @@ function CustomFilters() {
 							children: [/* @__PURE__ */ u("span", {
 								class: "muted",
 								children: [
-									status.value.applied,
+									outcome.value.applied,
 									" enforced · ",
-									status.value.shadowed,
+									outcome.value.shadowed,
 									" in shadow mode ·",
 									" ",
-									status.value.unsupported,
+									outcome.value.unsupported,
 									" not expressible in MV3 · ",
-									status.value.errors,
+									outcome.value.errors,
 									" errors"
 								]
 							}), /* @__PURE__ */ u("span", {
 								class: "mono",
 								children: [
-									status.value.applied + status.value.shadowed,
+									outcome.value.applied + outcome.value.shadowed,
 									"/",
-									status.value.limit,
+									outcome.value.limit,
 									" dynamic rules"
 								]
 							})]
 						}),
 						/* @__PURE__ */ u("div", {
 							class: "bar",
-							children: /* @__PURE__ */ u("span", { style: `width:${Math.min(100, (status.value.applied + status.value.shadowed) / status.value.limit * 100)}%` })
+							children: /* @__PURE__ */ u("span", { style: `width:${Math.min(100, (outcome.value.applied + outcome.value.shadowed) / outcome.value.limit * 100)}%` })
 						}),
-						status.value.dropped > 0 && /* @__PURE__ */ u("span", { children: [
+						outcome.value.dropped > 0 && /* @__PURE__ */ u("span", { children: [
 							/* @__PURE__ */ u("span", {
 								class: "badge high",
 								children: "budget"
@@ -520,10 +520,10 @@ function CustomFilters() {
 							/* @__PURE__ */ u("span", {
 								class: "muted",
 								children: [
-									status.value.dropped,
+									outcome.value.dropped,
 									" rules were dropped. Chromium caps dynamic rules at",
 									" ",
-									status.value.limit,
+									outcome.value.limit,
 									"; disable a subscription to make room."
 								]
 							})

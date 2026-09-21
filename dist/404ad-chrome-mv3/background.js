@@ -63,18 +63,16 @@ var background = (function() {
 		const matches = recentMatches(tabId);
 		if (matches.length === 0) return matches;
 		const file = await loadDiagnostics().catch(() => null);
-		return matches.map((match) => {
+		for (const match of matches) {
 			const meta = file?.network[String(match.ruleId)];
-			if (!meta) return match;
-			return {
-				...match,
-				raw: meta.raw,
-				list: meta.list,
-				line: meta.line,
-				riskScore: meta.riskScore,
-				riskBand: meta.riskBand
-			};
-		});
+			if (!meta) continue;
+			match.raw = meta.raw;
+			match.list = meta.list;
+			match.line = meta.line;
+			match.riskScore = meta.riskScore;
+			match.riskBand = meta.riskBand;
+		}
+		return matches;
 	}
 	/**
 	* Cosmetic hits per tab, reported by the content script.
@@ -1493,18 +1491,6 @@ var background = (function() {
 				refreshStaleSubscriptions();
 			}
 		}
-		/** Refresh stale subscriptions, then recompile if anything changed. */
-		async function refreshStaleSubscriptions() {
-			try {
-				const before = await loadSubscriptions();
-				if (!(await refreshSubscriptions()).some((s, i) => s.updatedAt !== before[i]?.updatedAt || s.bytes !== before[i]?.bytes)) return;
-				const settings = await loadSettings();
-				await applyUserFilters(settings.userFilters, settings.confirmedRiskyFilters);
-				await recordCounts(await measureSubscriptions());
-			} catch (error) {
-				console.warn("404AD: subscription refresh failed", error);
-			}
-		}
 		chrome.runtime.onInstalled.addListener((details) => {
 			if (details.reason === "install") chrome.storage.local.set({ settings: DEFAULT_SETTINGS });
 			bootstrap();
@@ -1691,16 +1677,6 @@ var background = (function() {
 					return await loadSubscriptions();
 			}
 		}
-		/** Recompile dynamic rules from whatever is currently in storage. */
-		async function recompileFromStorage() {
-			const settings = await loadSettings();
-			if (!settings.enabled) {
-				await clearUserFilters();
-				return;
-			}
-			await applyUserFilters(settings.userFilters, settings.confirmedRiskyFilters);
-			await recordCounts(await measureSubscriptions());
-		}
 		async function tabState(tabId) {
 			const settings = await loadSettings();
 			let host = "";
@@ -1723,6 +1699,28 @@ var background = (function() {
 			};
 		}
 	});
+	/** Refresh stale subscriptions, then recompile if anything changed. */
+	async function refreshStaleSubscriptions() {
+		try {
+			const before = await loadSubscriptions();
+			if (!(await refreshSubscriptions()).some((s, i) => s.updatedAt !== before[i]?.updatedAt || s.bytes !== before[i]?.bytes)) return;
+			const settings = await loadSettings();
+			await applyUserFilters(settings.userFilters, settings.confirmedRiskyFilters);
+			await recordCounts(await measureSubscriptions());
+		} catch (error) {
+			console.warn("404AD: subscription refresh failed", error);
+		}
+	}
+	/** Recompile dynamic rules from whatever is currently in storage. */
+	async function recompileFromStorage() {
+		const settings = await loadSettings();
+		if (!settings.enabled) {
+			await clearUserFilters();
+			return;
+		}
+		await applyUserFilters(settings.userFilters, settings.confirmedRiskyFilters);
+		await recordCounts(await measureSubscriptions());
+	}
 	async function activeTabId() {
 		const [tab] = await chrome.tabs.query({
 			active: true,
