@@ -1,0 +1,283 @@
+[Adblock Plus 2.0]
+! Title: 404AD Cosmetic
+! Description: EasyList-style element hiding.
+!
+! Discipline for generic rules, enforced by the risk model and by review:
+!   * every generic selector is anchored on a class or id token, so the runtime
+!     index can skip it unless that token is in the document;
+!   * no bare element selectors, no universal selectors, no token shorter than
+!     six characters. `.ad` matches `.address`-adjacent utility classes on real
+!     sites; `.ad-slot-container` does not.
+! Site-specific rules carry no such restriction, because their blast radius is
+! already bounded by the host.
+
+! ===========================================================================
+! GENERIC — ad containers
+! ===========================================================================
+##.ad-slot-container
+##.ad-slot-wrapper
+##.ad-slot-inner
+##.ad-placeholder-container
+##.ad-unit-wrapper
+##.ad-banner-container
+##.ad-banner-wrapper
+##.ad-block-container
+##.ad-module-container
+##.adunitcontainer
+##.advertisement-container
+##.advertisement-wrapper
+##.advertisement-block
+##.advertisement-label
+##.advert-container
+##.advert-wrapper
+##.advert-placeholder
+##.advertising-container
+##.advertising-wrapper
+##.ads-wrapper
+##.ads-placeholder
+##.adsbox
+##.adsbygoogle-noablate
+##.adszone
+##.banner-advertisement
+##.banner-advert
+##.billboard-advert
+##.display-advert
+##.inline-advert
+##.leaderboard-advert
+##.leaderboard-container-ad
+##.mpu-container
+##.mpu-advert
+##.rectangle-ad-container
+##.skyscraper-container
+##.sponsored-container
+##.sponsored-wrapper
+##.sponsored-placeholder
+##.textad-container
+##.wallpaper-advert
+
+! ===========================================================================
+! GENERIC — programmatic slot ids emitted by GPT, Prebid and friends
+! ===========================================================================
+###div-gpt-ad-container
+###gpt-passback
+###gpt-leaderboard
+###gpt-rectangle
+###gpt-skyscraper
+###dfp-leaderboard
+###dfp-rectangle
+###dfp-billboard
+###prebid-container
+###adngin-container
+###google_image_div
+###aswift_container
+###taboola-below-article-thumbnails
+###taboola-right-rail-thumbnails
+###taboola-mid-article-thumbnails
+###outbrain_widget_0
+###outbrain_widget_1
+###revcontent-widget
+###mgid-container
+###zergnet-widget
+###adsense-container
+###adsense-leaderboard
+###amazon-native-container
+
+! ===========================================================================
+! GENERIC — sponsored and native content
+! ===========================================================================
+##.sponsored-article-card
+##.sponsored-content-block
+##.sponsored-content-wrapper
+##.sponsored-listing
+##.sponsored-recirc
+##.sponsored-results
+##.sponsored-story-card
+##.native-ad-container
+##.native-ad-wrapper
+##.native-advertising
+##.partner-content-block
+##.partner-promo-block
+##.paid-content-block
+##.paid-partnership-label
+##.promoted-content-block
+##.promoted-listing
+##.promoted-results
+##.recommended-by-outbrain
+##.recommended-by-taboola
+##.taboola-recommendations
+##.trc_related_container
+##.content-recommendation-widget
+##.around-the-web-widget
+##.from-our-partners
+##.you-may-also-like-ads
+
+! ===========================================================================
+! GENERIC — interstitials, sticky rails and takeovers
+! ===========================================================================
+##.ad-interstitial
+##.ad-takeover
+##.ad-overlay-container
+##.anchor-ad-container
+##.floating-ad-container
+##.interstitial-advert
+##.sticky-ad-container
+##.sticky-ad-wrapper
+##.sticky-advert
+##.sticky-leaderboard
+##.sticky-footer-ad
+##.sticky-sidebar-ad
+##.pushdown-ad
+##.welcome-ad-overlay
+##.prestitial-overlay
+##.vignette-ad
+
+! ===========================================================================
+! GENERIC — video pre-roll shells and player ad chrome
+! ===========================================================================
+##.video-ad-overlay-container
+##.video-advert-container
+##.preroll-ad-container
+##.midroll-ad-container
+##.jw-ad-container
+##.vjs-ad-container
+##.plyr-ads-container
+##.player-ad-overlay
+##.ima-ad-container
+
+! ===========================================================================
+! GENERIC — adblock nag walls
+! ===========================================================================
+##.adblock-detected-modal
+##.adblock-warning-banner
+##.adblock-notice-overlay
+##.adblocker-message
+##.antiadblock-overlay
+##.disable-adblock-modal
+##.please-disable-adblock
+###adblock-detected
+###adblock-modal
+###adblock-overlay
+
+! ===========================================================================
+! GENERIC — affiliate and commerce widgets
+! ===========================================================================
+##.affiliate-disclosure-ad
+##.affiliate-link-widget
+##.affiliate-product-grid
+##.commerce-widget-ad
+##.deals-widget-sponsored
+##.shopping-recommendations-ad
+##.skimlinks-container
+
+! ===========================================================================
+! GENERIC — style corrections so a removed slot leaves no reserved hole
+! ===========================================================================
+#$#.ad-slot-container { display: none !important; height: 0 !important; min-height: 0 !important; margin: 0 !important; }
+#$#.sticky-ad-container { display: none !important; position: static !important; height: 0 !important; }
+#$#.anchor-ad-container { display: none !important; position: static !important; }
+#$#.leaderboard-container-ad { display: none !important; min-height: 0 !important; }
+
+! ===========================================================================
+! SITE-SPECIFIC — search engines
+! ===========================================================================
+google.*##[data-text-ad]
+google.*###tads
+google.*###tadsb
+google.*###bottomads
+google.*##.commercial-unit-desktop-top
+google.*##.commercial-unit-desktop-rhs
+google.*##.shopping-carousel-ads
+bing.com##.b_ad
+bing.com##.b_adSlug
+bing.com##.sb_adTA
+bing.com###b_results > .b_ad
+duckduckgo.com##.badge--ad
+duckduckgo.com##.result--ad
+duckduckgo.com##.module--carousel--advertisement
+yahoo.com##.ads
+yahoo.com###ysch-ads
+ecosia.org##.mainline-ad
+brave.com##.promoted-result
+startpage.com##.w-gl__result--ad
+
+! ===========================================================================
+! SITE-SPECIFIC — social platforms
+! ===========================================================================
+reddit.com##shreddit-comments-page-ad
+reddit.com##shreddit-ad-post
+reddit.com##.promotedlink
+reddit.com###ad_1
+reddit.com##[data-testid="ad-post"]
+facebook.com##[data-pagelet^="FeedUnit"]:has([aria-label="Sponsored"])
+facebook.com##[role="complementary"]:has(a[href*="ads/about"])
+linkedin.com##.ad-banner-container
+linkedin.com##.ads-container
+linkedin.com##[data-id^="urn:li:sponsoredContent"]
+x.com##[data-testid="placementTracking"]
+twitter.com##[data-testid="placementTracking"]
+instagram.com##article:has(a[href*="/sponsored"])
+tiktok.com##[data-e2e="ad-card"]
+pinterest.com##[data-test-id="promoted-pin"]
+tumblr.com##.post_container:has(.sponsored_badge)
+
+! ===========================================================================
+! SITE-SPECIFIC — news and publishing
+! ===========================================================================
+nytimes.com##.ad
+nytimes.com###sponsored-content
+washingtonpost.com##.hide-for-print[data-qa="ad"]
+theguardian.com##.ad-slot-container
+theguardian.com##.top-banner-ad-container
+bbc.*##.bbccom_advert
+bbc.*##.ad-content
+cnn.com##.ad-slot-header__wrapper
+cnn.com##.ad-feedback-link-container
+foxnews.com##.ad-container
+nbcnews.com##.ad-container
+reuters.com##[data-testid="Ad"]
+bloomberg.com##.ad-container
+forbes.com##.fbs-ad
+businessinsider.com##.ad-container
+wsj.com##.wsj-ad
+ft.com##.o-ads
+economist.com##.advert
+medium.com##.js-adPlaceholder
+substack.com##.sponsored-post-banner
+dailymail.co.uk##.mol-ads-cell
+dailymail.co.uk##.puff-slot
+mirror.co.uk##.ad-slot-container
+independent.co.uk##.advert-wrapper
+telegraph.co.uk##.advert-wrapper
+
+! ===========================================================================
+! SITE-SPECIFIC — developer and reference sites
+! ===========================================================================
+stackoverflow.com##.js-sidebar-ad
+stackoverflow.com##.js-dismissable-hero
+stackoverflow.com###sidebar .s-sidebarwidget:has(.js-ad)
+stackexchange.com##.everyonelovesstackoverflow
+github.com##.js-notice:has(a[href*="/sponsors"])
+npmjs.com##[data-testid="ad-banner"]
+geeksforgeeks.org##.ad-container
+w3schools.com###adngin-sidebar1-0
+w3schools.com###adngin-leaderboard-0
+tutorialspoint.com##.ad-container
+
+! ===========================================================================
+! SITE-SPECIFIC — streaming, shopping and forums
+! ===========================================================================
+twitch.tv##[data-a-target="video-ad-label"]
+twitch.tv##.player-ad-notice
+amazon.*##.s-sponsored-list-item
+amazon.*##[data-component-type="sp-sponsored-result"]
+amazon.*##.AdHolder
+amazon.*###sponsoredProducts2_feature_div
+ebay.*##.srp-river-answer--PROMOTED_LISTINGS
+walmart.com##[data-item-id][aria-label*="Sponsored"]
+etsy.com##[data-ad-id]
+imdb.com##.ipc-ad-slot
+imdb.com###injected-billboard
+spotify.com##.advertisement-container
+soundcloud.com##.adswizz-ad-container
+quora.com##.q-box:has(.AdRenderer)
+wikihow.com##.section_text:has(.ad_label)

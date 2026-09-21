@@ -1,7 +1,14 @@
 {
-  "buildId": "9662770fe61932d8f294cc56ce384297",
+  "buildId": "c62127c4ebd25585aa64cb0afa465578",
   "compilerVersion": "0.1.0",
   "lists": [
+    {
+      "id": "404ad-ads-extended",
+      "title": "404AD Ads Extended",
+      "category": "ads",
+      "enabled": true,
+      "bytes": 11046
+    },
     {
       "id": "404ad-annoyances",
       "title": "404AD Annoyances",
@@ -24,6 +31,20 @@
       "bytes": 2065
     },
     {
+      "id": "404ad-cosmetic",
+      "title": "404AD Cosmetic",
+      "category": "ads",
+      "enabled": true,
+      "bytes": 9410
+    },
+    {
+      "id": "404ad-privacy-extended",
+      "title": "404AD Privacy Extended",
+      "category": "tracking",
+      "enabled": true,
+      "bytes": 7591
+    },
+    {
       "id": "404ad-tracking",
       "title": "404AD Tracking",
       "category": "tracking",
@@ -39,14 +60,14 @@
     }
   ],
   "parsed": {
-    "network": 486,
-    "cosmetic": 271,
-    "ignored": 281,
+    "network": 1108,
+    "cosmetic": 489,
+    "ignored": 356,
     "errors": 0
   },
   "dedup": {
-    "networkRemoved": 0,
-    "cosmeticRemoved": 2,
+    "networkRemoved": 4,
+    "cosmeticRemoved": 3,
     "badfiltered": 0
   },
   "optimize": {
@@ -55,8 +76,8 @@
     "droppedPatternSubsumed": 0
   },
   "dnr": {
-    "rules": 486,
-    "enabledRules": 457,
+    "rules": 1108,
+    "enabledRules": 1079,
     "regexRules": 0,
     "shadowRules": 49,
     "rulesets": [
@@ -87,24 +108,24 @@
       }
     ],
     "perCategory": {
-      "ads": 169,
+      "ads": 548,
       "annoyances": 29,
       "shadow": 49,
-      "tracking": 212,
+      "tracking": 455,
       "youtube": 27
     }
   },
   "cosmetic": {
-    "genericSelectors": 180,
-    "hosts": 2,
-    "entities": 0,
+    "genericSelectors": 309,
+    "hosts": 51,
+    "entities": 4,
     "scriptlets": 7,
     "procedural": 0,
-    "indexBytesPostcard": 10491,
-    "indexBytesJson": 21727
+    "indexBytesPostcard": 19873,
+    "indexBytesJson": 46628
   },
   "budgets": {
-    "staticRulesUsed": 457,
+    "staticRulesUsed": 1079,
     "staticRulesLimit": 30000,
     "regexRulesUsed": 0,
     "regexRulesLimit": 1000,

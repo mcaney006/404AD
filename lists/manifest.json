@@ -1,10 +1,61 @@
 {
   "$schema": "./manifest.schema.json",
   "lists": [
-    { "id": "404ad-base",       "file": "404ad-base.txt",       "category": "ads",        "title": "404AD Base",              "enabled": true },
-    { "id": "404ad-tracking",   "file": "404ad-tracking.txt",   "category": "tracking",   "title": "404AD Tracking",          "enabled": true },
-    { "id": "404ad-youtube",    "file": "404ad-youtube.txt",    "category": "youtube",    "title": "404AD YouTube Adapter",   "enabled": true },
-    { "id": "404ad-annoyances", "file": "404ad-annoyances.txt", "category": "annoyances", "title": "404AD Annoyances",        "enabled": false },
-    { "id": "404ad-candidates", "file": "404ad-candidates.txt", "category": "shadow",     "title": "404AD Shadow Candidates", "enabled": true }
+    {
+      "id": "404ad-ads-extended",
+      "file": "404ad-ads-extended.txt",
+      "category": "ads",
+      "title": "404AD Ads Extended",
+      "enabled": true
+    },
+    {
+      "id": "404ad-annoyances",
+      "file": "404ad-annoyances.txt",
+      "category": "annoyances",
+      "title": "404AD Annoyances",
+      "enabled": false
+    },
+    {
+      "id": "404ad-base",
+      "file": "404ad-base.txt",
+      "category": "ads",
+      "title": "404AD Base",
+      "enabled": true
+    },
+    {
+      "id": "404ad-candidates",
+      "file": "404ad-candidates.txt",
+      "category": "shadow",
+      "title": "404AD Shadow Candidates",
+      "enabled": true
+    },
+    {
+      "id": "404ad-cosmetic",
+      "file": "404ad-cosmetic.txt",
+      "category": "ads",
+      "title": "404AD Cosmetic",
+      "enabled": true
+    },
+    {
+      "id": "404ad-privacy-extended",
+      "file": "404ad-privacy-extended.txt",
+      "category": "tracking",
+      "title": "404AD Privacy Extended",
+      "enabled": true
+    },
+    {
+      "id": "404ad-tracking",
+      "file": "404ad-tracking.txt",
+      "category": "tracking",
+      "title": "404AD Tracking",
+      "enabled": true
+    },
+    {
+      "id": "404ad-youtube",
+      "file": "404ad-youtube.txt",
+      "category": "youtube",
+      "title": "404AD YouTube Adapter",
+      "enabled": true
+    }
   ]
 }
