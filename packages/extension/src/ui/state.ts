@@ -71,8 +71,12 @@ export async function refreshMatches(tabId: number): Promise<void> {
   if (value) matches.value = value;
 }
 
-export async function setMode(host: string, mode: TabState["mode"]): Promise<void> {
-  await guard(() => send({ type: "site:set", host, mode }));
+export async function setMode(
+  host: string,
+  mode: TabState["mode"],
+  durationMs?: number,
+): Promise<void> {
+  await guard(() => send({ type: "site:set", host, mode, durationMs }));
   await Promise.all([refreshTab(), refreshSites()]);
 }
 

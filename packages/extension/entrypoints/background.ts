@@ -1,8 +1,10 @@
 import { defineBackground } from "wxt/utils/define-background";
 import {
+  annotatedMatches,
   clearTab,
+  cosmeticHits,
   loadDiagnostics,
-  recentMatches,
+  recordCosmetic,
   recordMatch,
   ruleMeta,
   ruleMetaMap,
@@ -127,8 +129,16 @@ export default defineBackground(() => {
       rulesetId: rule.rulesetId,
       url: request.url,
       type: request.type,
+      site: host,
       timestamp: Date.now(),
       shadow,
+      // A shadow rule is a priority-1 allow, so it matched without acting.
+      action: shadow ? "observed" : "blocked",
+      raw: null,
+      list: null,
+      line: null,
+      riskScore: null,
+      riskBand: null,
     });
 
     void loadSettings().then((settings) => {
@@ -226,6 +236,7 @@ export default defineBackground(() => {
         const tabId = sender.tab?.id;
         if (tabId !== undefined) {
           hiddenByTab.set(tabId, (hiddenByTab.get(tabId) ?? 0) + message.count);
+          recordCosmetic(tabId, message.hits);
         }
         return { ok: true };
       }
@@ -236,7 +247,7 @@ export default defineBackground(() => {
       }
 
       case "site:set": {
-        await setSiteMode(message.host, message.mode);
+        await setSiteMode(message.host, message.mode, message.durationMs);
         return { ok: true };
       }
 
@@ -282,7 +293,33 @@ export default defineBackground(() => {
       }
 
       case "diagnostics:recent":
-        return recentMatches(message.tabId);
+        return await annotatedMatches(message.tabId);
+
+      case "diagnostics:cosmetic":
+        return cosmeticHits(message.tabId);
+
+      case "shadow:promote": {
+        // Promotion is the whole point of shadow mode: a rule that has been
+        // observed against real traffic gets moved into the user's own filters,
+        // pre-confirmed, because its risk has already been measured rather than
+        // guessed at.
+        const meta = await ruleMeta(message.ruleId);
+        if (!meta) throw new Error(`no such rule: ${message.ruleId}`);
+
+        const current = await loadSettings();
+        const already = current.userFilters.split("\n").some((line) => line.trim() === meta.raw);
+        const userFilters = already
+          ? current.userFilters
+          : `${current.userFilters.replace(/\s*$/, "")}\n${meta.raw}\n`.replace(/^\n/, "");
+
+        const confirmed = current.confirmedRiskyFilters.includes(meta.raw)
+          ? current.confirmedRiskyFilters
+          : [...current.confirmedRiskyFilters, meta.raw];
+
+        const next = await saveSettings({ userFilters, confirmedRiskyFilters: confirmed });
+        const status = await applyUserFilters(next.userFilters, next.confirmedRiskyFilters);
+        return { promoted: meta.raw, status };
+      }
 
       case "diagnostics:explain":
         return await explain(message.url, message.initiator, message.resourceType);
@@ -353,10 +390,16 @@ export default defineBackground(() => {
     } catch {
       host = "";
     }
+    const rules = await loadSites();
+    const rule = host
+      ? rules.find((site) => host === site.host || host.endsWith(`.${site.host}`))
+      : undefined;
+
     return {
       tabId,
       host,
       mode: host ? await resolveMode(host) : "default",
+      expiresAt: rule?.expiresAt ?? null,
       blocked: tabBlockedCount(tabId),
       hidden: hiddenByTab.get(tabId) ?? 0,
       shadowMatches: tabShadowCount(tabId),

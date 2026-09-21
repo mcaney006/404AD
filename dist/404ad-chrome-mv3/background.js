@@ -51,8 +51,58 @@ var background = (function() {
 	function recentMatches(tabId) {
 		return (rings.get(tabId) ?? []).toReversed();
 	}
+	/**
+	* Join each recorded match to the rule it came from.
+	*
+	* A rule id alone answers nothing. "Blocked by `||doubleclick.net^$third-party`
+	* from 404ad-base line 12, risk Low" is a statement the user can act on: they
+	* can see the rule, the list, and whether it is the kind of rule that breaks
+	* pages.
+	*/
+	async function annotatedMatches(tabId) {
+		const matches = recentMatches(tabId);
+		if (matches.length === 0) return matches;
+		const file = await loadDiagnostics().catch(() => null);
+		return matches.map((match) => {
+			const meta = file?.network[String(match.ruleId)];
+			if (!meta) return match;
+			return {
+				...match,
+				raw: meta.raw,
+				list: meta.list,
+				line: meta.line,
+				riskScore: meta.riskScore,
+				riskBand: meta.riskBand
+			};
+		});
+	}
+	/**
+	* Cosmetic hits per tab, reported by the content script.
+	*
+	* Kept alongside the network ring so one panel can answer both halves of "why
+	* did that disappear": a request Chromium refused, or an element 404AD hid.
+	*/
+	var cosmeticRings = /* @__PURE__ */ new Map();
+	function recordCosmetic(tabId, hits) {
+		if (tabId < 0 || hits.length === 0) return;
+		const existing = new Map(cosmeticRings.get(tabId)?.map((h) => [h.selector, h]) ?? []);
+		for (const hit of hits) {
+			const previous = existing.get(hit.selector);
+			existing.set(hit.selector, {
+				selector: hit.selector,
+				count: (previous?.count ?? 0) + hit.count,
+				procedural: hit.procedural || (previous?.procedural ?? false)
+			});
+		}
+		const merged = [...existing.values()].sort((a, b) => b.count - a.count).slice(0, RING_SIZE);
+		cosmeticRings.set(tabId, merged);
+	}
+	function cosmeticHits(tabId) {
+		return cosmeticRings.get(tabId) ?? [];
+	}
 	function clearTab(tabId) {
 		rings.delete(tabId);
+		cosmeticRings.delete(tabId);
 	}
 	function tabBlockedCount(tabId) {
 		return (rings.get(tabId) ?? []).filter((m) => !m.shadow).length;
@@ -823,10 +873,30 @@ var background = (function() {
 	*/
 	var SITE_DISABLE_PRIORITY = 1e3;
 	var cache = null;
+	/**
+	* Load per-site rules, dropping any that have expired.
+	*
+	* Expiry is evaluated on read rather than on a timer. A rule that lapsed while
+	* the browser was closed should simply be gone when it reopens, and that needs
+	* no wakeup to be true.
+	*/
 	async function loadSites() {
-		if (cache) return cache;
-		cache = (await chrome.storage.local.get(KEY$1))[KEY$1] ?? [];
-		return cache;
+		if (!cache) cache = ((await chrome.storage.local.get(KEY$1))[KEY$1] ?? []).map(normalize);
+		const now = Date.now();
+		const live = cache.filter((site) => site.expiresAt === null || site.expiresAt > now);
+		if (live.length !== cache.length) {
+			await chrome.storage.local.set({ [KEY$1]: live });
+			cache = live;
+			syncSessionRules(live);
+		}
+		return live;
+	}
+	/** Fill in fields added since a profile was written. */
+	function normalize(rule) {
+		return {
+			...rule,
+			expiresAt: rule.expiresAt ?? null
+		};
 	}
 	/** All suffixes of a host with at least two labels, most specific first. */
 	function hostSuffixes(host) {
@@ -858,13 +928,17 @@ var background = (function() {
 		}
 		return "default";
 	}
-	async function setSiteMode(host, mode) {
+	async function setSiteMode(host, mode, durationMs) {
 		const next = (await loadSites()).filter((s) => s.host !== host);
-		if (mode !== "default") next.push({
-			host,
-			mode,
-			updatedAt: Date.now()
-		});
+		if (mode !== "default") {
+			const now = Date.now();
+			next.push({
+				host,
+				mode,
+				updatedAt: now,
+				expiresAt: durationMs && durationMs > 0 ? now + durationMs : null
+			});
+		}
 		next.sort((a, b) => a.host.localeCompare(b.host));
 		cache = next;
 		await chrome.storage.local.set({ [KEY$1]: next });
@@ -1450,8 +1524,15 @@ var background = (function() {
 				rulesetId: rule.rulesetId,
 				url: request.url,
 				type: request.type,
+				site: host,
 				timestamp: Date.now(),
-				shadow
+				shadow,
+				action: shadow ? "observed" : "blocked",
+				raw: null,
+				list: null,
+				line: null,
+				riskScore: null,
+				riskBand: null
 			});
 			loadSettings().then((settings) => {
 				if (!settings.statistics) return;
@@ -1519,12 +1600,15 @@ var background = (function() {
 				}
 				case "content:hidden": {
 					const tabId = sender.tab?.id;
-					if (tabId !== void 0) hiddenByTab.set(tabId, (hiddenByTab.get(tabId) ?? 0) + message.count);
+					if (tabId !== void 0) {
+						hiddenByTab.set(tabId, (hiddenByTab.get(tabId) ?? 0) + message.count);
+						recordCosmetic(tabId, message.hits);
+					}
 					return { ok: true };
 				}
 				case "tab:state": return await tabState(message.tabId ?? await activeTabId());
 				case "site:set":
-					await setSiteMode(message.host, message.mode);
+					await setSiteMode(message.host, message.mode, message.durationMs);
 					return { ok: true };
 				case "site:list": return await loadSites();
 				case "settings:get": return await loadSettings();
@@ -1558,7 +1642,22 @@ var background = (function() {
 						feedbackAvailable: feedback !== void 0
 					};
 				}
-				case "diagnostics:recent": return recentMatches(message.tabId);
+				case "diagnostics:recent": return await annotatedMatches(message.tabId);
+				case "diagnostics:cosmetic": return cosmeticHits(message.tabId);
+				case "shadow:promote": {
+					const meta = await ruleMeta(message.ruleId);
+					if (!meta) throw new Error(`no such rule: ${message.ruleId}`);
+					const current = await loadSettings();
+					const next = await saveSettings({
+						userFilters: current.userFilters.split("\n").some((line) => line.trim() === meta.raw) ? current.userFilters : `${current.userFilters.replace(/\s*$/, "")}\n${meta.raw}\n`.replace(/^\n/, ""),
+						confirmedRiskyFilters: current.confirmedRiskyFilters.includes(meta.raw) ? current.confirmedRiskyFilters : [...current.confirmedRiskyFilters, meta.raw]
+					});
+					const status = await applyUserFilters(next.userFilters, next.confirmedRiskyFilters);
+					return {
+						promoted: meta.raw,
+						status
+					};
+				}
 				case "diagnostics:explain": return await explain(message.url, message.initiator, message.resourceType);
 				case "diagnostics:rule": return await ruleMeta(message.ruleId);
 				case "filters:validate": return await validateFilters(message.text);
@@ -1610,10 +1709,13 @@ var background = (function() {
 			} catch {
 				host = "";
 			}
+			const rules = await loadSites();
+			const rule = host ? rules.find((site) => host === site.host || host.endsWith(`.${site.host}`)) : void 0;
 			return {
 				tabId,
 				host,
 				mode: host ? await resolveMode(host) : "default",
+				expiresAt: rule?.expiresAt ?? null,
 				blocked: tabBlockedCount(tabId),
 				hidden: hiddenByTab.get(tabId) ?? 0,
 				shadowMatches: tabShadowCount(tabId),

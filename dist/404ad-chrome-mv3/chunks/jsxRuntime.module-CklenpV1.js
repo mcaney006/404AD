@@ -1116,11 +1116,12 @@ async function refreshMatches(tabId) {
 	}));
 	if (value) matches.value = value;
 }
-async function setMode(host, mode) {
+async function setMode(host, mode, durationMs) {
 	await guard(() => send({
 		type: "site:set",
 		host,
-		mode
+		mode,
+		durationMs
 	}));
 	await Promise.all([refreshTab(), refreshSites()]);
 }

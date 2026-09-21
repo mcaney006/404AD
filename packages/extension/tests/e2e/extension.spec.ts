@@ -378,6 +378,192 @@ async function resetUserState(page: import("@playwright/test").Page): Promise<vo
   });
 }
 
+test.describe("per-site controls", () => {
+  test("a temporary exception lapses on its own", async ({ context, extensionId }) => {
+    const page = await context.newPage();
+    await page.goto(`chrome-extension://${extensionId}/options.html`);
+
+    await page.evaluate(() =>
+      chrome.runtime.sendMessage({
+        type: "site:set",
+        host: "temporary.test",
+        mode: "off",
+        durationMs: 400,
+      }),
+    );
+
+    const during = await page.evaluate(
+      async () =>
+        (
+          (await chrome.runtime.sendMessage({ type: "site:list" })) as {
+            data: Array<{ host: string; expiresAt: number | null }>;
+          }
+        ).data,
+    );
+    expect(during.find((s) => s.host === "temporary.test")?.expiresAt).toBeGreaterThan(0);
+
+    await page.waitForTimeout(600);
+    const after = await page.evaluate(
+      async () =>
+        (
+          (await chrome.runtime.sendMessage({ type: "site:list" })) as {
+            data: Array<{ host: string }>;
+          }
+        ).data,
+    );
+    expect(after.some((s) => s.host === "temporary.test")).toBe(false);
+    await page.close();
+  });
+
+  test("a permanent exception does not lapse", async ({ context, extensionId }) => {
+    const page = await context.newPage();
+    await page.goto(`chrome-extension://${extensionId}/options.html`);
+
+    await page.evaluate(() =>
+      chrome.runtime.sendMessage({ type: "site:set", host: "permanent.test", mode: "relaxed" }),
+    );
+    await page.waitForTimeout(300);
+
+    const sites = await page.evaluate(
+      async () =>
+        (
+          (await chrome.runtime.sendMessage({ type: "site:list" })) as {
+            data: Array<{ host: string; expiresAt: number | null }>;
+          }
+        ).data,
+    );
+    const rule = sites.find((s) => s.host === "permanent.test");
+    expect(rule?.expiresAt).toBeNull();
+
+    await page.evaluate(() =>
+      chrome.runtime.sendMessage({ type: "site:set", host: "permanent.test", mode: "default" }),
+    );
+    await page.close();
+  });
+});
+
+test.describe("diagnostics", () => {
+  test("a hidden element is attributed to the selector that hid it", async ({
+    context,
+    extensionId,
+  }) => {
+    const page = await context.newPage();
+    await page.goto("/");
+    await expect(page.locator("#generic-ad")).toBeHidden({ timeout: 10_000 });
+
+    const tabId = await page.evaluate(() => 0);
+    void tabId;
+
+    const options = await context.newPage();
+    await options.goto(`chrome-extension://${extensionId}/options.html`);
+    // Give the content script's periodic report a chance to arrive.
+    await options.waitForTimeout(1_500);
+
+    const hits = await options.evaluate(async () => {
+      const tabs = await chrome.tabs.query({});
+      const target = tabs.find((t) => t.url?.startsWith("http://127.0.0.1"));
+      const reply = (await chrome.runtime.sendMessage({
+        type: "diagnostics:cosmetic",
+        tabId: target?.id ?? -1,
+      })) as { data: Array<{ selector: string; count: number }> };
+      return reply.data;
+    });
+
+    expect(hits.length).toBeGreaterThan(0);
+    // Not just "3 things vanished": which rule did it.
+    expect(hits.some((h) => h.selector.includes("ad-banner"))).toBe(true);
+
+    await options.close();
+    await page.close();
+  });
+
+  test("rule provenance and risk arithmetic reach the UI", async ({ context, extensionId }) => {
+    const page = await context.newPage();
+    await page.goto(`chrome-extension://${extensionId}/options.html`);
+
+    const explained = await page.evaluate(
+      async () =>
+        (
+          (await chrome.runtime.sendMessage({
+            type: "diagnostics:explain",
+            url: "https://doubleclick.net/ad.js",
+            initiator: "https://news.example.com/",
+            resourceType: "script",
+          })) as {
+            data: {
+              matched: Array<{
+                raw: string;
+                list: string;
+                line: number;
+                riskScore: number;
+                riskFactors: Array<{ reason: string; delta: number }>;
+              }>;
+            };
+          }
+        ).data,
+    );
+
+    const [first] = explained.matched;
+    expect(first?.raw).toContain("doubleclick");
+    expect(first?.list).toBeTruthy();
+    expect(first?.line).toBeGreaterThan(0);
+    // The score must be exactly the sum of its printed terms.
+    const sum = first!.riskFactors.reduce((total, f) => total + f.delta, 0);
+    expect(first!.riskScore).toBe(Math.min(100, Math.max(0, sum)));
+
+    await page.close();
+  });
+});
+
+test.describe("shadow promotion", () => {
+  test("promoting a shadow rule enforces it as a user filter", async ({
+    context,
+    extensionId,
+    serviceWorker,
+  }) => {
+    const options = await context.newPage();
+    await options.goto(`chrome-extension://${extensionId}/options.html`);
+
+    // Find a shadow rule from the compiled candidate list.
+    const shadowRule = await options.evaluate(async () => {
+      const response = await fetch(chrome.runtime.getURL("generated/diagnostics.json"));
+      const file = (await response.json()) as {
+        network: Record<string, { shadow: boolean; raw: string }>;
+      };
+      const entry = Object.entries(file.network).find(([, d]) => d.shadow);
+      return entry ? { ruleId: Number(entry[0]), raw: entry[1].raw } : null;
+    });
+    expect(shadowRule).not.toBeNull();
+
+    const result = await options.evaluate(
+      async (ruleId) =>
+        (
+          (await chrome.runtime.sendMessage({ type: "shadow:promote", ruleId })) as {
+            data: { promoted: string; status: { applied: number } };
+          }
+        ).data,
+      shadowRule!.ruleId,
+    );
+    expect(result.promoted).toBe(shadowRule!.raw);
+    expect(result.status.applied).toBeGreaterThan(0);
+
+    // It is now in the user's own filters, pre-confirmed.
+    const settings = await options.evaluate(
+      async () =>
+        (
+          (await chrome.runtime.sendMessage({ type: "settings:get" })) as {
+            data: { userFilters: string; confirmedRiskyFilters: string[] };
+          }
+        ).data,
+    );
+    expect(settings.userFilters).toContain(shadowRule!.raw);
+
+    await resetUserState(options);
+    await options.close();
+    void serviceWorker;
+  });
+});
+
 test.describe("custom user filters", () => {
   test("a user cosmetic rule hides an element no bundled list touches", async ({
     context,

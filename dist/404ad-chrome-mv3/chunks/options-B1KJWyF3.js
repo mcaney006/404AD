@@ -1,4 +1,4 @@
-import { C as S, S as R, a as patchSettings, b as y, c as refreshSites, g as status, h as stats, l as refreshStats, m as sites, n as error, p as settings, r as formatCount, s as refreshSettings, t as u, u as refreshStatus, v as send, x as h, y as useSignal } from "./jsxRuntime.module-CxOplL_Z.js";
+import { C as S, S as R, a as patchSettings, b as y, c as refreshSites, g as status, h as stats, l as refreshStats, m as sites, n as error, p as settings, r as formatCount, s as refreshSettings, t as u, u as refreshStatus, v as send, x as h, y as useSignal } from "./jsxRuntime.module-CklenpV1.js";
 //#region entrypoints/options/main.tsx
 var TABS = [
 	{
@@ -575,7 +575,7 @@ function CustomFilters() {
 				}) }),
 				/* @__PURE__ */ u("td", {
 					class: "muted",
-					children: [line.error ?? line.riskFactors.join(", "), line.needsConfirmation && /* @__PURE__ */ u(S, { children: [" ", /* @__PURE__ */ u("button", {
+					children: [line.error ?? line.riskFactors.map((f) => `${f.delta >= 0 ? "+" : ""}${f.delta} ${f.reason}`).join(", "), line.needsConfirmation && /* @__PURE__ */ u(S, { children: [" ", /* @__PURE__ */ u("button", {
 						"aria-pressed": confirmed.has(line.raw),
 						onClick: () => void toggleConfirm(line.raw),
 						children: confirmed.has(line.raw) ? "confirmed" : "confirm"
@@ -814,6 +814,25 @@ function Statistics() {
 }
 function Shadow() {
 	const data = stats.value;
+	const promoting = useSignal(null);
+	const promoted = useSignal([]);
+	const problem = useSignal(null);
+	const promote = async (ruleId) => {
+		promoting.value = ruleId;
+		problem.value = null;
+		try {
+			const result = await send({
+				type: "shadow:promote",
+				ruleId
+			});
+			promoted.value = [...promoted.value, result.promoted];
+			await Promise.all([refreshSettings(), refreshStats()]);
+		} catch (e) {
+			problem.value = e instanceof Error ? e.message : String(e);
+		} finally {
+			promoting.value = null;
+		}
+	};
 	if (!data) return /* @__PURE__ */ u("div", {
 		class: "empty",
 		children: "Loading…"
@@ -850,11 +869,12 @@ function Shadow() {
 						class: "num",
 						children: "Sites"
 					}),
-					/* @__PURE__ */ u("th", { children: "Risk" })
+					/* @__PURE__ */ u("th", { children: "Risk" }),
+					/* @__PURE__ */ u("th", {})
 				] }) }), /* @__PURE__ */ u("tbody", { children: data.shadow.map((obs) => /* @__PURE__ */ u("tr", { children: [
 					/* @__PURE__ */ u("td", {
 						class: "mono truncate",
-						style: "max-width:320px",
+						style: "max-width:260px",
 						title: obs.raw,
 						children: obs.raw
 					}),
@@ -873,13 +893,36 @@ function Shadow() {
 					/* @__PURE__ */ u("td", { children: /* @__PURE__ */ u("span", {
 						class: `badge ${obs.riskBand}`,
 						children: obs.riskBand
-					}) })
+					}) }),
+					/* @__PURE__ */ u("td", {
+						class: "num",
+						children: /* @__PURE__ */ u("button", {
+							disabled: promoting.value === obs.ruleId,
+							title: "Copy this rule into your own filters and enforce it",
+							onClick: () => void promote(obs.ruleId),
+							children: promoted.value.includes(obs.raw) ? "Promoted" : "Promote"
+						})
+					})
 				] }, obs.ruleId)) })] }),
+				problem.value && /* @__PURE__ */ u("p", {
+					style: "margin:0",
+					children: [
+						/* @__PURE__ */ u("span", {
+							class: "badge critical",
+							children: "error"
+						}),
+						" ",
+						/* @__PURE__ */ u("span", {
+							class: "mono",
+							children: problem.value
+						})
+					]
+				}),
 				/* @__PURE__ */ u("p", {
 					class: "muted",
 					style: "margin:0",
 					children: [
-						"A rule matching often, across many sites, with a low risk score is a promotion candidate: move it out of ",
+						"A rule matching often, across many sites, with a low risk score is a promotion candidate. Promoting copies it into your own filters and enforces it immediately, pre-confirmed, because its risk has now been measured against your traffic rather than guessed at. To promote it for everyone, move the line out of ",
 						/* @__PURE__ */ u("code", { children: "lists/404ad-candidates.txt" }),
 						" into a real list and recompile."
 					]

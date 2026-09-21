@@ -156,7 +156,7 @@ struct ExplainedRule {
     line: u32,
     risk_score: u8,
     risk_band: risk::RiskBand,
-    risk_factors: Vec<&'static str>,
+    risk_factors: Vec<risk::RiskFactor>,
 }
 
 #[derive(Serialize)]
@@ -274,7 +274,7 @@ struct ValidatedLine {
     error: Option<String>,
     risk_score: u8,
     risk_band: risk::RiskBand,
-    risk_factors: Vec<&'static str>,
+    risk_factors: Vec<risk::RiskFactor>,
     /// True when the rule is risky enough that 404AD holds it in shadow mode
     /// until the user explicitly confirms it.
     needs_confirmation: bool,

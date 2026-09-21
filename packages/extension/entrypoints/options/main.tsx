@@ -497,7 +497,10 @@ function CustomFilters() {
                       )}
                     </td>
                     <td class="muted">
-                      {line.error ?? line.riskFactors.join(", ")}
+                      {line.error ??
+                        line.riskFactors
+                          .map((f) => `${f.delta >= 0 ? "+" : ""}${f.delta} ${f.reason}`)
+                          .join(", ")}
                       {line.needsConfirmation && (
                         <>
                           {" "}
@@ -717,6 +720,24 @@ function Statistics() {
 
 function Shadow() {
   const data = stats.value;
+  const promoting = useSignal<number | null>(null);
+  const promoted = useSignal<string[]>([]);
+  const problem = useSignal<string | null>(null);
+
+  const promote = async (ruleId: number): Promise<void> => {
+    promoting.value = ruleId;
+    problem.value = null;
+    try {
+      const result = await send({ type: "shadow:promote", ruleId });
+      promoted.value = [...promoted.value, result.promoted];
+      await Promise.all([refreshSettings(), refreshStats()]);
+    } catch (e) {
+      problem.value = e instanceof Error ? e.message : String(e);
+    } finally {
+      promoting.value = null;
+    }
+  };
+
   if (!data) return <div class="empty">Loading…</div>;
 
   return (
@@ -746,12 +767,13 @@ function Shadow() {
                 <th class="num">Matches</th>
                 <th class="num">Sites</th>
                 <th>Risk</th>
+                <th />
               </tr>
             </thead>
             <tbody>
               {data.shadow.map((obs) => (
                 <tr key={obs.ruleId}>
-                  <td class="mono truncate" style="max-width:320px" title={obs.raw}>
+                  <td class="mono truncate" style="max-width:260px" title={obs.raw}>
                     {obs.raw}
                   </td>
                   <td class="muted">{obs.list}</td>
@@ -760,14 +782,31 @@ function Shadow() {
                   <td>
                     <span class={`badge ${obs.riskBand}`}>{obs.riskBand}</span>
                   </td>
+                  <td class="num">
+                    <button
+                      disabled={promoting.value === obs.ruleId}
+                      title="Copy this rule into your own filters and enforce it"
+                      onClick={() => void promote(obs.ruleId)}
+                    >
+                      {promoted.value.includes(obs.raw) ? "Promoted" : "Promote"}
+                    </button>
+                  </td>
                 </tr>
               ))}
             </tbody>
           </table>
         )}
+        {problem.value && (
+          <p style="margin:0">
+            <span class="badge critical">error</span> <span class="mono">{problem.value}</span>
+          </p>
+        )}
         <p class="muted" style="margin:0">
-          A rule matching often, across many sites, with a low risk score is a promotion candidate:
-          move it out of <code>lists/404ad-candidates.txt</code> into a real list and recompile.
+          A rule matching often, across many sites, with a low risk score is a promotion candidate.
+          Promoting copies it into your own filters and enforces it immediately, pre-confirmed,
+          because its risk has now been measured against your traffic rather than guessed at. To
+          promote it for everyone, move the line out of <code>lists/404ad-candidates.txt</code> into
+          a real list and recompile.
         </p>
       </div>
     </div>

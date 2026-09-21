@@ -190,7 +190,7 @@ fn no_shipped_rule_is_rated_critical() {
                 assessment.score,
                 assessment.band,
                 rule.source.raw,
-                assessment.factors.join(", ")
+                assessment.reasons().join(", ")
             ));
         }
     }
@@ -204,7 +204,7 @@ fn no_shipped_rule_is_rated_critical() {
                 assessment.score,
                 assessment.band,
                 rule.source.raw,
-                assessment.factors.join(", ")
+                assessment.reasons().join(", ")
             ));
         }
     }

@@ -1,4 +1,4 @@
-import type { ProceduralEntry, ProceduralOp } from "../core/protocol";
+import type { CosmeticHit, ProceduralEntry, ProceduralOp } from "../core/protocol";
 
 /**
  * Procedural selector evaluation.
@@ -99,17 +99,39 @@ export function evaluate(entry: ProceduralEntry, root: ParentNode = document): E
   return elements;
 }
 
+/** A readable label for a procedural rule, for the diagnostics panel. */
+function describe(entry: ProceduralEntry): string {
+  const ops = entry.ops
+    .map((op) => {
+      if ("HasText" in op) return `:has-text(${op.HasText.needle})`;
+      if ("Upward" in op) {
+        return `:upward(${op.Upward.steps ?? op.Upward.selector ?? ""})`;
+      }
+      if ("MatchesAttr" in op) return `:matches-attr(${op.MatchesAttr.name})`;
+      if ("MinTextLength" in op) return `:min-text-length(${op.MinTextLength.len})`;
+      return "";
+    })
+    .join("");
+  return `${entry.prefix ?? "*"}${ops}`;
+}
+
 export class ProceduralEngine {
   private entries: ProceduralEntry[] = [];
-  private hidden = 0;
+  private readonly hidden = new Map<number, number>();
+  private readonly labels = new Map<number, string>();
   private scheduled = false;
 
   get hiddenCount(): number {
-    return this.hidden;
+    let total = 0;
+    for (const count of this.hidden.values()) total += count;
+    return total;
   }
 
   setEntries(entries: ProceduralEntry[]): void {
     this.entries = entries.filter((e) => !e.shadow);
+    for (const entry of this.entries) {
+      this.labels.set(entry.ruleId, describe(entry));
+    }
   }
 
   get isEmpty(): boolean {
@@ -131,6 +153,15 @@ export class ProceduralEngine {
     }
   }
 
+  /** Per-rule hide counts, for the diagnostics panel. */
+  hits(): CosmeticHit[] {
+    return [...this.hidden].map(([ruleId, count]) => ({
+      selector: this.labels.get(ruleId) ?? `rule ${ruleId}`,
+      count,
+      procedural: true,
+    }));
+  }
+
   run(): number {
     const started = performance.now();
     let newlyHidden = 0;
@@ -141,10 +172,10 @@ export class ProceduralEngine {
         if (element.hasAttribute(HIDDEN_ATTR)) continue;
         element.setAttribute(HIDDEN_ATTR, String(entry.ruleId));
         (element as HTMLElement).style.setProperty("display", "none", "important");
+        this.hidden.set(entry.ruleId, (this.hidden.get(entry.ruleId) ?? 0) + 1);
         newlyHidden += 1;
       }
     }
-    this.hidden += newlyHidden;
     return newlyHidden;
   }
 
@@ -154,6 +185,6 @@ export class ProceduralEngine {
       (element as HTMLElement).style.removeProperty("display");
       element.removeAttribute(HIDDEN_ATTR);
     }
-    this.hidden = 0;
+    this.hidden.clear();
   }
 }

@@ -21,6 +21,14 @@ export interface SiteRule {
   mode: SiteMode;
   /** Epoch millis, so the options page can show and sort recent changes. */
   updatedAt: number;
+  /**
+   * Epoch millis after which this rule stops applying, or null for permanent.
+   *
+   * A temporary exception is the honest shape for "let me through just this
+   * once": a permanent one quietly accumulates until the user is browsing with
+   * half their sites unprotected and no memory of why.
+   */
+  expiresAt: number | null;
 }
 
 /** A remote filter list the user subscribed to. Data only: never executed. */
@@ -119,6 +127,8 @@ export interface TabState {
   tabId: number;
   host: string;
   mode: SiteMode;
+  /** When this site's exception lapses, or null when permanent or absent. */
+  expiresAt: number | null;
   /** Requests blocked on this tab since the last navigation. */
   blocked: number;
   /** Elements hidden by the content script on this tab. */
@@ -132,9 +142,39 @@ export interface RuleMatch {
   ruleId: number;
   rulesetId: string;
   url: string;
+  /** Resource type Chromium matched on: script, image, xmlhttprequest, … */
   type: string;
+  /** Host of the document that made the request. */
+  site: string;
   timestamp: number;
   shadow: boolean;
+  /** What Chromium did: block, allow, redirect, … */
+  action: string;
+  /** Joined from the compiled diagnostics map, when the rule is a known one. */
+  raw: string | null;
+  list: string | null;
+  line: number | null;
+  riskScore: number | null;
+  riskBand: string | null;
+}
+
+/** An element hidden on the page, reported by the content script. */
+export interface CosmeticHit {
+  selector: string;
+  count: number;
+  /** True for a procedural rule evaluated in JavaScript. */
+  procedural: boolean;
+}
+
+/**
+ * One additive term of a risk score, with the number it contributed.
+ *
+ * The score is not a black box: every term is named, signed and visible, so the
+ * arithmetic can be checked by hand rather than trusted.
+ */
+export interface RiskFactor {
+  reason: string;
+  delta: number;
 }
 
 export interface RuleDiagnostic {
@@ -146,7 +186,7 @@ export interface RuleDiagnostic {
   shadow: boolean;
   riskScore: number;
   riskBand: "low" | "medium" | "high" | "critical";
-  riskFactors: string[];
+  riskFactors: RiskFactor[];
 }
 
 export interface ExplainedRule extends Omit<RuleDiagnostic, "irId"> {
@@ -168,7 +208,7 @@ export interface ValidatedLine {
   error: string | null;
   riskScore: number;
   riskBand: "low" | "medium" | "high" | "critical";
-  riskFactors: string[];
+  riskFactors: RiskFactor[];
   needsConfirmation: boolean;
 }
 
@@ -222,9 +262,9 @@ export interface EngineStatus {
 export type Request =
   | { type: "document:resolve"; host: string; tokens: string[] }
   | { type: "document:generic"; host: string; tokens: string[]; unhideIds: number[] }
-  | { type: "content:hidden"; count: number }
+  | { type: "content:hidden"; count: number; hits: CosmeticHit[] }
   | { type: "tab:state"; tabId?: number }
-  | { type: "site:set"; host: string; mode: SiteMode }
+  | { type: "site:set"; host: string; mode: SiteMode; durationMs?: number }
   | { type: "site:list" }
   | { type: "settings:get" }
   | { type: "settings:set"; patch: Partial<Settings> }
@@ -241,7 +281,9 @@ export type Request =
   | { type: "subs:add"; url: string }
   | { type: "subs:remove"; id: string }
   | { type: "subs:enable"; id: string; enabled: boolean }
-  | { type: "subs:refresh"; id?: string };
+  | { type: "subs:refresh"; id?: string }
+  | { type: "diagnostics:cosmetic"; tabId: number }
+  | { type: "shadow:promote"; ruleId: number };
 
 export interface ResponseMap {
   "document:resolve": DocumentPayload;
@@ -266,6 +308,8 @@ export interface ResponseMap {
   "subs:remove": Subscription[];
   "subs:enable": Subscription[];
   "subs:refresh": Subscription[];
+  "diagnostics:cosmetic": CosmeticHit[];
+  "shadow:promote": { promoted: string; status: UserFilterStatus };
 }
 
 export type Response<T extends Request["type"]> = ResponseMap[T];

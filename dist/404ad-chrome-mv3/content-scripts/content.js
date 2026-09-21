@@ -100,17 +100,30 @@
 			for (const element of root.querySelectorAll("[class],[id]")) scan(element);
 			return fresh;
 		}
-		/** How many elements the injected selectors actually match right now. */
-		countHidden() {
-			if (this.applied.size === 0) return 0;
-			let total = 0;
+		/**
+		* Which selectors are matching, and how many elements each one hides.
+		*
+		* Counting per selector rather than in aggregate is what lets the popup
+		* answer "what hid that?" instead of only "how many things vanished".
+		*/
+		hits() {
+			const out = [];
 			for (const selector of this.applied) {
 				if (selector.includes("{")) continue;
 				try {
-					total += document.querySelectorAll(selector).length;
+					const count = document.querySelectorAll(selector).length;
+					if (count > 0) out.push({
+						selector,
+						count,
+						procedural: false
+					});
 				} catch {}
 			}
-			return total;
+			return out;
+		}
+		/** How many elements the injected selectors match right now. */
+		countHidden() {
+			return this.hits().reduce((sum, hit) => sum + hit.count, 0);
 		}
 	};
 	//#endregion
@@ -253,15 +266,30 @@
 		}
 		return elements;
 	}
+	/** A readable label for a procedural rule, for the diagnostics panel. */
+	function describe(entry) {
+		const ops = entry.ops.map((op) => {
+			if ("HasText" in op) return `:has-text(${op.HasText.needle})`;
+			if ("Upward" in op) return `:upward(${op.Upward.steps ?? op.Upward.selector ?? ""})`;
+			if ("MatchesAttr" in op) return `:matches-attr(${op.MatchesAttr.name})`;
+			if ("MinTextLength" in op) return `:min-text-length(${op.MinTextLength.len})`;
+			return "";
+		}).join("");
+		return `${entry.prefix ?? "*"}${ops}`;
+	}
 	var ProceduralEngine = class {
 		entries = [];
-		hidden = 0;
+		hidden = /* @__PURE__ */ new Map();
+		labels = /* @__PURE__ */ new Map();
 		scheduled = false;
 		get hiddenCount() {
-			return this.hidden;
+			let total = 0;
+			for (const count of this.hidden.values()) total += count;
+			return total;
 		}
 		setEntries(entries) {
 			this.entries = entries.filter((e) => !e.shadow);
+			for (const entry of this.entries) this.labels.set(entry.ruleId, describe(entry));
 		}
 		get isEmpty() {
 			return this.entries.length === 0;
@@ -277,6 +305,14 @@
 			if (typeof requestIdleCallback === "function") requestIdleCallback(run, { timeout: 500 });
 			else setTimeout(run, 100);
 		}
+		/** Per-rule hide counts, for the diagnostics panel. */
+		hits() {
+			return [...this.hidden].map(([ruleId, count]) => ({
+				selector: this.labels.get(ruleId) ?? `rule ${ruleId}`,
+				count,
+				procedural: true
+			}));
+		}
 		run() {
 			const started = performance.now();
 			let newlyHidden = 0;
@@ -286,10 +322,10 @@
 					if (element.hasAttribute(HIDDEN_ATTR)) continue;
 					element.setAttribute(HIDDEN_ATTR, String(entry.ruleId));
 					element.style.setProperty("display", "none", "important");
+					this.hidden.set(entry.ruleId, (this.hidden.get(entry.ruleId) ?? 0) + 1);
 					newlyHidden += 1;
 				}
 			}
-			this.hidden += newlyHidden;
 			return newlyHidden;
 		}
 		/** Undo every hide, for when a site is switched to relaxed or off. */
@@ -298,7 +334,7 @@
 				element.style.removeProperty("display");
 				element.removeAttribute(HIDDEN_ATTR);
 			}
-			this.hidden = 0;
+			this.hidden.clear();
 		}
 	};
 	//#endregion
@@ -385,11 +421,13 @@
 				scheduleTokenFlush();
 			};
 			const reportHidden = () => {
-				const total = injector.countHidden() + procedural.hiddenCount;
+				const hits = injector.hits();
+				const total = hits.reduce((sum, hit) => sum + hit.count, 0) + procedural.hiddenCount;
 				if (total === reportedHidden) return;
 				notify({
 					type: "content:hidden",
-					count: total - reportedHidden
+					count: total - reportedHidden,
+					hits: [...hits, ...procedural.hits()]
 				});
 				reportedHidden = total;
 			};

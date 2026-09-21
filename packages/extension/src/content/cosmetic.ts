@@ -1,3 +1,4 @@
+import type { CosmeticHit } from "../core/protocol";
 /**
  * Cosmetic filtering in the content script.
  *
@@ -115,19 +116,29 @@ export class CosmeticInjector {
     return fresh;
   }
 
-  /** How many elements the injected selectors actually match right now. */
-  countHidden(): number {
-    if (this.applied.size === 0) return 0;
-    let total = 0;
+  /**
+   * Which selectors are matching, and how many elements each one hides.
+   *
+   * Counting per selector rather than in aggregate is what lets the popup
+   * answer "what hid that?" instead of only "how many things vanished".
+   */
+  hits(): CosmeticHit[] {
+    const out: CosmeticHit[] = [];
     for (const selector of this.applied) {
       // Style rules are not selectors; skip anything with a declaration block.
       if (selector.includes("{")) continue;
       try {
-        total += document.querySelectorAll(selector).length;
+        const count = document.querySelectorAll(selector).length;
+        if (count > 0) out.push({ selector, count, procedural: false });
       } catch {
         // A filter list can contain a selector this browser rejects.
       }
     }
-    return total;
+    return out;
+  }
+
+  /** How many elements the injected selectors match right now. */
+  countHidden(): number {
+    return this.hits().reduce((sum, hit) => sum + hit.count, 0);
   }
 }

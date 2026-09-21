@@ -76,9 +76,16 @@ export default defineContentScript({
     };
 
     const reportHidden = (): void => {
-      const total = injector.countHidden() + procedural.hiddenCount;
+      const hits = injector.hits();
+      const total = hits.reduce((sum, hit) => sum + hit.count, 0) + procedural.hiddenCount;
       if (total === reportedHidden) return;
-      notify({ type: "content:hidden", count: total - reportedHidden });
+      // The selectors travel with the count, so the diagnostics panel can say
+      // *which* rule hid something rather than only how many things vanished.
+      notify({
+        type: "content:hidden",
+        count: total - reportedHidden,
+        hits: [...hits, ...procedural.hits()],
+      });
       reportedHidden = total;
     };
 

@@ -34,42 +34,87 @@ impl RiskBand {
     }
 }
 
+/// One additive term, with the number it contributed.
+///
+/// The score is not a black box and is not meant to be trusted on faith: every
+/// term is named, signed and visible, so the arithmetic can be checked by hand.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize)]
+pub struct RiskFactor {
+    pub reason: &'static str,
+    pub delta: i32,
+}
+
 #[derive(Debug, Clone, Serialize)]
 pub struct RiskAssessment {
     pub score: u8,
     pub band: RiskBand,
-    /// Human-readable reasons, in the order they were applied.
-    pub factors: Vec<&'static str>,
+    /// Every term that was applied, in order, with its contribution.
+    pub factors: Vec<RiskFactor>,
+}
+
+impl RiskAssessment {
+    /// The reasons alone, for callers that only want prose.
+    pub fn reasons(&self) -> Vec<&'static str> {
+        self.factors.iter().map(|f| f.reason).collect()
+    }
+
+    /// Sum of the terms before clamping. Equals `score` unless it clamped.
+    pub fn raw_total(&self) -> i32 {
+        self.factors.iter().map(|f| f.delta).sum()
+    }
+}
+
+/// Accumulates named terms so the score and its explanation cannot diverge.
+struct Ledger {
+    factors: Vec<RiskFactor>,
+}
+
+impl Ledger {
+    fn new() -> Self {
+        Ledger {
+            factors: Vec::new(),
+        }
+    }
+
+    fn add(&mut self, delta: i32, reason: &'static str) {
+        self.factors.push(RiskFactor { reason, delta });
+    }
+
+    fn finish(self) -> RiskAssessment {
+        let total: i32 = self.factors.iter().map(|f| f.delta).sum();
+        let score = total.clamp(0, 100) as u8;
+        RiskAssessment {
+            score,
+            band: RiskBand::from_score(score),
+            factors: self.factors,
+        }
+    }
+
+    fn only(delta: i32, reason: &'static str) -> RiskAssessment {
+        let mut ledger = Ledger::new();
+        ledger.add(delta, reason);
+        ledger.finish()
+    }
 }
 
 /// Score a network rule.
 pub fn score_network(rule: &NetworkRule) -> RiskAssessment {
-    let mut score: i32 = 0;
-    let mut factors = Vec::new();
-
     // Exceptions only ever un-block, so they cannot break page rendering.
     if rule.exception {
-        return RiskAssessment {
-            score: 0,
-            band: RiskBand::Low,
-            factors: vec!["exception rule"],
-        };
+        return Ledger::only(0, "exception rule");
     }
-
     // A rule that cannot stop a request does not get scored like one that can.
     if !matches!(rule.modifier, Modifier::Block) {
         return score_modifier(rule);
     }
 
+    let mut ledger = Ledger::new();
+
     // Blocking the top-level document removes the page entirely. Nothing else
     // a filter can do is worse.
-    // Only actions that can actually stop a navigation count here. A
-    // `$removeparam` rule covers main_frame by design and is harmless there.
-    let blocks_document =
-        rule.types.contains(ResourceTypes::MAIN_FRAME) && matches!(rule.modifier, Modifier::Block);
+    let blocks_document = rule.types.contains(ResourceTypes::MAIN_FRAME);
     if blocks_document {
-        score += 50;
-        factors.push("blocks the top-level document");
+        ledger.add(50, "blocks the top-level document");
     }
 
     // A rule that names no type is not *targeting* scripts, it simply inherits
@@ -77,64 +122,45 @@ pub fn score_network(rule: &NetworkRule) -> RiskAssessment {
     // common and safest rule shape there is: a plain third-party host block.
     // Explicit type selection is the signal worth scoring.
     if rule.types == ResourceTypes::implicit_default() {
-        score += 10;
-        factors.push("matches all subresource types");
+        ledger.add(10, "matches all subresource types");
     } else {
         // Scripts and XHR are where functional breakage concentrates.
         if rule.types.contains(ResourceTypes::SCRIPT) {
-            score += 18;
-            factors.push("targets scripts");
+            ledger.add(18, "targets scripts");
         }
         if rule.types.contains(ResourceTypes::XHR) {
-            score += 16;
-            factors.push("targets XHR/fetch");
+            ledger.add(16, "targets XHR/fetch");
         }
         if rule.types.contains(ResourceTypes::STYLESHEET) {
-            score += 12;
-            factors.push("targets stylesheets");
+            ledger.add(12, "targets stylesheets");
         }
         if rule.types.contains(ResourceTypes::SUB_FRAME) {
-            score += 8;
-            factors.push("targets subframes");
+            ledger.add(8, "targets subframes");
         }
     }
 
     // First-party blocking is far riskier than third-party blocking.
     match rule.party {
-        Party::Third => {
-            score -= 14;
-            factors.push("third-party only");
-        }
-        Party::First => {
-            score += 20;
-            factors.push("first-party only");
-        }
-        Party::Any => {
-            score += 8;
-            factors.push("any party");
-        }
+        Party::Third => ledger.add(-14, "third-party only"),
+        Party::First => ledger.add(20, "first-party only"),
+        Party::Any => ledger.add(8, "any party"),
     }
 
     // A short literal matches enormous numbers of unrelated URLs.
     let literal = rule.pattern.literal_len();
     if literal <= 4 {
-        score += 30;
-        factors.push("very short pattern");
+        ledger.add(30, "very short pattern");
     } else if literal <= 8 {
-        score += 16;
-        factors.push("short pattern");
+        ledger.add(16, "short pattern");
     } else if literal >= 20 {
-        score -= 10;
-        factors.push("long specific pattern");
+        ledger.add(-10, "long specific pattern");
     }
 
     if rule.pattern.is_regex() {
-        score += 14;
-        factors.push("regular expression");
+        ledger.add(14, "regular expression");
     }
     if matches!(&rule.pattern, Pattern::Plain { raw } if raw.contains('*')) {
-        score += 8;
-        factors.push("wildcard pattern");
+        ledger.add(8, "wildcard pattern");
     }
 
     // `||tracker.example^` names an entire host: unambiguous intent and a
@@ -142,33 +168,24 @@ pub fn score_network(rule: &NetworkRule) -> RiskAssessment {
     // also takes down the document served from that host.
     if let Pattern::HostAnchored { host, .. } = &rule.pattern {
         if !blocks_document && host.contains('.') && rule.pattern.literal_len() >= 10 {
-            score -= 8;
-            factors.push("anchored to a specific host");
+            ledger.add(-8, "anchored to a specific host");
         }
     }
 
     // Scoping a rule to named sites bounds its blast radius.
     if !rule.initiator_domains.is_empty() {
-        score -= 22;
-        factors.push("scoped to specific sites");
+        ledger.add(-22, "scoped to specific sites");
     }
     if !rule.excluded_request_domains.is_empty() {
-        score -= 5;
-        factors.push("has denyallow carve-outs");
+        ledger.add(-5, "has denyallow carve-outs");
     }
 
     // `$important` overrides exception rules, including site-specific fixes.
     if rule.important {
-        score += 12;
-        factors.push("important (overrides exceptions)");
+        ledger.add(12, "important (overrides exceptions)");
     }
 
-    let score = score.clamp(0, 100) as u8;
-    RiskAssessment {
-        score,
-        band: RiskBand::from_score(score),
-        factors,
-    }
+    ledger.finish()
 }
 
 /// Risk model for rules that modify a request rather than stop it.
@@ -178,114 +195,70 @@ pub fn score_network(rule: &NetworkRule) -> RiskAssessment {
 /// parameter strip is not comparable to cancelling it. What matters instead is
 /// how much of the request the modifier rewrites.
 fn score_modifier(rule: &NetworkRule) -> RiskAssessment {
-    let mut factors: Vec<&'static str> = Vec::new();
-    let mut score: i32 = match &rule.modifier {
+    let mut ledger = Ledger::new();
+    match &rule.modifier {
         Modifier::RemoveParam(RemoveParam::Keys(_)) => {
-            factors.push("strips named query parameters");
-            5
+            ledger.add(5, "strips named query parameters")
         }
-        Modifier::RemoveParam(RemoveParam::All) => {
-            // Signed URLs and session handoffs live in the query string.
-            factors.push("strips the entire query string");
-            30
-        }
+        // Signed URLs and session handoffs live in the query string.
+        Modifier::RemoveParam(RemoveParam::All) => ledger.add(30, "strips the entire query string"),
         Modifier::RemoveParam(RemoveParam::ExceptKeys(_)) => {
-            factors.push("strips every parameter except an allowlist");
-            35
+            ledger.add(35, "strips every parameter except an allowlist")
         }
-        Modifier::Redirect(_) => {
-            factors.push("serves a neutered stub in place of the resource");
-            15
-        }
-        Modifier::Csp(_) => {
-            factors.push("injects a Content-Security-Policy header");
-            18
-        }
+        Modifier::Redirect(_) => ledger.add(15, "serves a neutered stub in place of the resource"),
+        Modifier::Csp(_) => ledger.add(18, "injects a Content-Security-Policy header"),
         Modifier::GenericHide
         | Modifier::ElemHide
         | Modifier::GenericBlock
-        | Modifier::Document => {
-            factors.push("relaxes filtering");
-            0
-        }
+        | Modifier::Document => ledger.add(0, "relaxes filtering"),
         Modifier::Block => unreachable!("handled by the blocking model"),
-    };
+    }
 
     if rule.is_scoped() {
-        score -= 8;
-        factors.push("scoped to specific sites");
+        ledger.add(-8, "scoped to specific sites");
     }
     if rule.important {
-        score += 10;
-        factors.push("important (overrides exceptions)");
+        ledger.add(10, "important (overrides exceptions)");
     }
-
-    let score = score.clamp(0, 100) as u8;
-    RiskAssessment {
-        score,
-        band: RiskBand::from_score(score),
-        factors,
-    }
+    ledger.finish()
 }
 
 /// Score a cosmetic rule. Cosmetic breakage is visual, not functional, so the
 /// baseline sits well below network rules.
 pub fn score_cosmetic(rule: &CosmeticRule) -> RiskAssessment {
-    let mut score: i32 = 0;
-    let mut factors = Vec::new();
+    let mut ledger = Ledger::new();
 
     match rule.kind {
         CosmeticKind::Unhide | CosmeticKind::UnScriptlet => {
-            return RiskAssessment {
-                score: 0,
-                band: RiskBand::Low,
-                factors: vec!["exception rule"],
-            }
+            return Ledger::only(0, "exception rule")
         }
-        CosmeticKind::Scriptlet => {
-            score += 35;
-            factors.push("runs a scriptlet in the page");
-        }
-        CosmeticKind::Style => {
-            score += 10;
-            factors.push("injects a style declaration");
-        }
+        CosmeticKind::Scriptlet => ledger.add(35, "runs a scriptlet in the page"),
+        CosmeticKind::Style => ledger.add(10, "injects a style declaration"),
         CosmeticKind::Hide => {}
     }
 
     if rule.is_generic() {
-        score += 28;
-        factors.push("applies to every site");
+        ledger.add(28, "applies to every site");
     } else {
-        score -= 12;
-        factors.push("scoped to specific sites");
+        ledger.add(-12, "scoped to specific sites");
     }
 
     let selector = rule.css_prefix.as_deref().unwrap_or(&rule.payload);
     // Bare element selectors like `div` or `a` hide huge parts of a page.
     if selector.len() <= 4 && !selector.starts_with('.') && !selector.starts_with('#') {
-        score += 40;
-        factors.push("extremely broad selector");
+        ledger.add(40, "extremely broad selector");
     }
     if selector.contains('*') {
-        score += 15;
-        factors.push("universal selector");
+        ledger.add(15, "universal selector");
     }
     if rule.anchor_token().is_none() && rule.is_generic() {
-        score += 20;
-        factors.push("no class or id anchor");
+        ledger.add(20, "no class or id anchor");
     }
     if !rule.procedural.is_empty() {
-        score += 6;
-        factors.push("procedural selector (runtime cost)");
+        ledger.add(6, "procedural selector (runtime cost)");
     }
 
-    let score = score.clamp(0, 100) as u8;
-    RiskAssessment {
-        score,
-        band: RiskBand::from_score(score),
-        factors,
-    }
+    ledger.finish()
 }
 
 #[cfg(test)]
@@ -379,7 +352,7 @@ mod tests {
     fn removeparam_on_navigations_is_not_treated_as_document_blocking() {
         let a = score_network(&net("$removeparam=utm_source"));
         assert!(
-            !a.factors.contains(&"blocks the top-level document"),
+            !a.reasons().contains(&"blocks the top-level document"),
             "stripping a parameter does not stop a navigation: {a:?}"
         );
         assert_eq!(a.band, RiskBand::Low, "{a:?}");
@@ -395,6 +368,55 @@ mod tests {
             implicit.score < explicit.score,
             "implicit {implicit:?} explicit {explicit:?}"
         );
+    }
+
+    #[test]
+    fn the_score_is_exactly_the_sum_of_its_printed_terms() {
+        // The whole point of the ledger: the explanation and the number cannot
+        // drift apart, because the number is computed from the explanation.
+        for line in [
+            "||doubleclick.net^$third-party",
+            "/ad$script",
+            "||x.com^$document,important",
+            "$removeparam=utm_source",
+            "||x.com/t^$removeparam",
+            "||x.com/ads.js$redirect=noopjs",
+            "@@||x.com^",
+        ] {
+            let a = score_network(&net(line));
+            let sum: i32 = a.factors.iter().map(|f| f.delta).sum();
+            assert_eq!(a.raw_total(), sum, "{line}");
+            assert_eq!(
+                a.score,
+                sum.clamp(0, 100) as u8,
+                "{line} terms {:?}",
+                a.factors
+            );
+        }
+    }
+
+    #[test]
+    fn cosmetic_scores_are_the_sum_of_their_terms_too() {
+        for line in [
+            "##div",
+            "example.com##.ad-slot-container",
+            "##.promo:has-text(Ad)",
+        ] {
+            let a = score_cosmetic(&cos(line));
+            assert_eq!(a.score, a.raw_total().clamp(0, 100) as u8, "{line}");
+        }
+    }
+
+    #[test]
+    fn every_term_carries_a_reason_and_a_nonzero_effect_or_says_why() {
+        let a = score_network(&net("||ads.com^$third-party,script"));
+        assert!(!a.factors.is_empty());
+        for factor in &a.factors {
+            assert!(
+                !factor.reason.is_empty(),
+                "a term with no reason is not inspectable"
+            );
+        }
     }
 
     #[test]

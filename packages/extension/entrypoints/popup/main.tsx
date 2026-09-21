@@ -3,7 +3,8 @@ import { useEffect } from "preact/hooks";
 import { useSignal } from "@preact/signals";
 import "../../src/ui/styles.css";
 import { send } from "../../src/core/messaging";
-import type { SiteMode } from "../../src/core/protocol";
+import type { CosmeticHit, SiteMode } from "../../src/core/protocol";
+import { TEMPORARY_DURATIONS } from "../../src/core/sites";
 import {
   error,
   formatCount,
@@ -25,13 +26,21 @@ const MODES: Array<{ id: SiteMode; label: string; hint: string }> = [
 
 function Diagnostics() {
   const open = useSignal(false);
+  const cosmetic = useSignal<CosmeticHit[]>([]);
   const state = tab.value;
 
   useEffect(() => {
-    if (open.value && state) void refreshMatches(state.tabId);
+    if (!open.value || !state) return;
+    void refreshMatches(state.tabId);
+    void send({ type: "diagnostics:cosmetic", tabId: state.tabId })
+      .then((hits) => {
+        cosmetic.value = hits;
+      })
+      .catch(() => undefined);
   }, [open.value, state?.tabId]);
 
   if (!state) return null;
+  const network = matches.value;
 
   return (
     <div class="card col">
@@ -42,44 +51,71 @@ function Diagnostics() {
           open.value = !open.value;
         }}
       >
-        <h3>Why was it blocked</h3>
+        <h3>Why was it blocked or hidden</h3>
         <span class="muted">{open.value ? "−" : "+"}</span>
       </button>
 
-      {open.value &&
-        (matches.value.length === 0 ? (
-          <p class="muted" style="margin:0">
-            No rule matches recorded for this tab yet. Reload the page with the popup closed, then
-            reopen it.
-          </p>
-        ) : (
-          <table>
-            <thead>
-              <tr>
-                <th>Request</th>
-                <th>Rule</th>
-              </tr>
-            </thead>
-            <tbody>
-              {matches.value.slice(0, 12).map((m) => (
-                <tr key={`${m.ruleId}-${m.timestamp}-${m.url}`}>
-                  <td class="truncate mono" style="max-width:190px" title={m.url}>
-                    {m.url}
-                  </td>
-                  <td class="mono">
-                    #{m.ruleId}
-                    {m.shadow && (
-                      <>
-                        {" "}
-                        <span class="badge shadow">shadow</span>
-                      </>
-                    )}
-                  </td>
-                </tr>
+      {open.value && (
+        <>
+          <h3>Requests</h3>
+          {network.length === 0 ? (
+            <p class="muted" style="margin:0">
+              No rule matches recorded for this tab. Reload the page, then reopen this panel.
+            </p>
+          ) : (
+            <div class="col" style="gap:6px">
+              {network.slice(0, 10).map((match) => (
+                <div
+                  key={`${match.ruleId}-${match.timestamp}-${match.url}`}
+                  class="col"
+                  style="gap:1px"
+                >
+                  <div class="row between">
+                    <span class="mono truncate" style="max-width:220px" title={match.url}>
+                      {match.url}
+                    </span>
+                    <span class="badge">{match.type}</span>
+                  </div>
+                  <div class="row" style="gap:6px">
+                    <span class={`badge ${match.shadow ? "shadow" : "high"}`}>
+                      {match.shadow ? "observed" : "blocked"}
+                    </span>
+                    <code class="truncate grow" title={match.raw ?? undefined}>
+                      {match.raw ?? `rule #${match.ruleId}`}
+                    </code>
+                  </div>
+                  <span class="muted">
+                    {match.list ? `${match.list}:${match.line}` : match.rulesetId} · rule #
+                    {match.ruleId}
+                    {match.riskBand && ` · risk ${match.riskBand} ${match.riskScore}`}
+                  </span>
+                </div>
               ))}
-            </tbody>
-          </table>
-        ))}
+            </div>
+          )}
+
+          <h3>Elements</h3>
+          {cosmetic.value.length === 0 ? (
+            <p class="muted" style="margin:0">
+              Nothing hidden on this tab.
+            </p>
+          ) : (
+            <table>
+              <tbody>
+                {cosmetic.value.slice(0, 10).map((hit) => (
+                  <tr key={hit.selector}>
+                    <td class="mono truncate" style="max-width:230px" title={hit.selector}>
+                      {hit.selector}
+                      {hit.procedural && <span class="badge"> procedural</span>}
+                    </td>
+                    <td class="num mono">{hit.count}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
+        </>
+      )}
     </div>
   );
 }
@@ -144,6 +180,26 @@ function App() {
         <p class="muted" style="margin:0">
           {MODES.find((m) => m.id === state.mode)?.hint}
         </p>
+
+        {state.mode !== "default" && (
+          <div class="row" style="gap:6px;flex-wrap:wrap">
+            <span class="muted">Just for:</span>
+            {TEMPORARY_DURATIONS.map((duration) => (
+              <button
+                key={duration.ms}
+                disabled={!state.host}
+                onClick={() => void setMode(state.host, state.mode, duration.ms)}
+              >
+                {duration.label}
+              </button>
+            ))}
+            <span class="muted">
+              {state.expiresAt
+                ? `lapses ${new Date(state.expiresAt).toLocaleTimeString()}`
+                : "permanent"}
+            </span>
+          </div>
+        )}
       </div>
 
       <div class="card row" style="justify-content:space-around">

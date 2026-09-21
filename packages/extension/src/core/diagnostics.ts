@@ -1,4 +1,4 @@
-import type { RuleDiagnostic, RuleMatch } from "./protocol";
+import type { CosmeticHit, RuleDiagnostic, RuleMatch } from "./protocol";
 
 /**
  * Rule provenance and the recent-match log.
@@ -81,8 +81,63 @@ export function recentMatches(tabId: number): RuleMatch[] {
   return (rings.get(tabId) ?? []).toReversed();
 }
 
+/**
+ * Join each recorded match to the rule it came from.
+ *
+ * A rule id alone answers nothing. "Blocked by `||doubleclick.net^$third-party`
+ * from 404ad-base line 12, risk Low" is a statement the user can act on: they
+ * can see the rule, the list, and whether it is the kind of rule that breaks
+ * pages.
+ */
+export async function annotatedMatches(tabId: number): Promise<RuleMatch[]> {
+  const matches = recentMatches(tabId);
+  if (matches.length === 0) return matches;
+
+  const file = await loadDiagnostics().catch(() => null);
+  return matches.map((match) => {
+    const meta = file?.network[String(match.ruleId)];
+    if (!meta) return match;
+    return {
+      ...match,
+      raw: meta.raw,
+      list: meta.list,
+      line: meta.line,
+      riskScore: meta.riskScore,
+      riskBand: meta.riskBand,
+    };
+  });
+}
+
+/**
+ * Cosmetic hits per tab, reported by the content script.
+ *
+ * Kept alongside the network ring so one panel can answer both halves of "why
+ * did that disappear": a request Chromium refused, or an element 404AD hid.
+ */
+const cosmeticRings = new Map<number, CosmeticHit[]>();
+
+export function recordCosmetic(tabId: number, hits: CosmeticHit[]): void {
+  if (tabId < 0 || hits.length === 0) return;
+  const existing = new Map(cosmeticRings.get(tabId)?.map((h) => [h.selector, h]) ?? []);
+  for (const hit of hits) {
+    const previous = existing.get(hit.selector);
+    existing.set(hit.selector, {
+      selector: hit.selector,
+      count: (previous?.count ?? 0) + hit.count,
+      procedural: hit.procedural || (previous?.procedural ?? false),
+    });
+  }
+  const merged = [...existing.values()].sort((a, b) => b.count - a.count).slice(0, RING_SIZE);
+  cosmeticRings.set(tabId, merged);
+}
+
+export function cosmeticHits(tabId: number): CosmeticHit[] {
+  return cosmeticRings.get(tabId) ?? [];
+}
+
 export function clearTab(tabId: number): void {
   rings.delete(tabId);
+  cosmeticRings.delete(tabId);
 }
 
 export function tabBlockedCount(tabId: number): number {

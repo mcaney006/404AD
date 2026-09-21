@@ -66,7 +66,7 @@ struct RuleDiagnostic {
     shadow: bool,
     risk_score: u8,
     risk_band: risk::RiskBand,
-    risk_factors: Vec<&'static str>,
+    risk_factors: Vec<risk::RiskFactor>,
 }
 
 #[derive(Debug, Serialize)]
@@ -702,11 +702,18 @@ fn explain(lists_dir: &Path, url: &str, initiator: &str, ty: &str) -> Result<()>
             m.raw
         );
         if let Some(a) = assessment {
+            // The arithmetic is printed, not just the total: the score is meant
+            // to be checked by hand, not trusted on faith.
+            let terms: Vec<String> = a
+                .factors
+                .iter()
+                .map(|f| format!("{:+} {}", f.delta, f.reason))
+                .collect();
             println!(
-                "      breakage risk {} ({:?}): {}",
+                "      breakage risk {} ({:?}) = {}",
                 a.score,
                 a.band,
-                a.factors.join(", ")
+                terms.join(", ")
             );
         }
     }
