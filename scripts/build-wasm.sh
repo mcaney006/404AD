@@ -36,6 +36,17 @@ wasm-pack build crates/fad-wasm \
   --out-name fad_wasm \
   --no-pack
 
+# The YouTube transport engine is a separate module on purpose: it is loaded
+# only when a SABR media request is first seen, so no site that is not YouTube
+# pays for it, and YouTube does not pay until playback starts.
+echo "==> building fad-yt-wasm"
+wasm-pack build crates/fad-yt-wasm \
+  --target web \
+  --release \
+  --out-dir pkg \
+  --out-name fad_yt_wasm \
+  --no-pack
+
 GLUE_DIR=packages/extension/src/wasm
 WASM_DIR=packages/extension/public/wasm
 rm -rf "$GLUE_DIR" "$WASM_DIR"
@@ -49,8 +60,14 @@ sed "s|new URL('fad_wasm_bg.wasm', import.meta.url)|(() => { throw new Error('40
   crates/fad-wasm/pkg/fad_wasm.js > "$GLUE_DIR/fad_wasm.js"
 cp crates/fad-wasm/pkg/fad_wasm.d.ts    "$GLUE_DIR/"
 cp crates/fad-wasm/pkg/fad_wasm_bg.wasm "$WASM_DIR/"
+
+sed "s|new URL('fad_yt_wasm_bg.wasm', import.meta.url)|(() => { throw new Error('404AD: pass module_or_path explicitly'); })()|" \
+  crates/fad-yt-wasm/pkg/fad_yt_wasm.js > "$GLUE_DIR/fad_yt_wasm.js"
+cp crates/fad-yt-wasm/pkg/fad_yt_wasm.d.ts    "$GLUE_DIR/"
+cp crates/fad-yt-wasm/pkg/fad_yt_wasm_bg.wasm "$WASM_DIR/"
 if [ -f crates/fad-wasm/pkg/fad_wasm_bg.wasm.d.ts ]; then
   cp crates/fad-wasm/pkg/fad_wasm_bg.wasm.d.ts "$GLUE_DIR/"
 fi
 
-printf '==> wasm runtime: %s bytes\n' "$(wc -c < "$WASM_DIR/fad_wasm_bg.wasm" | tr -d ' ')"
+printf '==> core runtime:    %s bytes\n' "$(wc -c < "$WASM_DIR/fad_wasm_bg.wasm" | tr -d ' ')"
+printf '==> youtube runtime: %s bytes\n' "$(wc -c < "$WASM_DIR/fad_yt_wasm_bg.wasm" | tr -d ' ')"

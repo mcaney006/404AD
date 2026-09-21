@@ -1,5 +1,6 @@
 import { defineUnlistedScript } from "wxt/utils/define-unlisted-script";
 import { youtubeAdapter } from "../src/adapters/youtube";
+import { installTransport } from "../src/adapters/youtube-transport";
 import { SCRIPTLETS, type Scriptlet } from "../src/scriptlets/library";
 
 /**
@@ -20,6 +21,9 @@ interface Entry {
 
 const REGISTRY: Record<string, Scriptlet> = {
   ...SCRIPTLETS,
+  // The SABR/UMP transport engine. Takes the URL of its own WASM module, which
+  // the content script supplies, because the main world has no chrome APIs.
+  "404ad-yt-transport": (args) => installTransport(args[0] ?? ""),
   // Site adapters are ordinary scriptlets, so a filter list can enable, scope
   // or cancel one with exactly the same syntax as everything else.
   "404ad-yt-player": youtubeAdapter,

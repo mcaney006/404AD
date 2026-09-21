@@ -1,5 +1,5 @@
 {
-  "buildId": "c62127c4ebd25585aa64cb0afa465578",
+  "buildId": "07aa047119fc923f16c8b06be6a59d2d",
   "compilerVersion": "0.1.0",
   "lists": [
     {
@@ -56,13 +56,13 @@
       "title": "404AD YouTube Adapter",
       "category": "youtube",
       "enabled": true,
-      "bytes": 10054
+      "bytes": 10299
     }
   ],
   "parsed": {
     "network": 1108,
-    "cosmetic": 489,
-    "ignored": 356,
+    "cosmetic": 491,
+    "ignored": 359,
     "errors": 0
   },
   "dedup": {
@@ -119,10 +119,10 @@
     "genericSelectors": 309,
     "hosts": 51,
     "entities": 4,
-    "scriptlets": 7,
+    "scriptlets": 9,
     "procedural": 0,
-    "indexBytesPostcard": 19873,
-    "indexBytesJson": 46628
+    "indexBytesPostcard": 19921,
+    "indexBytesJson": 46872
   },
   "budgets": {
     "staticRulesUsed": 1079,

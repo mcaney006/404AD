@@ -1,0 +1,21 @@
+[package]
+name = "fad-youtube"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "YouTube transport engine: media timeline, sequential ad inference and buffer policy."
+
+[dependencies]
+fad-ump = { workspace = true }
+serde = { workspace = true }
+
+[dev-dependencies]
+criterion = "0.5"
+proptest = "1"
+serde_json = { workspace = true }
+
+[[bench]]
+name = "transport"
+harness = false

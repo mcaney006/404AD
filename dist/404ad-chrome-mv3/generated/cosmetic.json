@@ -1,5 +1,5 @@
 {
-  "build_id": "c62127c4ebd25585aa64cb0afa465578",
+  "build_id": "07aa047119fc923f16c8b06be6a59d2d",
   "selectors": [
     "#sponsoredProducts2_feature_div",
     ".AdHolder",
@@ -476,12 +476,24 @@
     },
     {
       "rule_id": 470,
-      "name": "404ad-yt-player",
+      "name": "404ad-yt-transport",
       "args": [],
       "shadow": false
     },
     {
       "rule_id": 471,
+      "name": "404ad-yt-player",
+      "args": [],
+      "shadow": false
+    },
+    {
+      "rule_id": 472,
+      "name": "404ad-yt-transport",
+      "args": [],
+      "shadow": false
+    },
+    {
+      "rule_id": 473,
       "name": "json-prune",
       "args": [
         "adPlacements",
@@ -492,7 +504,7 @@
       "shadow": false
     },
     {
-      "rule_id": 472,
+      "rule_id": 474,
       "name": "set-constant",
       "args": [
         "playerResponse.adPlacements",
@@ -501,7 +513,7 @@
       "shadow": false
     },
     {
-      "rule_id": 473,
+      "rule_id": 475,
       "name": "set-constant",
       "args": [
         "ytInitialPlayerResponse.adPlacements",
@@ -510,7 +522,7 @@
       "shadow": false
     },
     {
-      "rule_id": 474,
+      "rule_id": 476,
       "name": "set-constant",
       "args": [
         "ytInitialPlayerResponse.adSlots",
@@ -519,7 +531,7 @@
       "shadow": false
     },
     {
-      "rule_id": 475,
+      "rule_id": 477,
       "name": "set-constant",
       "args": [
         "ytInitialPlayerResponse.playerAds",
@@ -1980,7 +1992,8 @@
       "unhide": [],
       "styles": [],
       "scriptlets": [
-        0
+        0,
+        1
       ],
       "unscriptlets": [],
       "procedural": []
@@ -2066,12 +2079,13 @@
         1
       ],
       "scriptlets": [
-        1,
         2,
         3,
         4,
         5,
-        6
+        6,
+        7,
+        8
       ],
       "unscriptlets": [],
       "procedural": []

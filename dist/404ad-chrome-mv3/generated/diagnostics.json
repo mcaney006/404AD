@@ -1,5 +1,5 @@
 {
-  "buildId": "c62127c4ebd25585aa64cb0afa465578",
+  "buildId": "07aa047119fc923f16c8b06be6a59d2d",
   "compilerVersion": "0.1.0",
   "network": {
     "1": {
@@ -22578,6 +22578,20 @@
     },
     "470": {
       "irId": 470,
+      "raw": "youtube-nocookie.com##+js(404ad-yt-transport)",
+      "list": "404ad-youtube",
+      "line": 196,
+      "priority": 0,
+      "shadow": false,
+      "riskScore": 23,
+      "riskBand": "low",
+      "riskFactors": [
+        "runs a scriptlet in the page",
+        "scoped to specific sites"
+      ]
+    },
+    "471": {
+      "irId": 471,
       "raw": "youtube.com##+js(404ad-yt-player)",
       "list": "404ad-youtube",
       "line": 190,
@@ -22590,37 +22604,9 @@
         "scoped to specific sites"
       ]
     },
-    "471": {
-      "irId": 471,
-      "raw": "youtube.com##+js(json-prune, adPlacements, playerAds, adSlots, adBreakHeartbeatParams)",
-      "list": "404ad-youtube",
-      "line": 201,
-      "priority": 0,
-      "shadow": false,
-      "riskScore": 23,
-      "riskBand": "low",
-      "riskFactors": [
-        "runs a scriptlet in the page",
-        "scoped to specific sites"
-      ]
-    },
     "472": {
       "irId": 472,
-      "raw": "youtube.com##+js(set-constant, playerResponse.adPlacements, undefined)",
-      "list": "404ad-youtube",
-      "line": 198,
-      "priority": 0,
-      "shadow": false,
-      "riskScore": 23,
-      "riskBand": "low",
-      "riskFactors": [
-        "runs a scriptlet in the page",
-        "scoped to specific sites"
-      ]
-    },
-    "473": {
-      "irId": 473,
-      "raw": "youtube.com##+js(set-constant, ytInitialPlayerResponse.adPlacements, undefined)",
+      "raw": "youtube.com##+js(404ad-yt-transport)",
       "list": "404ad-youtube",
       "line": 195,
       "priority": 0,
@@ -22632,11 +22618,25 @@
         "scoped to specific sites"
       ]
     },
+    "473": {
+      "irId": 473,
+      "raw": "youtube.com##+js(json-prune, adPlacements, playerAds, adSlots, adBreakHeartbeatParams)",
+      "list": "404ad-youtube",
+      "line": 206,
+      "priority": 0,
+      "shadow": false,
+      "riskScore": 23,
+      "riskBand": "low",
+      "riskFactors": [
+        "runs a scriptlet in the page",
+        "scoped to specific sites"
+      ]
+    },
     "474": {
       "irId": 474,
-      "raw": "youtube.com##+js(set-constant, ytInitialPlayerResponse.adSlots, undefined)",
+      "raw": "youtube.com##+js(set-constant, playerResponse.adPlacements, undefined)",
       "list": "404ad-youtube",
-      "line": 197,
+      "line": 203,
       "priority": 0,
       "shadow": false,
       "riskScore": 23,
@@ -22648,9 +22648,9 @@
     },
     "475": {
       "irId": 475,
-      "raw": "youtube.com##+js(set-constant, ytInitialPlayerResponse.playerAds, undefined)",
+      "raw": "youtube.com##+js(set-constant, ytInitialPlayerResponse.adPlacements, undefined)",
       "list": "404ad-youtube",
-      "line": 196,
+      "line": 200,
       "priority": 0,
       "shadow": false,
       "riskScore": 23,
@@ -22662,6 +22662,34 @@
     },
     "476": {
       "irId": 476,
+      "raw": "youtube.com##+js(set-constant, ytInitialPlayerResponse.adSlots, undefined)",
+      "list": "404ad-youtube",
+      "line": 202,
+      "priority": 0,
+      "shadow": false,
+      "riskScore": 23,
+      "riskBand": "low",
+      "riskFactors": [
+        "runs a scriptlet in the page",
+        "scoped to specific sites"
+      ]
+    },
+    "477": {
+      "irId": 477,
+      "raw": "youtube.com##+js(set-constant, ytInitialPlayerResponse.playerAds, undefined)",
+      "list": "404ad-youtube",
+      "line": 201,
+      "priority": 0,
+      "shadow": false,
+      "riskScore": 23,
+      "riskBand": "low",
+      "riskFactors": [
+        "runs a scriptlet in the page",
+        "scoped to specific sites"
+      ]
+    },
+    "478": {
+      "irId": 478,
       "raw": "youtube.com#$##player-ads { display: none !important; height: 0 !important; }",
       "list": "404ad-youtube",
       "line": 183,
@@ -22674,8 +22702,8 @@
         "scoped to specific sites"
       ]
     },
-    "477": {
-      "irId": 477,
+    "479": {
+      "irId": 479,
       "raw": "youtube.com#$#ytd-rich-grid-renderer { --ytd-rich-grid-row-margin: 0 !important; }",
       "list": "404ad-youtube",
       "line": 182,
@@ -22688,8 +22716,8 @@
         "scoped to specific sites"
       ]
     },
-    "478": {
-      "irId": 478,
+    "480": {
+      "irId": 480,
       "raw": "#$#.ad-container { display: none !important; min-height: 0 !important; height: 0 !important; }",
       "list": "404ad-base",
       "line": 360,
@@ -22702,8 +22730,8 @@
         "applies to every site"
       ]
     },
-    "479": {
-      "irId": 479,
+    "481": {
+      "irId": 481,
       "raw": "#$#.ad-slot { display: none !important; min-height: 0 !important; }",
       "list": "404ad-base",
       "line": 145,
@@ -22716,8 +22744,8 @@
         "applies to every site"
       ]
     },
-    "480": {
-      "irId": 480,
+    "482": {
+      "irId": 482,
       "raw": "#$#.ad-slot-container { display: none !important; height: 0 !important; min-height: 0 !important; margin: 0 !important; }",
       "list": "404ad-cosmetic",
       "line": 175,
@@ -22730,8 +22758,8 @@
         "applies to every site"
       ]
     },
-    "481": {
-      "irId": 481,
+    "483": {
+      "irId": 483,
       "raw": "#$#.ad-wrapper { display: none !important; margin: 0 !important; padding: 0 !important; }",
       "list": "404ad-base",
       "line": 361,
@@ -22744,8 +22772,8 @@
         "applies to every site"
       ]
     },
-    "482": {
-      "irId": 482,
+    "484": {
+      "irId": 484,
       "raw": "#$#.anchor-ad-container { display: none !important; position: static !important; }",
       "list": "404ad-cosmetic",
       "line": 177,
@@ -22758,8 +22786,8 @@
         "applies to every site"
       ]
     },
-    "483": {
-      "irId": 483,
+    "485": {
+      "irId": 485,
       "raw": "#$#.leaderboard-container-ad { display: none !important; min-height: 0 !important; }",
       "list": "404ad-cosmetic",
       "line": 178,
@@ -22772,8 +22800,8 @@
         "applies to every site"
       ]
     },
-    "484": {
-      "irId": 484,
+    "486": {
+      "irId": 486,
       "raw": "#$#.sticky-ad { display: none !important; position: static !important; }",
       "list": "404ad-base",
       "line": 362,
@@ -22786,8 +22814,8 @@
         "applies to every site"
       ]
     },
-    "485": {
-      "irId": 485,
+    "487": {
+      "irId": 487,
       "raw": "#$#.sticky-ad-container { display: none !important; position: static !important; height: 0 !important; }",
       "list": "404ad-cosmetic",
       "line": 176,
@@ -22800,8 +22828,8 @@
         "applies to every site"
       ]
     },
-    "486": {
-      "irId": 486,
+    "488": {
+      "irId": 488,
       "raw": "#$#.sticky-ad-rail { display: none !important; position: static !important; }",
       "list": "404ad-base",
       "line": 146,
@@ -22814,8 +22842,8 @@
         "applies to every site"
       ]
     },
-    "487": {
-      "irId": 487,
+    "489": {
+      "irId": 489,
       "raw": "#$#body { overflow: auto !important; position: static !important; }",
       "list": "404ad-annoyances",
       "line": 50,
@@ -22829,8 +22857,8 @@
         "no class or id anchor"
       ]
     },
-    "488": {
-      "irId": 488,
+    "490": {
+      "irId": 490,
       "raw": "#$#body.modal-open { overflow: auto !important; padding-right: 0 !important; }",
       "list": "404ad-annoyances",
       "line": 142,
@@ -22843,8 +22871,8 @@
         "applies to every site"
       ]
     },
-    "489": {
-      "irId": 489,
+    "491": {
+      "irId": 491,
       "raw": "#$#html { overflow: auto !important; }",
       "list": "404ad-annoyances",
       "line": 51,

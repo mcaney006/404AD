@@ -292,12 +292,43 @@ dependencies = [
 ]
 
 [[package]]
+name = "fad-ump"
+version = "0.1.0"
+dependencies = [
+ "proptest",
+ "serde",
+ "thiserror",
+]
+
+[[package]]
 name = "fad-wasm"
 version = "0.1.0"
 dependencies = [
  "fad-dnr",
  "fad-filter",
  "postcard",
+ "serde",
+ "serde-wasm-bindgen",
+ "wasm-bindgen",
+]
+
+[[package]]
+name = "fad-youtube"
+version = "0.1.0"
+dependencies = [
+ "criterion",
+ "fad-ump",
+ "proptest",
+ "serde",
+ "serde_json",
+]
+
+[[package]]
+name = "fad-yt-wasm"
+version = "0.1.0"
+dependencies = [
+ "fad-ump",
+ "fad-youtube",
  "serde",
  "serde-wasm-bindgen",
  "wasm-bindgen",

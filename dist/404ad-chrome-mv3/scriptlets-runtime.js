@@ -590,9 +590,631 @@
 		globalThis.addEventListener("pagehide", () => teardown(), { once: true });
 	}
 	//#endregion
+	//#region src/wasm/fad_yt_wasm.js
+	var TransportEngine = class {
+		__destroy_into_raw() {
+			const ptr = this.__wbg_ptr;
+			this.__wbg_ptr = 0;
+			TransportEngineFinalization.unregister(this);
+			return ptr;
+		}
+		free() {
+			const ptr = this.__destroy_into_raw();
+			wasm.__wbg_transportengine_free(ptr, 0);
+		}
+		/**
+		* Transport time mapped to the viewer's clock.
+		* @param {number} transport_us
+		* @returns {number}
+		*/
+		contentTime(transport_us) {
+			return wasm.transportengine_contentTime(this.__wbg_ptr, transport_us);
+		}
+		constructor() {
+			const ret = wasm.transportengine_new();
+			this.__wbg_ptr = ret;
+			TransportEngineFinalization.register(this, this.__wbg_ptr, this);
+			return this;
+		}
+		/**
+		* Record an observation from the page.
+		*
+		* Returns the verdict after the observation. An unknown signal name is an
+		* error rather than a silent no-op: a typo here would quietly remove
+		* evidence from the test.
+		* @param {string} signal
+		* @returns {string}
+		*/
+		observe(signal) {
+			let deferred3_0;
+			let deferred3_1;
+			try {
+				const retptr = wasm.__wbindgen_add_to_stack_pointer(-16);
+				const ptr0 = passStringToWasm0(signal, wasm.__wbindgen_export, wasm.__wbindgen_export2);
+				const len0 = WASM_VECTOR_LEN;
+				wasm.transportengine_observe(retptr, this.__wbg_ptr, ptr0, len0);
+				var r0 = getDataViewMemory0().getInt32(retptr + 0, true);
+				var r1 = getDataViewMemory0().getInt32(retptr + 4, true);
+				var r2 = getDataViewMemory0().getInt32(retptr + 8, true);
+				var r3 = getDataViewMemory0().getInt32(retptr + 12, true);
+				var ptr2 = r0;
+				var len2 = r1;
+				if (r3) {
+					ptr2 = 0;
+					len2 = 0;
+					throw takeObject(r2);
+				}
+				deferred3_0 = ptr2;
+				deferred3_1 = len2;
+				return getStringFromWasm0(ptr2, len2);
+			} finally {
+				wasm.__wbindgen_add_to_stack_pointer(16);
+				wasm.__wbindgen_export3(deferred3_0, deferred3_1, 1);
+			}
+		}
+		/**
+		* What to do with media at this transport timestamp, in microseconds.
+		* @param {number} transport_us
+		* @returns {any}
+		*/
+		policyAt(transport_us) {
+			try {
+				const retptr = wasm.__wbindgen_add_to_stack_pointer(-16);
+				wasm.transportengine_policyAt(retptr, this.__wbg_ptr, transport_us);
+				var r0 = getDataViewMemory0().getInt32(retptr + 0, true);
+				var r1 = getDataViewMemory0().getInt32(retptr + 4, true);
+				if (getDataViewMemory0().getInt32(retptr + 8, true)) throw takeObject(r1);
+				return takeObject(r0);
+			} finally {
+				wasm.__wbindgen_add_to_stack_pointer(16);
+			}
+		}
+		/**
+		* Drop timeline history behind the playback cursor.
+		* @param {number} before_us
+		*/
+		prune(before_us) {
+			wasm.transportengine_prune(this.__wbg_ptr, before_us);
+		}
+		/**
+		* Feed one network chunk. The only per-chunk call across the boundary.
+		* @param {Uint8Array} chunk
+		* @returns {any}
+		*/
+		push(chunk) {
+			try {
+				const retptr = wasm.__wbindgen_add_to_stack_pointer(-16);
+				const ptr0 = passArray8ToWasm0(chunk, wasm.__wbindgen_export);
+				const len0 = WASM_VECTOR_LEN;
+				wasm.transportengine_push(retptr, this.__wbg_ptr, ptr0, len0);
+				var r0 = getDataViewMemory0().getInt32(retptr + 0, true);
+				var r1 = getDataViewMemory0().getInt32(retptr + 4, true);
+				if (getDataViewMemory0().getInt32(retptr + 8, true)) throw takeObject(r1);
+				return takeObject(r0);
+			} finally {
+				wasm.__wbindgen_add_to_stack_pointer(16);
+			}
+		}
+		reset() {
+			wasm.transportengine_reset(this.__wbg_ptr);
+		}
+		/**
+		* Where playback should resume if this point is inside an ad.
+		* @param {number} transport_us
+		* @returns {number | undefined}
+		*/
+		resumeTarget(transport_us) {
+			try {
+				const retptr = wasm.__wbindgen_add_to_stack_pointer(-16);
+				wasm.transportengine_resumeTarget(retptr, this.__wbg_ptr, transport_us);
+				var r0 = getDataViewMemory0().getInt32(retptr + 0, true);
+				var r2 = getDataViewMemory0().getFloat64(retptr + 8, true);
+				return r0 === 0 ? void 0 : r2;
+			} finally {
+				wasm.__wbindgen_add_to_stack_pointer(16);
+			}
+		}
+		/**
+		* The video the viewer asked for. Changing it discards everything learned
+		* about the previous stream.
+		* @param {string} video_id
+		*/
+		setRequestedVideo(video_id) {
+			const ptr0 = passStringToWasm0(video_id, wasm.__wbindgen_export, wasm.__wbindgen_export2);
+			const len0 = WASM_VECTOR_LEN;
+			wasm.transportengine_setRequestedVideo(this.__wbg_ptr, ptr0, len0);
+		}
+		/**
+		* The MediaSource gate.
+		* @param {number} transport_us
+		* @returns {boolean}
+		*/
+		shouldAppend(transport_us) {
+			return wasm.transportengine_shouldAppend(this.__wbg_ptr, transport_us) !== 0;
+		}
+		/**
+		* Everything the diagnostics panel needs, in one call.
+		* @returns {any}
+		*/
+		state() {
+			try {
+				const retptr = wasm.__wbindgen_add_to_stack_pointer(-16);
+				wasm.transportengine_state(retptr, this.__wbg_ptr);
+				var r0 = getDataViewMemory0().getInt32(retptr + 0, true);
+				var r1 = getDataViewMemory0().getInt32(retptr + 4, true);
+				if (getDataViewMemory0().getInt32(retptr + 8, true)) throw takeObject(r1);
+				return takeObject(r0);
+			} finally {
+				wasm.__wbindgen_add_to_stack_pointer(16);
+			}
+		}
+		/**
+		* The viewer's clock mapped back to transport time.
+		* @param {number} content_us
+		* @returns {number}
+		*/
+		transportTime(content_us) {
+			return wasm.transportengine_transportTime(this.__wbg_ptr, content_us);
+		}
+		/**
+		* @returns {string}
+		*/
+		verdict() {
+			let deferred1_0;
+			let deferred1_1;
+			try {
+				const retptr = wasm.__wbindgen_add_to_stack_pointer(-16);
+				wasm.transportengine_verdict(retptr, this.__wbg_ptr);
+				var r0 = getDataViewMemory0().getInt32(retptr + 0, true);
+				var r1 = getDataViewMemory0().getInt32(retptr + 4, true);
+				deferred1_0 = r0;
+				deferred1_1 = r1;
+				return getStringFromWasm0(r0, r1);
+			} finally {
+				wasm.__wbindgen_add_to_stack_pointer(16);
+				wasm.__wbindgen_export3(deferred1_0, deferred1_1, 1);
+			}
+		}
+	};
+	if (Symbol.dispose) TransportEngine.prototype[Symbol.dispose] = TransportEngine.prototype.free;
+	function __wbg_get_imports() {
+		return {
+			__proto__: null,
+			"./fad_yt_wasm_bg.js": {
+				__proto__: null,
+				__wbg_Error_67e7344beaa85059: function(arg0, arg1) {
+					return addHeapObject(Error(getStringFromWasm0(arg0, arg1)));
+				},
+				__wbg_String_8564e559799eccda: function(arg0, arg1) {
+					const ptr1 = passStringToWasm0(String(getObject(arg1)), wasm.__wbindgen_export, wasm.__wbindgen_export2);
+					const len1 = WASM_VECTOR_LEN;
+					getDataViewMemory0().setInt32(arg0 + 4, len1, true);
+					getDataViewMemory0().setInt32(arg0 + 0, ptr1, true);
+				},
+				__wbg___wbindgen_throw_5d9e815e6fdf150f: function(arg0, arg1) {
+					throw new Error(getStringFromWasm0(arg0, arg1));
+				},
+				__wbg_error_3a1d0b2365a2c693: function(arg0, arg1) {
+					console.error(getStringFromWasm0(arg0, arg1));
+				},
+				__wbg_new_bebc3f4757acf305: function() {
+					return addHeapObject(/* @__PURE__ */ new Object());
+				},
+				__wbg_new_ffa92086ea89f79c: function() {
+					return addHeapObject(new Array());
+				},
+				__wbg_set_13d25b81ab403f5e: function(arg0, arg1, arg2) {
+					getObject(arg0)[arg1 >>> 0] = takeObject(arg2);
+				},
+				__wbg_set_6be42768c690e380: function(arg0, arg1, arg2) {
+					getObject(arg0)[takeObject(arg1)] = takeObject(arg2);
+				},
+				__wbindgen_generic_0000000000000001: function(arg0) {
+					return addHeapObject(arg0);
+				},
+				__wbindgen_generic_0000000000000002: function(arg0) {
+					return addHeapObject(arg0);
+				},
+				__wbindgen_generic_0000000000000003: function(arg0, arg1) {
+					return addHeapObject(getStringFromWasm0(arg0, arg1));
+				},
+				__wbindgen_generic_0000000000000004: function(arg0) {
+					return addHeapObject(BigInt.asUintN(64, arg0));
+				},
+				__wbindgen_object_clone_ref: function(arg0) {
+					return addHeapObject(getObject(arg0));
+				},
+				__wbindgen_object_drop_ref: function(arg0) {
+					takeObject(arg0);
+				}
+			}
+		};
+	}
+	var TransportEngineFinalization = typeof FinalizationRegistry === "undefined" ? {
+		register: () => {},
+		unregister: () => {}
+	} : new FinalizationRegistry((ptr) => wasm.__wbg_transportengine_free(ptr, 1));
+	function addHeapObject(obj) {
+		if (heap_next === heap.length) heap.push(heap.length + 1);
+		const idx = heap_next;
+		heap_next = heap[idx];
+		heap[idx] = obj;
+		return idx;
+	}
+	function dropObject(idx) {
+		if (idx < 1028) return;
+		heap[idx] = heap_next;
+		heap_next = idx;
+	}
+	var cachedDataViewMemory0 = null;
+	function getDataViewMemory0() {
+		if (cachedDataViewMemory0 === null || cachedDataViewMemory0.buffer.detached === true || cachedDataViewMemory0.buffer.detached === void 0 && cachedDataViewMemory0.buffer !== wasm.memory.buffer) cachedDataViewMemory0 = new DataView(wasm.memory.buffer);
+		return cachedDataViewMemory0;
+	}
+	function getStringFromWasm0(ptr, len) {
+		return decodeText(ptr >>> 0, len);
+	}
+	var cachedUint8ArrayMemory0 = null;
+	function getUint8ArrayMemory0() {
+		if (cachedUint8ArrayMemory0 === null || cachedUint8ArrayMemory0.byteLength === 0) cachedUint8ArrayMemory0 = new Uint8Array(wasm.memory.buffer);
+		return cachedUint8ArrayMemory0;
+	}
+	function getObject(idx) {
+		return heap[idx];
+	}
+	var heap = new Array(1024).fill(void 0);
+	heap.push(void 0, null, true, false);
+	var heap_next = heap.length;
+	function passArray8ToWasm0(arg, malloc) {
+		const ptr = malloc(arg.length * 1, 1) >>> 0;
+		getUint8ArrayMemory0().set(arg, ptr / 1);
+		WASM_VECTOR_LEN = arg.length;
+		return ptr;
+	}
+	function passStringToWasm0(arg, malloc, realloc) {
+		if (realloc === void 0) {
+			const buf = cachedTextEncoder.encode(arg);
+			const ptr = malloc(buf.length, 1) >>> 0;
+			getUint8ArrayMemory0().subarray(ptr, ptr + buf.length).set(buf);
+			WASM_VECTOR_LEN = buf.length;
+			return ptr;
+		}
+		let len = arg.length;
+		let ptr = malloc(len, 1) >>> 0;
+		const mem = getUint8ArrayMemory0();
+		let offset = 0;
+		for (; offset < len; offset++) {
+			const code = arg.charCodeAt(offset);
+			if (code > 127) break;
+			mem[ptr + offset] = code;
+		}
+		if (offset !== len) {
+			if (offset !== 0) arg = arg.slice(offset);
+			ptr = realloc(ptr, len, len = offset + arg.length * 3, 1) >>> 0;
+			const view = getUint8ArrayMemory0().subarray(ptr + offset, ptr + len);
+			const ret = cachedTextEncoder.encodeInto(arg, view);
+			offset += ret.written;
+			ptr = realloc(ptr, len, offset, 1) >>> 0;
+		}
+		WASM_VECTOR_LEN = offset;
+		return ptr;
+	}
+	function takeObject(idx) {
+		const ret = getObject(idx);
+		dropObject(idx);
+		return ret;
+	}
+	var cachedTextDecoder = new TextDecoder("utf-8", {
+		ignoreBOM: true,
+		fatal: true
+	});
+	cachedTextDecoder.decode();
+	var MAX_SAFARI_DECODE_BYTES = 2146435072;
+	var numBytesDecoded = 0;
+	function decodeText(ptr, len) {
+		numBytesDecoded += len;
+		if (numBytesDecoded >= MAX_SAFARI_DECODE_BYTES) {
+			cachedTextDecoder = new TextDecoder("utf-8", {
+				ignoreBOM: true,
+				fatal: true
+			});
+			cachedTextDecoder.decode();
+			numBytesDecoded = len;
+		}
+		return cachedTextDecoder.decode(getUint8ArrayMemory0().subarray(ptr, ptr + len));
+	}
+	var cachedTextEncoder = new TextEncoder();
+	if (!("encodeInto" in cachedTextEncoder)) cachedTextEncoder.encodeInto = function(arg, view) {
+		const buf = cachedTextEncoder.encode(arg);
+		view.set(buf);
+		return {
+			read: arg.length,
+			written: buf.length
+		};
+	};
+	var WASM_VECTOR_LEN = 0;
+	var wasm;
+	function __wbg_finalize_init(instance, module) {
+		wasm = instance.exports;
+		cachedDataViewMemory0 = null;
+		cachedUint8ArrayMemory0 = null;
+		wasm.__wbindgen_start();
+		return wasm;
+	}
+	async function __wbg_load(module, imports) {
+		if (typeof Response === "function" && module instanceof Response) {
+			if (!module.ok) throw new Error(`failed to fetch Wasm: ${module.status} ${module.statusText} fetching '${module.url}'`);
+			if (typeof WebAssembly.instantiateStreaming === "function") try {
+				return await WebAssembly.instantiateStreaming(module, imports);
+			} catch (e) {
+				if (expectedResponseType(module.type) && module.headers.get("Content-Type") !== "application/wasm") console.warn("`WebAssembly.instantiateStreaming` failed because your server does not serve Wasm with `application/wasm` MIME type. Falling back to `WebAssembly.instantiate` which is slower. Original error:\n", e);
+				else throw e;
+			}
+			const bytes = await module.arrayBuffer();
+			return await WebAssembly.instantiate(bytes, imports);
+		} else {
+			const instance = await WebAssembly.instantiate(module, imports);
+			if (instance instanceof WebAssembly.Instance) return {
+				instance,
+				module
+			};
+			else return instance;
+		}
+		function expectedResponseType(type) {
+			switch (type) {
+				case "basic":
+				case "cors":
+				case "default": return true;
+			}
+			return false;
+		}
+	}
+	async function __wbg_init(module_or_path) {
+		if (wasm !== void 0) return wasm;
+		if (module_or_path !== void 0) {
+			if (Object.getPrototypeOf(module_or_path) === Object.prototype) ({module_or_path} = module_or_path);
+			else console.warn("using deprecated parameters for the initialization function; pass a single object instead");
+		}
+		if (module_or_path === void 0) module_or_path = (() => {
+			throw new Error("404AD: pass module_or_path explicitly");
+		})();
+		const imports = __wbg_get_imports();
+		if (typeof module_or_path === "string" || typeof Request === "function" && module_or_path instanceof Request || typeof URL === "function" && module_or_path instanceof URL) module_or_path = fetch(module_or_path);
+		const { instance, module } = await __wbg_load(await module_or_path, imports);
+		return __wbg_finalize_init(instance, module);
+	}
+	//#endregion
+	//#region src/adapters/youtube-transport.ts
+	/**
+	* YouTube transport instrumentation.
+	*
+	* YouTube's web client is increasingly SABR-only: audio and video arrive inside
+	* UMP-framed responses rather than as ordinary segment URLs. A URL-matching
+	* blocker cannot see inside that, and with server-side ad placement the ad and
+	* the content can share a transport stream.
+	*
+	* So 404AD instruments the one place an extension can still reach:
+	*
+	* ```text
+	* Chromium network stack
+	*        │
+	*       DNR                  ← peripheral requests only
+	*        │
+	* fetch / streaming Response
+	*        │
+	*   ████ 404AD HOOK ████     ← here
+	*        │
+	*   SABR / UMP               → Rust: framing, timeline, inference
+	*        │
+	*   MediaSource
+	*        │
+	*   SourceBuffer.appendBuffer  ← fallback gate
+	* ```
+	*
+	* Three defences, in order of preference:
+	*
+	* 1. **Payload surgery** (`youtube.ts`) removes ad placements before the player
+	*    initialises. Cheapest and safest.
+	* 2. **Transport classification** (this file) recognises an advertising media
+	*    epoch from the stream itself and seeks past it.
+	* 3. **MediaSource gate** refuses to enqueue classified ad media. Deliberately
+	*    the last resort: refusing an append can stall the pipeline, so it only
+	*    engages once the classifier is past its threshold *and* the ad's extent is
+	*    known.
+	*
+	* Everything the classifier does is evidence-weighted. The DOM contributes
+	* evidence; it is never truth.
+	*/
+	/** SABR media requests. Anything else is left entirely alone. */
+	var MEDIA_URL = /googlevideo\.com\/(video|init)playback/;
+	/** Stop feeding a single response after this much, as a runaway guard. */
+	var MAX_BYTES_PER_RESPONSE = 67108864;
+	/** How often the skip state machine looks at the player. */
+	var TICK_MS = 250;
+	/** Seek only when the engine is this far past its threshold, in nats. */
+	var SKIP_MARGIN_NATS = .5;
+	var SECOND_US = 1e6;
+	var engine = null;
+	var loading = null;
+	var installed = false;
+	/**
+	* Load the transport engine.
+	*
+	* Deliberately lazy: the module is only fetched once a SABR media request is
+	* actually seen, so a YouTube page that never starts playback never pays for it
+	* and no other site ever touches it.
+	*/
+	function loadEngine(wasmUrl) {
+		loading ??= (async () => {
+			await __wbg_init({ module_or_path: wasmUrl });
+			engine = new TransportEngine();
+			const videoId = currentVideoId();
+			if (videoId) engine.setRequestedVideo(videoId);
+			return engine;
+		})();
+		return loading;
+	}
+	function currentVideoId() {
+		try {
+			return new URL(location.href).searchParams.get("v");
+		} catch {
+			return null;
+		}
+	}
+	/** The player element, if the page has one. */
+	function player() {
+		return document.querySelector("#movie_player");
+	}
+	function videoElement() {
+		return document.querySelector("video.html5-main-video");
+	}
+	/**
+	* Feed a response body to the engine without consuming it.
+	*
+	* `tee` gives two independent streams from one body: the page reads its branch
+	* exactly as it would have, and 404AD reads the other. The page's playback path
+	* is never in 404AD's critical path, so a slow or failed analysis cannot stall
+	* the video.
+	*/
+	function observeBody(body, active) {
+		const [toPage, toEngine] = body.tee();
+		(async () => {
+			const reader = toEngine.getReader();
+			let total = 0;
+			try {
+				for (;;) {
+					const { done, value } = await reader.read();
+					if (done || !value) break;
+					total += value.byteLength;
+					if (total > MAX_BYTES_PER_RESPONSE) break;
+					try {
+						active.push(value);
+					} catch (error) {
+						console.warn("404AD: transport parse stopped", error);
+						break;
+					}
+				}
+			} catch {} finally {
+				reader.releaseLock();
+			}
+		})();
+		return toPage;
+	}
+	function urlOf(input) {
+		if (typeof input === "string") return input;
+		if (input instanceof URL) return input.href;
+		return input.url;
+	}
+	function installFetchHook(wasmUrl) {
+		const host = globalThis;
+		const original = host.fetch;
+		if (typeof original !== "function") return;
+		host.fetch = async function transportFetch(input, init) {
+			const response = await original.call(globalThis, input, init);
+			if (!MEDIA_URL.test(urlOf(input)) || !response.body || !response.ok) return response;
+			try {
+				const active = engine ?? await loadEngine(wasmUrl);
+				const toPage = observeBody(response.body, active);
+				return new Response(toPage, {
+					status: response.status,
+					statusText: response.statusText,
+					headers: response.headers
+				});
+			} catch (error) {
+				console.warn("404AD: transport engine unavailable", error);
+				return response;
+			}
+		};
+	}
+	/**
+	* The MediaSource gate.
+	*
+	* Only refuses an append when the classifier has crossed its threshold with
+	* margin *and* the ad's extent is known, because a refused append can stall the
+	* pipeline. Anything less certain is appended: showing an ad is recoverable,
+	* stalling the player is not.
+	*/
+	function installBufferGate() {
+		const proto = globalThis.SourceBuffer?.prototype;
+		if (!proto) return;
+		const originalAppend = proto.appendBuffer;
+		proto.appendBuffer = function gatedAppend(data) {
+			const active = engine;
+			if (active) try {
+				const ranges = this.buffered;
+				const at = (ranges.length > 0 ? ranges.end(ranges.length - 1) : 0) * SECOND_US;
+				const state = active.state();
+				const confident = state.logLr >= state.upperThreshold + SKIP_MARGIN_NATS;
+				const known = active.resumeTarget(at) !== void 0;
+				if (confident && known && !active.shouldAppend(at)) return;
+			} catch {}
+			return originalAppend.call(this, data);
+		};
+	}
+	/**
+	* The skip state machine.
+	*
+	* Reports the player's own state as evidence, and acts on the engine's verdict
+	* by seeking to the end of the classified ad interval. Seeking is preferred
+	* over waiting: it returns control to the viewer immediately.
+	*/
+	function installSkipLoop() {
+		let lastReportedAdState = null;
+		let lastSkipTarget = -1;
+		const tick = () => {
+			const active = engine;
+			const video = videoElement();
+			const element = player();
+			if (!active || !video || !element) return;
+			const showingAd = element.classList.contains("ad-showing");
+			if (showingAd !== lastReportedAdState) {
+				lastReportedAdState = showingAd;
+				try {
+					active.observe(showingAd ? "player-ad" : "player-content");
+				} catch {}
+			}
+			if (!Number.isFinite(video.currentTime)) return;
+			const at = video.currentTime * SECOND_US;
+			const target = active.resumeTarget(at);
+			if (target === void 0) return;
+			const seconds = target / SECOND_US;
+			if (Math.abs(seconds - lastSkipTarget) < .05) return;
+			if (!Number.isFinite(video.duration) || seconds >= video.duration) return;
+			lastSkipTarget = seconds;
+			video.currentTime = seconds;
+			if (video.paused) video.play().catch(() => void 0);
+		};
+		const timer = setInterval(tick, TICK_MS);
+		return () => clearInterval(timer);
+	}
+	/**
+	* Install the transport engine.
+	*
+	* `wasmUrl` is an extension URL supplied by the content script. Nothing is
+	* fetched from the network: the module is part of the package.
+	*/
+	function installTransport(wasmUrl) {
+		if (installed || !wasmUrl) return;
+		installed = true;
+		installFetchHook(wasmUrl);
+		installBufferGate();
+		const stopLoop = installSkipLoop();
+		globalThis.addEventListener("yt-navigate-finish", () => {
+			const videoId = currentVideoId();
+			if (engine && videoId) engine.setRequestedVideo(videoId);
+		});
+		globalThis.addEventListener("pagehide", () => stopLoop(), { once: true });
+		Object.defineProperty(globalThis, "__404AD_TRANSPORT__", {
+			value: () => engine ? engine.state() : null,
+			configurable: true,
+			enumerable: false
+		});
+	}
+	//#endregion
 	//#region entrypoints/scriptlets-runtime.ts
 	var REGISTRY = {
 		...SCRIPTLETS,
+		"404ad-yt-transport": (args) => installTransport(args[0] ?? ""),
 		"404ad-yt-player": youtubeAdapter
 	};
 	function readConfig() {

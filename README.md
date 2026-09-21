@@ -24,6 +24,31 @@ That path is deterministic. `bun run build` always produces it, and it is a plai
 the WXT output, so the two can never disagree. The directory is committed, so a fresh
 clone can be loaded without building anything first.
 
+## Two engines
+
+404AD is a generic content blocker with a **separate transport engine for
+YouTube**, because the two problems are no longer the same problem.
+
+```text
+404AD
+│
+├── generic blocker
+│     Chromium DNR
+│     cosmetic filtering
+│     tracker blocking
+│
+└── youtube transport engine
+      │
+      ├── main-world transport instrumentation
+      ├── InnerTube / player-response surgery
+      ├── SABR request observer
+      ├── streaming UMP parser          ← Rust/WASM
+      ├── deterministic ad classifier   ← sequential probability ratio test
+      ├── timeline mapper               ← two clocks
+      ├── media-buffer controller
+      └── skip / recovery state machine
+```
+
 ## The one architectural rule
 
 **Chromium's `declarativeNetRequest` engine owns the network hot path.**
@@ -78,6 +103,8 @@ network. Rust and WASM are the control plane; Chromium is the data plane.
 | Diagnostics and explainability | `crates/fad-filter/src/matcher.rs`, options → Overview |
 | Per-site controls | `packages/extension/src/core/sites.ts` |
 | YouTube runtime adapter | `packages/extension/src/adapters/youtube.ts`, `lists/404ad-youtube.txt` |
+| YouTube transport engine | `crates/fad-ump`, `crates/fad-youtube`, `crates/fad-yt-wasm` |
+| Remote list subscriptions | `packages/extension/src/core/subscriptions.ts` |
 | Local-only adaptive statistics | `packages/extension/src/core/stats.ts` |
 | Shadow-mode rules | `lists/404ad-candidates.txt`, options → Shadow mode |
 | Breakage-risk scoring | `crates/fad-filter/src/risk.rs` |
@@ -132,7 +159,114 @@ A procedural operator nested *inside* `:has()` reaches neither engine, so the
 compiler rejects it by name rather than shipping a rule that silently matches
 nothing.
 
-### The YouTube adapter does data-model surgery, not just CSS
+### YouTube is a transport problem now
+
+YouTube's web client is increasingly SABR-only: audio and video arrive inside
+UMP-framed responses rather than as ordinary DASH or HLS segment URLs, and with
+server-side ad placement the ad and the content can share one stream. A
+URL-matching blocker cannot see inside that. `video.currentTime += 30` is not an
+answer either.
+
+So 404AD instruments the lowest layer an extension can legitimately reach:
+
+```text
+Chromium network stack
+ │
+DNR                      ← peripheral requests only
+ │
+fetch / streaming Response
+ │
+████ 404AD HOOK ████     ← main world, document_start
+ │
+SABR / UMP               → Rust: framing → timeline → inference
+ │
+MediaSource
+ │
+SourceBuffer.appendBuffer  ← fallback gate
+```
+
+Three defences, in order of preference:
+
+1. **Payload surgery** removes ad placements before the player initialises.
+2. **Transport classification** recognises an advertising media epoch from the
+   stream itself and seeks past it.
+3. **MediaSource gate** refuses to enqueue classified ad media. Last resort,
+   because a refused append can stall the pipeline.
+
+#### The classifier is a sequential test, not an `if`
+
+Evidence accumulates from independent observations and is tested with Wald's
+sequential probability ratio test:
+
+```text
+L_n = Σ log( P(x_k | AD) / P(x_k | CONTENT) )
+
+L_n ≥ ln((1-β)/α) = +6.86  ⇒  AD
+L_n ≤ ln(β/(1-α)) = −2.99  ⇒  CONTENT
+otherwise                  ⇒  UNKNOWN
+```
+
+`α = 0.001` is the probability of calling content an ad; `β = 0.05` is the
+probability of calling an ad content. They are asymmetric because the errors
+are: skipping part of the video the viewer asked for is unacceptable, showing
+an ad is the status quo.
+
+Every signal carries an explicit likelihood pair, so the whole decision can be
+printed and argued with. No model, no training, no opaque score.
+
+| Signal | P(x\|AD) | P(x\|CONTENT) | log LR |
+| --- | --- | --- | --- |
+| ad placement metadata present | 0.95 | 0.005 | +5.25 |
+| player reports an ad | 0.97 | 0.02 | +3.88 |
+| media identity differs from the request | 0.90 | 0.03 | +3.40 |
+| ad renderer activated | 0.80 | 0.10 | +2.08 |
+| short isolated media epoch | 0.65 | 0.10 | +1.87 |
+| media timeline discontinuity | 0.70 | 0.25 | +1.03 |
+| format set changed | 0.60 | 0.35 | +0.54 |
+| new transport epoch | 0.55 | 0.30 | +0.61 |
+| timeline continuous | 0.20 | 0.90 | −1.50 |
+| epoch too long to be an ad | 0.02 | 0.60 | −3.40 |
+| player reports content | 0.03 | 0.98 | −3.49 |
+| media identity matches the request | 0.02 | 0.95 | −3.86 |
+
+No single circumstantial signal can decide. Five transport signals sum to about
+6.13 nats against a 6.86 threshold, which is the asymmetry doing its job. The
+DOM contributes evidence; it is never truth.
+
+#### Two clocks
+
+With ad intervals `A = {[a_i, b_i)}` the viewer's clock is
+
+```text
+T_c(t) = t − Σ clamp(t − a_i, 0, b_i − a_i)
+```
+
+```text
+transport   0────120────135────────600
+                  [ AD ]
+content     0────120──────────────585
+```
+
+The viewer never conceptually enters 120→135. 404AD maps across it, and the
+mapping is invertible, so a seek in content time lands in the right place in
+transport time.
+
+#### Measured
+
+`cargo test -p fad-youtube --test budget` enforces these, not merely reports
+them:
+
+| | Measured | Budget |
+| --- | --- | --- |
+| Transport parsing (10 min of 8 Mbps) | 572 MB in 94 ms, **6,072 MB/s** | > 50 MB/s |
+| Bytes retained between chunks over 114 MB | **26 bytes** | < 8 KB |
+| Media bytes skipped, never buffered | **100%** | > 90% |
+| YouTube WASM module | **72 KB** | loaded only on first media request |
+
+Bulk media payloads are never copied into the parser's buffer. The parser reads
+the frames around media, never the media.
+
+### The YouTube adapter also does data-model surgery
 
 YouTube does not deliver video ads as separate blockable requests. The ad
 manifest arrives inside the same `/youtubei/v1/player` response that carries the

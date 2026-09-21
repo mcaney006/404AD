@@ -190,6 +190,11 @@ youtube.com#$##player-ads { display: none !important; height: 0 !important; }
 youtube.com##+js(404ad-yt-player)
 youtube-nocookie.com##+js(404ad-yt-player)
 
+! The SABR/UMP transport engine. Loads its own WASM module lazily, on the first
+! media request, so a YouTube page that never starts playback never pays for it.
+youtube.com##+js(404ad-yt-transport)
+youtube-nocookie.com##+js(404ad-yt-transport)
+
 ! Belt and braces for the inlined bootstrap objects, in case the adapter's
 ! property hook loses the race with an inline script.
 youtube.com##+js(set-constant, ytInitialPlayerResponse.adPlacements, undefined)

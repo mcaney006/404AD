@@ -301,6 +301,45 @@ test.describe("youtube adapter", () => {
     await page.close();
   });
 
+  test("the transport engine installs in the page realm with its WASM URL", async ({ context }) => {
+    const page = await openYouTubeFixture(context);
+    await waitForAdapter(page);
+
+    // The transport scriptlet exposes its state accessor on the page realm.
+    await page.waitForFunction(() => "__404AD_TRANSPORT__" in globalThis, null, {
+      timeout: 10_000,
+    });
+    // It has not loaded its module yet: no SABR media request has happened.
+    // Lazy is the point; a page that never plays must never pay.
+    const state = await page.evaluate(() =>
+      (globalThis as unknown as { __404AD_TRANSPORT__: () => unknown }).__404AD_TRANSPORT__(),
+    );
+    expect(state).toBeNull();
+    await page.close();
+  });
+
+  test("the transport WASM module is packaged and fetchable at its URL", async ({
+    context,
+    extensionId,
+  }) => {
+    // Fetched rather than navigated to: Chromium does not render a wasm
+    // response, so a navigation proves nothing about whether it is reachable.
+    const page = await context.newPage();
+    await page.goto(`chrome-extension://${extensionId}/options.html`);
+
+    const size = await page.evaluate(async () => {
+      const response = await fetch(chrome.runtime.getURL("wasm/fad_yt_wasm_bg.wasm"));
+      if (!response.ok) return -1;
+      return (await response.arrayBuffer()).byteLength;
+    });
+
+    // Small on purpose: a separate module from the core runtime, so it can be
+    // loaded only once playback starts.
+    expect(size).toBeGreaterThan(10_000);
+    expect(size).toBeLessThan(400_000);
+    await page.close();
+  });
+
   test("feed data is pruned of ad renderers before the page reads it", async ({ context }) => {
     const page = await openYouTubeFixture(context);
     await waitForAdapter(page);

@@ -2,6 +2,9 @@
 resolver = "2"
 members = [
     "crates/fad-filter",
+    "crates/fad-ump",
+    "crates/fad-youtube",
+    "crates/fad-yt-wasm",
     "crates/fad-dnr",
     "crates/fad-compiler",
     "crates/fad-wasm",
@@ -19,6 +22,8 @@ repository = "https://github.com/mcaney006/404AD"
 
 [workspace.dependencies]
 fad-filter = { path = "crates/fad-filter" }
+fad-ump = { path = "crates/fad-ump" }
+fad-youtube = { path = "crates/fad-youtube" }
 fad-dnr = { path = "crates/fad-dnr" }
 
 aho-corasick = "1.1"

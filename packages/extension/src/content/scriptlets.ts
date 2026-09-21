@@ -22,6 +22,19 @@ import type { ScriptletEntry } from "../core/protocol";
  */
 
 const RUNTIME_PATH = "scriptlets-runtime.js";
+const TRANSPORT_WASM_PATH = "wasm/fad_yt_wasm_bg.wasm";
+
+/**
+ * Supply arguments only the extension realm can produce.
+ *
+ * The main world has no `chrome` APIs, so a scriptlet that needs an extension
+ * URL cannot build one. The content script fills it in here rather than the
+ * runtime guessing, which also keeps the URL out of the filter list.
+ */
+function withRuntimeArgs(entry: ScriptletEntry): ScriptletEntry {
+  if (entry.name !== "404ad-yt-transport") return entry;
+  return { ...entry, args: [chrome.runtime.getURL(TRANSPORT_WASM_PATH), ...entry.args] };
+}
 const CONFIG_ATTRIBUTE = "data-404ad-scriptlets";
 
 let injected = false;
@@ -29,7 +42,7 @@ let injected = false;
 export function injectScriptlets(entries: ScriptletEntry[]): boolean {
   if (injected || entries.length === 0) return false;
 
-  const active = entries.filter((entry) => !entry.shadow);
+  const active = entries.filter((entry) => !entry.shadow).map(withRuntimeArgs);
   if (active.length === 0) return false;
   injected = true;
 
