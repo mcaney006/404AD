@@ -69,10 +69,25 @@ jobs:
       - name: Install wasm-pack
         run: command -v wasm-pack || cargo install wasm-pack --locked
 
-      - run: bun install --frozen-lockfile
+      # `--ignore-scripts` because the extension's postinstall runs `wxt
+      # prepare`, which loads a config that reads the compiled rulesets. Those
+      # do not exist yet on a fresh checkout, so installing must not depend on
+      # them. The order below is the real dependency order.
+      - name: Install dependencies
+        run: bun install --frozen-lockfile --ignore-scripts
 
-      # wasm -> filters -> WXT -> dist/404ad-chrome-mv3 + the archive.
-      - run: bun run build
+      - name: Build extension inputs
+        run: |
+          bun run build:wasm
+          bun run build:filters
+
+      - name: Prepare and build the extension
+        run: |
+          bun run --cwd packages/extension wxt prepare
+          bun run build:extension
+
+      - name: Package
+        run: ./scripts/package.sh
 
       - run: bunx tsc --noEmit -p packages/extension/tsconfig.json
       - run: bun run lint

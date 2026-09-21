@@ -21,6 +21,22 @@ rm -rf "$DEST"
 mkdir -p "$(dirname "$DEST")"
 cp -R "$SRC" "$DEST"
 
+# The manifest must actually declare its rulesets, and every path it names
+# must be there. `wxt.config.ts` warns and carries on when the compiled rules
+# are missing, so that preparing types does not require building them; this is
+# the check that turns that warning into a failure at the point it matters.
+DECLARED=$(grep -o '"path":"rules/[^"]*"' "$DEST/manifest.json" | sed 's/.*"rules/rules/;s/"$//' | sort -u)
+if [ -z "$DECLARED" ]; then
+  echo "error: $DEST/manifest.json declares no rulesets. Run \`bun run build:filters\` first." >&2
+  exit 1
+fi
+for RULESET in $DECLARED; do
+  if [ ! -f "$DEST/$RULESET" ]; then
+    echo "error: manifest declares $RULESET but it is not in the package." >&2
+    exit 1
+  fi
+done
+
 FILES=$(find "$DEST" -type f | wc -l | tr -d ' ')
 BYTES=$(find "$DEST" -type f -exec cat {} + | wc -c | tr -d ' ')
 

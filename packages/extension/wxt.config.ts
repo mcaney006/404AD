@@ -14,9 +14,18 @@ function ruleResources(): Array<{ id: string; enabled: boolean; path: string }> 
   try {
     return JSON.parse(readFileSync(generated, 'utf8'));
   } catch {
-    throw new Error(
-      `404AD: ${generated} is missing. Run \`bun run build:filters\` before building the extension.`,
+    // Missing on a fresh checkout, because `fad-compile` has not run yet. This
+    // used to throw, which made `bun install` fail on a clean clone: the
+    // postinstall hook runs `wxt prepare`, and preparing types has no business
+    // requiring compiled rules.
+    //
+    // Returning empty is only safe because it is not the last check. A build
+    // that reaches the packaging step without rulesets fails there, where the
+    // mistake actually matters.
+    console.warn(
+      `404AD: ${generated} not found; the manifest will declare no rulesets. Run \`bun run build:filters\`.`,
     );
+    return [];
   }
 }
 
