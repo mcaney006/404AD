@@ -1,5 +1,8 @@
 # 404AD
 
+[![CI](https://github.com/mcaney006/404AD/actions/workflows/rust.yml/badge.svg?branch=main)](https://github.com/mcaney006/404AD/actions/workflows/rust.yml)
+[![Release](https://img.shields.io/github/v/release/mcaney006/404AD?color=blue)](https://github.com/mcaney006/404AD/releases/latest)
+
 A high-performance, privacy-first content blocker for Chromium, built on Manifest V3.
 
 No account. No server. No telemetry. The extension makes no network requests of its own:
