@@ -1,0 +1,51 @@
+[Adblock Plus 2.0]
+! Title: 404AD Annoyances
+! Description: Cookie walls, newsletter modals, app-install interstitials.
+! Ships DISABLED. These rules are the most breakage-prone class in the product:
+! a cookie banner and a consent-gated paywall are frequently the same element.
+
+! ---------------------------------------------------------------------------
+! Consent management platforms.
+! ---------------------------------------------------------------------------
+||cookielaw.org^$third-party
+||onetrust.com^$third-party
+||cookiebot.com^$third-party
+||consensu.org^$third-party
+||quantcast.mgr.consensu.org^$third-party
+||trustarc.com^$third-party
+||usercentrics.eu^$third-party
+||didomi.io^$third-party
+||sourcepoint.mgr.consensu.org^$third-party
+||privacymanager.io^$third-party
+
+! ---------------------------------------------------------------------------
+! Cookie and consent UI.
+! ---------------------------------------------------------------------------
+##.cookie-banner
+##.cookie-consent
+##.cookie-notice
+##.cookie-policy-banner
+##.gdpr-banner
+##.gdpr-consent
+##.consent-modal
+###onetrust-banner-sdk
+###onetrust-consent-sdk
+###cookiescript_injected
+###CybotCookiebotDialog
+###usercentrics-root
+
+! ---------------------------------------------------------------------------
+! Newsletter and app-install interstitials.
+! ---------------------------------------------------------------------------
+##.newsletter-modal
+##.newsletter-signup-overlay
+##.email-capture-modal
+##.app-install-banner
+##.smart-app-banner
+##.push-notification-prompt
+##.paywall-overlay-dismissible
+
+! Restore scrolling after a modal is removed. Without this the page stays
+! locked, which is worse than the modal.
+#$#body { overflow: auto !important; position: static !important; }
+#$#html { overflow: auto !important; }

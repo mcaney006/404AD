@@ -1,0 +1,6 @@
+[test]
+# The content runtime, the scriptlet library and the YouTube adapter are all DOM
+# code. Testing them against a real DOM implementation instead of hand-rolled
+# stubs is the difference between a test that proves behaviour and one that
+# proves the stub matches the code.
+preload = ["./tests/setup.ts"]

@@ -1,0 +1,146 @@
+[Adblock Plus 2.0]
+! Title: 404AD Base
+! Description: Core advertising network and ad-delivery blocking.
+! Expires: 4 days
+! Syntax: Adblock Plus, compiled to Chromium declarativeNetRequest by fad-compile.
+
+! ---------------------------------------------------------------------------
+! Major ad exchanges and delivery networks (third-party only).
+! Scoped to $third-party so a site serving its own assets from these hosts is
+! never broken by a blanket block.
+! ---------------------------------------------------------------------------
+||doubleclick.net^$third-party
+||googlesyndication.com^$third-party
+||googleadservices.com^$third-party
+||googletagservices.com^$third-party
+||adservice.google.com^$third-party
+||pagead2.googlesyndication.com^$third-party
+||2mdn.net^$third-party
+||adnxs.com^$third-party
+||adsrvr.org^$third-party
+||rubiconproject.com^$third-party
+||pubmatic.com^$third-party
+||openx.net^$third-party
+||criteo.com^$third-party
+||criteo.net^$third-party
+||taboola.com^$third-party
+||outbrain.com^$third-party
+||revcontent.com^$third-party
+||mgid.com^$third-party
+||smartadserver.com^$third-party
+||casalemedia.com^$third-party
+||sharethrough.com^$third-party
+||districtm.io^$third-party
+||33across.com^$third-party
+||sovrn.com^$third-party
+||lijit.com^$third-party
+||indexww.com^$third-party
+||media.net^$third-party
+||yieldmo.com^$third-party
+||teads.tv^$third-party
+||spotxchange.com^$third-party
+||springserve.com^$third-party
+||adform.net^$third-party
+||adroll.com^$third-party
+||bidswitch.net^$third-party
+||contextweb.com^$third-party
+||gumgud.com^$third-party
+||inmobi.com^$third-party
+||smaato.net^$third-party
+||applovin.com^$third-party
+||unityads.unity3d.com^$third-party
+||vungle.com^$third-party
+||chartboost.com^$third-party
+||adcolony.com^$third-party
+||tapjoy.com^$third-party
+||moatads.com^$third-party
+||serving-sys.com^$third-party
+||flashtalking.com^$third-party
+||sizmek.com^$third-party
+||undertone.com^$third-party
+||zedo.com^$third-party
+||exponential.com^$third-party
+||propellerads.com^$third-party
+||popads.net^$third-party
+||adsterra.com^$third-party
+||hilltopads.net^$third-party
+
+! ---------------------------------------------------------------------------
+! Header bidding and prebid wrappers.
+! ---------------------------------------------------------------------------
+||prebid.org^$script,third-party
+||amazon-adsystem.com^$third-party
+||aps.amazon-adsystem.com^$third-party
+||c.amazon-adsystem.com^$third-party
+||ad.doubleclick.net^
+||ads.pubmatic.com^
+||ib.adnxs.com^
+
+! ---------------------------------------------------------------------------
+! Generic ad-path patterns. Deliberately narrow: short generic patterns are the
+! single largest source of false positives, so each of these carries at least
+! one path separator and a resource-type restriction.
+! ---------------------------------------------------------------------------
+/adframe/*$subdocument,third-party
+/adserver/*$script,third-party
+/ad-choices.$image,third-party
+/banners/ads/*$image,third-party
+/pagead/js/adsbygoogle.js$script
+/pagead/conversion/*$script,third-party
+||securepubads.g.doubleclick.net^$script
+
+! ---------------------------------------------------------------------------
+! Neutered stubs instead of hard blocks. A page that expects these globals to
+! exist keeps working; it just gets an inert object.
+! ---------------------------------------------------------------------------
+||googletagmanager.com/gtag/js$script,redirect=noopjs,third-party
+||google-analytics.com/analytics.js$script,redirect=noopjs,third-party
+||connect.facebook.net/*/sdk.js$script,redirect=noopjs,third-party
+
+! ---------------------------------------------------------------------------
+! Exceptions. These sites serve functional payloads from hosts that are
+! otherwise ad infrastructure; blocking them breaks checkout or login.
+! ---------------------------------------------------------------------------
+@@||googletagmanager.com/gtm.js$script,domain=accounts.google.com
+@@||amazon-adsystem.com^$domain=amazon.com|amazon.co.uk|amazon.de
+@@||doubleclick.net/instream/ad_status.js$script,domain=youtube.com
+
+! ---------------------------------------------------------------------------
+! Generic cosmetic rules. Every one is anchored on a class or id token so the
+! runtime index can skip it unless that token is present in the document.
+! ---------------------------------------------------------------------------
+##.ad-banner
+##.ad-container
+##.ad-placeholder
+##.ad-slot
+##.ad-wrapper
+##.adsbygoogle
+##.advertisement
+##.advert-container
+##.banner-ad
+##.display-ad
+##.google-ad
+##.leaderboard-ad
+##.native-ad
+##.outbrain-widget
+##.promoted-content
+##.sidebar-ad
+##.skyscraper-ad
+##.sponsored-block
+##.sponsored-link
+##.taboola-widget
+##.text-ad
+##.top-banner-ad
+##.video-ad-overlay
+###ad-top
+###ad-sidebar
+###ad-footer
+###adsense
+###banner-ad
+###google_ads_frame
+###sponsored-content
+###taboola-below-article
+
+! Style rules reclaim the space a hidden slot leaves behind.
+#$#.ad-slot { display: none !important; min-height: 0 !important; }
+#$#.sticky-ad-rail { display: none !important; position: static !important; }

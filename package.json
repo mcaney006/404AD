@@ -1,0 +1,37 @@
+{
+  "name": "404ad",
+  "version": "0.1.0",
+  "private": true,
+  "description": "A high-performance, privacy-first Chromium MV3 content blocker.",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mcaney006/404AD"
+  },
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "build:wasm": "./scripts/build-wasm.sh",
+    "build:filters": "./scripts/build-filters.sh",
+    "build:extension": "bun run --cwd packages/extension build",
+    "build": "bun run build:wasm && bun run build:filters && bun run build:extension && ./scripts/package.sh",
+    "dev": "bun run build:wasm && bun run build:filters && bun run --cwd packages/extension dev",
+    "test": "bun run test:rust && bun run test:unit",
+    "test:rust": "cargo test --workspace",
+    "test:unit": "bun test packages/extension/src",
+    "test:e2e": "bun run --cwd packages/extension test:e2e",
+    "verify": "cargo run -q -p fad-compiler -- verify --lists lists",
+    "lint": "oxlint packages/extension/src packages/extension/entrypoints",
+    "fmt": "oxfmt packages/extension/src packages/extension/entrypoints",
+    "fmt:check": "oxfmt --check packages/extension/src packages/extension/entrypoints"
+  },
+  "devDependencies": {
+    "@happy-dom/global-registrator": "^20.14.5",
+    "@types/bun": "latest",
+    "@types/chrome": "^0.3.0",
+    "oxfmt": "^0.68.0",
+    "oxlint": "^1.83.0",
+    "typescript": "^5.7.0"
+  }
+}

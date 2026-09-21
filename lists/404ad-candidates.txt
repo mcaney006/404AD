@@ -1,0 +1,27 @@
+[Adblock Plus 2.0]
+! Title: 404AD Shadow Candidates
+! Description: Rules under evaluation. Everything below compiles into the
+! extension as a priority-1 `allow`, which can never outrank a real block, so
+! these rules are measured against live traffic without changing a single
+! request outcome. Promote a rule by moving it into a real list once its match
+! rate and breakage reports justify it.
+
+!#shadow on
+||adsafeprotected.com^$third-party
+||ads.linkedin.com^$third-party
+||analytics.yahoo.com^$third-party
+||branch.io^$third-party
+||braze.com^$third-party
+||clicktale.net^$third-party
+||cdn.cookielaw.org^$third-party
+||impactradius-event.com^$third-party
+||klaviyo.com^$script,third-party
+||onesignal.com^$third-party
+||pendo.io^$third-party
+||pushwoosh.com^$third-party
+||rlcdn.com^$third-party
+||tealiumiq.com^$third-party
+||yandex.ru/metrika^$third-party
+/analytics-beacon/*$xmlhttprequest,third-party
+/telemetry/collect$xmlhttprequest,third-party
+!#shadow off

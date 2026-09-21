@@ -1,0 +1,116 @@
+{
+  "buildId": "6563152040263c594ecac0766ba8388e",
+  "compilerVersion": "0.1.0",
+  "lists": [
+    {
+      "id": "404ad-annoyances",
+      "title": "404AD Annoyances",
+      "category": "annoyances",
+      "enabled": false,
+      "bytes": 1805
+    },
+    {
+      "id": "404ad-base",
+      "title": "404AD Base",
+      "category": "ads",
+      "enabled": true,
+      "bytes": 5144
+    },
+    {
+      "id": "404ad-candidates",
+      "title": "404AD Shadow Candidates",
+      "category": "shadow",
+      "enabled": true,
+      "bytes": 971
+    },
+    {
+      "id": "404ad-tracking",
+      "title": "404AD Tracking",
+      "category": "tracking",
+      "enabled": true,
+      "bytes": 3878
+    },
+    {
+      "id": "404ad-youtube",
+      "title": "404AD YouTube Adapter",
+      "category": "youtube",
+      "enabled": true,
+      "bytes": 2643
+    }
+  ],
+  "parsed": {
+    "network": 193,
+    "cosmetic": 77,
+    "ignored": 123,
+    "errors": 0
+  },
+  "dedup": {
+    "networkRemoved": 0,
+    "cosmeticRemoved": 0,
+    "badfiltered": 0
+  },
+  "optimize": {
+    "mergedByDomain": 0,
+    "droppedScopeSubsumed": 0,
+    "droppedPatternSubsumed": 0
+  },
+  "dnr": {
+    "rules": 193,
+    "enabledRules": 183,
+    "regexRules": 0,
+    "shadowRules": 17,
+    "rulesets": [
+      {
+        "id": "ads",
+        "enabled": true,
+        "path": "rules/ads.json"
+      },
+      {
+        "id": "annoyances",
+        "enabled": false,
+        "path": "rules/annoyances.json"
+      },
+      {
+        "id": "shadow",
+        "enabled": true,
+        "path": "rules/shadow.json"
+      },
+      {
+        "id": "tracking",
+        "enabled": true,
+        "path": "rules/tracking.json"
+      },
+      {
+        "id": "youtube",
+        "enabled": true,
+        "path": "rules/youtube.json"
+      }
+    ],
+    "perCategory": {
+      "ads": 75,
+      "annoyances": 10,
+      "shadow": 17,
+      "tracking": 83,
+      "youtube": 8
+    }
+  },
+  "cosmetic": {
+    "genericSelectors": 50,
+    "hosts": 1,
+    "entities": 0,
+    "scriptlets": 3,
+    "procedural": 2,
+    "indexBytesPostcard": 2903,
+    "indexBytesJson": 6624
+  },
+  "budgets": {
+    "staticRulesUsed": 183,
+    "staticRulesLimit": 30000,
+    "regexRulesUsed": 0,
+    "regexRulesLimit": 1000,
+    "enabledRulesetsUsed": 4,
+    "enabledRulesetsLimit": 50
+  },
+  "unsupported": [],
+  "errors": []
+}

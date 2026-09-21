@@ -1,0 +1,27 @@
+[
+  {
+    "id": "ads",
+    "enabled": true,
+    "path": "rules/ads.json"
+  },
+  {
+    "id": "annoyances",
+    "enabled": false,
+    "path": "rules/annoyances.json"
+  },
+  {
+    "id": "shadow",
+    "enabled": true,
+    "path": "rules/shadow.json"
+  },
+  {
+    "id": "tracking",
+    "enabled": true,
+    "path": "rules/tracking.json"
+  },
+  {
+    "id": "youtube",
+    "enabled": true,
+    "path": "rules/youtube.json"
+  }
+]

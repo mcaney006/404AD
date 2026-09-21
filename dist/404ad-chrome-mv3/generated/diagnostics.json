@@ -1,0 +1,3873 @@
+{
+  "buildId": "6563152040263c594ecac0766ba8388e",
+  "compilerVersion": "0.1.0",
+  "network": {
+    "1": {
+      "irId": 1,
+      "raw": "||2mdn.net^$third-party",
+      "list": "404ad-base",
+      "line": 18,
+      "priority": 10,
+      "shadow": false,
+      "riskScore": 0,
+      "riskBand": "low",
+      "riskFactors": [
+        "matches all subresource types",
+        "third-party only"
+      ]
+    },
+    "2": {
+      "irId": 2,
+      "raw": "||33across.com^$third-party",
+      "list": "404ad-base",
+      "line": 34,
+      "priority": 10,
+      "shadow": false,
+      "riskScore": 0,
+      "riskBand": "low",
+      "riskFactors": [
+        "matches all subresource types",
+        "third-party only",
+        "anchored to a specific host"
+      ]
+    },
+    "3": {
+      "irId": 3,
+      "raw": "||ad.doubleclick.net^",
+      "list": "404ad-base",
+      "line": 75,
+      "priority": 10,
+      "shadow": false,
+      "riskScore": 10,
+      "riskBand": "low",
+      "riskFactors": [
+        "matches all subresource types",
+        "any party",
+        "anchored to a specific host"
+      ]
+    },
+    "4": {
+      "irId": 4,
+      "raw": "||adcolony.com^$third-party",
+      "list": "404ad-base",
+      "line": 54,
+      "priority": 10,
+      "shadow": false,
+      "riskScore": 0,
+      "riskBand": "low",
+      "riskFactors": [
+        "matches all subresource types",
+        "third-party only",
+        "anchored to a specific host"
+      ]
+    },
+    "5": {
+      "irId": 5,
+      "raw": "||adform.net^$third-party",
+      "list": "404ad-base",
+      "line": 43,
+      "priority": 10,
+      "shadow": false,
+      "riskScore": 0,
+      "riskBand": "low",
+      "riskFactors": [
+        "matches all subresource types",
+        "third-party only",
+        "anchored to a specific host"
+      ]
+    },
+    "6": {
+      "irId": 6,
+      "raw": "||adnxs.com^$third-party",
+      "list": "404ad-base",
+      "line": 19,
+      "priority": 10,
+      "shadow": false,
+      "riskScore": 0,
+      "riskBand": "low",
+      "riskFactors": [
+        "matches all subresource types",
+        "third-party only",
+        "anchored to a specific host"
+      ]
+    },
+    "7": {
+      "irId": 7,
+      "raw": "||adobedtm.com^$script,third-party",
+      "list": "404ad-tracking",
+      "line": 76,
+      "priority": 10,
+      "shadow": false,
+      "riskScore": 0,
+      "riskBand": "low",
+      "riskFactors": [
+        "targets scripts",
+        "third-party only",
+        "anchored to a specific host"
+      ]
+    },
+    "8": {
+      "irId": 8,
+      "raw": "||adroll.com^$third-party",
+      "list": "404ad-base",
+      "line": 44,
+      "priority": 10,
+      "shadow": false,
+      "riskScore": 0,
+      "riskBand": "low",
+      "riskFactors": [
+        "matches all subresource types",
+        "third-party only",
+        "anchored to a specific host"
+      ]
+    },
+    "9": {
+      "irId": 9,
+      "raw": "||ads-api.tiktok.com^$third-party",
+      "list": "404ad-tracking",
+      "line": 54,
+      "priority": 10,
+      "shadow": false,
+      "riskScore": 0,
+      "riskBand": "low",
+      "riskFactors": [
+        "matches all subresource types",
+        "third-party only",
+        "anchored to a specific host"
+      ]
+    },
+    "10": {
+      "irId": 10,
+      "raw": "||ads.pinterest.com^$third-party",
+      "list": "404ad-tracking",
+      "line": 57,
+      "priority": 10,
+      "shadow": false,
+      "riskScore": 0,
+      "riskBand": "low",
+      "riskFactors": [
+        "matches all subresource types",
+        "third-party only",
+        "anchored to a specific host"
+      ]
+    },
+    "11": {
+      "irId": 11,
+      "raw": "||ads.pubmatic.com^",
+      "list": "404ad-base",
+      "line": 76,
+      "priority": 10,
+      "shadow": false,
+      "riskScore": 10,
+      "riskBand": "low",
+      "riskFactors": [
+        "matches all subresource types",
+        "any party",
+        "anchored to a specific host"
+      ]
+    },
+    "12": {
+      "irId": 12,
+      "raw": "||adsco.re^$third-party",
+      "list": "404ad-tracking",
+      "line": 71,
+      "priority": 10,
+      "shadow": false,
+      "riskScore": 0,
+      "riskBand": "low",
+      "riskFactors": [
+        "matches all subresource types",
+        "third-party only"
+      ]
+    },
+    "13": {
+      "irId": 13,
+      "raw": "||adservice.google.com^$third-party",
+      "list": "404ad-base",
+      "line": 16,
+      "priority": 10,
+      "shadow": false,
+      "riskScore": 0,
+      "riskBand": "low",
+      "riskFactors": [
+        "matches all subresource types",
+        "third-party only",
+        "long specific pattern",
+        "anchored to a specific host"
+      ]
+    },
+    "14": {
+      "irId": 14,
+      "raw": "||adsrvr.org^$third-party",
+      "list": "404ad-base",
+      "line": 20,
+      "priority": 10,
+      "shadow": false,
+      "riskScore": 0,
+      "riskBand": "low",
+      "riskFactors": [
+        "matches all subresource types",
+        "third-party only",
+        "anchored to a specific host"
+      ]
+    },
+    "15": {
+      "irId": 15,
+      "raw": "||adsterra.com^$third-party",
+      "list": "404ad-base",
+      "line": 65,
+      "priority": 10,
+      "shadow": false,
+      "riskScore": 0,
+      "riskBand": "low",
+      "riskFactors": [
+        "matches all subresource types",
+        "third-party only",
+        "anchored to a specific host"
+      ]
+    },
+    "16": {
+      "irId": 16,
+      "raw": "||amazon-adsystem.com^$third-party",
+      "list": "404ad-base",
+      "line": 72,
+      "priority": 10,
+      "shadow": false,
+      "riskScore": 0,
+      "riskBand": "low",
+      "riskFactors": [
+        "matches all subresource types",
+        "third-party only",
+        "long specific pattern",
+        "anchored to a specific host"
+      ]
+    },
+    "17": {
+      "irId": 17,
+      "raw": "||amplitude.com^$third-party",
+      "list": "404ad-tracking",
+      "line": 14,
+      "priority": 10,
+      "shadow": false,
+      "riskScore": 0,
+      "riskBand": "low",
+      "riskFactors": [
+        "matches all subresource types",
+        "third-party only",
+        "anchored to a specific host"
+      ]
+    },
+    "18": {
+      "irId": 18,
+      "raw": "||analytics.google.com^$third-party",
+      "list": "404ad-tracking",
+      "line": 9,
+      "priority": 10,
+      "shadow": false,
+      "riskScore": 0,
+      "riskBand": "low",
+      "riskFactors": [
+        "matches all subresource types",
+        "third-party only",
+        "long specific pattern",
+        "anchored to a specific host"
+      ]
+    },
+    "19": {
+      "irId": 19,
+      "raw": "||analytics.tiktok.com^$third-party",
+      "list": "404ad-tracking",
+      "line": 53,
+      "priority": 10,
+      "shadow": false,
+      "riskScore": 0,
+      "riskBand": "low",
+      "riskFactors": [
+        "matches all subresource types",
+        "third-party only",
+        "long specific pattern",
+        "anchored to a specific host"
+      ]
+    },
+    "20": {
+      "irId": 20,
+      "raw": "||analytics.twitter.com^$third-party",
+      "list": "404ad-tracking",
+      "line": 58,
+      "priority": 10,
+      "shadow": false,
+      "riskScore": 0,
+      "riskBand": "low",
+      "riskFactors": [
+        "matches all subresource types",
+        "third-party only",
+        "long specific pattern",
+        "anchored to a specific host"
+      ]
+    },
+    "21": {
+      "irId": 21,
+      "raw": "||applovin.com^$third-party",
+      "list": "404ad-base",
+      "line": 50,
+      "priority": 10,
+      "shadow": false,
+      "riskScore": 0,
+      "riskBand": "low",
+      "riskFactors": [
+        "matches all subresource types",
+        "third-party only",
+        "anchored to a specific host"
+      ]
+    },
+    "22": {
+      "irId": 22,
+      "raw": "||aps.amazon-adsystem.com^$third-party",
+      "list": "404ad-base",
+      "line": 73,
+      "priority": 10,
+      "shadow": false,
+      "riskScore": 0,
+      "riskBand": "low",
+      "riskFactors": [
+        "matches all subresource types",
+        "third-party only",
+        "long specific pattern",
+        "anchored to a specific host"
+      ]
+    },
+    "23": {
+      "irId": 23,
+      "raw": "||b.6sc.co^$third-party",
+      "list": "404ad-tracking",
+      "line": 111,
+      "priority": 10,
+      "shadow": false,
+      "riskScore": 0,
+      "riskBand": "low",
+      "riskFactors": [
+        "matches all subresource types",
+        "third-party only"
+      ]
+    },
+    "24": {
+      "irId": 24,
+      "raw": "||bat.bing.com^$third-party",
+      "list": "404ad-tracking",
+      "line": 60,
+      "priority": 10,
+      "shadow": false,
+      "riskScore": 0,
+      "riskBand": "low",
+      "riskFactors": [
+        "matches all subresource types",
+        "third-party only",
+        "anchored to a specific host"
+      ]
+    },
+    "25": {
+      "irId": 25,
+      "raw": "||beacon.krxd.net^$third-party",
+      "list": "404ad-tracking",
+      "line": 110,
+      "priority": 10,
+      "shadow": false,
+      "riskScore": 0,
+      "riskBand": "low",
+      "riskFactors": [
+        "matches all subresource types",
+        "third-party only",
+        "anchored to a specific host"
+      ]
+    },
+    "26": {
+      "irId": 26,
+      "raw": "||bidswitch.net^$third-party",
+      "list": "404ad-base",
+      "line": 45,
+      "priority": 10,
+      "shadow": false,
+      "riskScore": 0,
+      "riskBand": "low",
+      "riskFactors": [
+        "matches all subresource types",
+        "third-party only",
+        "anchored to a specific host"
+      ]
+    },
+    "27": {
+      "irId": 27,
+      "raw": "||bugsnag.com^$third-party",
+      "list": "404ad-tracking",
+      "line": 28,
+      "priority": 10,
+      "shadow": false,
+      "riskScore": 0,
+      "riskBand": "low",
+      "riskFactors": [
+        "matches all subresource types",
+        "third-party only",
+        "anchored to a specific host"
+      ]
+    },
+    "28": {
+      "irId": 28,
+      "raw": "||c.amazon-adsystem.com^$third-party",
+      "list": "404ad-base",
+      "line": 74,
+      "priority": 10,
+      "shadow": false,
+      "riskScore": 0,
+      "riskBand": "low",
+      "riskFactors": [
+        "matches all subresource types",
+        "third-party only",
+        "long specific pattern",
+        "anchored to a specific host"
+      ]
+    },
+    "29": {
+      "irId": 29,
+      "raw": "||casalemedia.com^$third-party",
+      "list": "404ad-base",
+      "line": 31,
+      "priority": 10,
+      "shadow": false,
+      "riskScore": 0,
+      "riskBand": "low",
+      "riskFactors": [
+        "matches all subresource types",
+        "third-party only",
+        "anchored to a specific host"
+      ]
+    },
+    "30": {
+      "irId": 30,
+      "raw": "||chartbeat.com^$third-party",
+      "list": "404ad-tracking",
+      "line": 23,
+      "priority": 10,
+      "shadow": false,
+      "riskScore": 0,
+      "riskBand": "low",
+      "riskFactors": [
+        "matches all subresource types",
+        "third-party only",
+        "anchored to a specific host"
+      ]
+    },
+    "31": {
+      "irId": 31,
+      "raw": "||chartbeat.net^$third-party",
+      "list": "404ad-tracking",
+      "line": 24,
+      "priority": 10,
+      "shadow": false,
+      "riskScore": 0,
+      "riskBand": "low",
+      "riskFactors": [
+        "matches all subresource types",
+        "third-party only",
+        "anchored to a specific host"
+      ]
+    },
+    "32": {
+      "irId": 32,
+      "raw": "||chartboost.com^$third-party",
+      "list": "404ad-base",
+      "line": 53,
+      "priority": 10,
+      "shadow": false,
+      "riskScore": 0,
+      "riskBand": "low",
+      "riskFactors": [
+        "matches all subresource types",
+        "third-party only",
+        "anchored to a specific host"
+      ]
+    },
+    "33": {
+      "irId": 33,
+      "raw": "||clarity.microsoft.com^$third-party",
+      "list": "404ad-tracking",
+      "line": 61,
+      "priority": 10,
+      "shadow": false,
+      "riskScore": 0,
+      "riskBand": "low",
+      "riskFactors": [
+        "matches all subresource types",
+        "third-party only",
+        "long specific pattern",
+        "anchored to a specific host"
+      ]
+    },
+    "34": {
+      "irId": 34,
+      "raw": "||clarity.ms^",
+      "list": "404ad-tracking",
+      "line": 41,
+      "priority": 10,
+      "shadow": false,
+      "riskScore": 10,
+      "riskBand": "low",
+      "riskFactors": [
+        "matches all subresource types",
+        "any party",
+        "anchored to a specific host"
+      ]
+    },
+    "35": {
+      "irId": 35,
+      "raw": "||comscore.com^$third-party",
+      "list": "404ad-tracking",
+      "line": 22,
+      "priority": 10,
+      "shadow": false,
+      "riskScore": 0,
+      "riskBand": "low",
+      "riskFactors": [
+        "matches all subresource types",
+        "third-party only",
+        "anchored to a specific host"
+      ]
+    },
+    "36": {
+      "irId": 36,
+      "raw": "||connect.facebook.net/*/sdk.js$script,redirect=noopjs,third-party",
+      "list": "404ad-base",
+      "line": 98,
+      "priority": 30,
+      "shadow": false,
+      "riskScore": 15,
+      "riskBand": "low",
+      "riskFactors": [
+        "serves a neutered stub in place of the resource"
+      ]
+    },
+    "37": {
+      "irId": 37,
+      "raw": "||consensu.org^$third-party",
+      "list": "404ad-annoyances",
+      "line": 13,
+      "priority": 10,
+      "shadow": false,
+      "riskScore": 0,
+      "riskBand": "low",
+      "riskFactors": [
+        "matches all subresource types",
+        "third-party only",
+        "anchored to a specific host"
+      ]
+    },
+    "38": {
+      "irId": 38,
+      "raw": "||contentsquare.net^",
+      "list": "404ad-tracking",
+      "line": 45,
+      "priority": 10,
+      "shadow": false,
+      "riskScore": 10,
+      "riskBand": "low",
+      "riskFactors": [
+        "matches all subresource types",
+        "any party",
+        "anchored to a specific host"
+      ]
+    },
+    "39": {
+      "irId": 39,
+      "raw": "||contextweb.com^$third-party",
+      "list": "404ad-base",
+      "line": 46,
+      "priority": 10,
+      "shadow": false,
+      "riskScore": 0,
+      "riskBand": "low",
+      "riskFactors": [
+        "matches all subresource types",
+        "third-party only",
+        "anchored to a specific host"
+      ]
+    },
+    "40": {
+      "irId": 40,
+      "raw": "||cookiebot.com^$third-party",
+      "list": "404ad-annoyances",
+      "line": 12,
+      "priority": 10,
+      "shadow": false,
+      "riskScore": 0,
+      "riskBand": "low",
+      "riskFactors": [
+        "matches all subresource types",
+        "third-party only",
+        "anchored to a specific host"
+      ]
+    },
+    "41": {
+      "irId": 41,
+      "raw": "||cookielaw.org^$third-party",
+      "list": "404ad-annoyances",
+      "line": 10,
+      "priority": 10,
+      "shadow": false,
+      "riskScore": 0,
+      "riskBand": "low",
+      "riskFactors": [
+        "matches all subresource types",
+        "third-party only",
+        "anchored to a specific host"
+      ]
+    },
+    "42": {
+      "irId": 42,
+      "raw": "||criteo.com^$third-party",
+      "list": "404ad-base",
+      "line": 24,
+      "priority": 10,
+      "shadow": false,
+      "riskScore": 0,
+      "riskBand": "low",
+      "riskFactors": [
+        "matches all subresource types",
+        "third-party only",
+        "anchored to a specific host"
+      ]
+    },
+    "43": {
+      "irId": 43,
+      "raw": "||criteo.net^$third-party",
+      "list": "404ad-base",
+      "line": 25,
+      "priority": 10,
+      "shadow": false,
+      "riskScore": 0,
+      "riskBand": "low",
+      "riskFactors": [
+        "matches all subresource types",
+        "third-party only",
+        "anchored to a specific host"
+      ]
+    },
+    "44": {
+      "irId": 44,
+      "raw": "||crwdcntrl.net^$third-party",
+      "list": "404ad-tracking",
+      "line": 73,
+      "priority": 10,
+      "shadow": false,
+      "riskScore": 0,
+      "riskBand": "low",
+      "riskFactors": [
+        "matches all subresource types",
+        "third-party only",
+        "anchored to a specific host"
+      ]
+    },
+    "45": {
+      "irId": 45,
+      "raw": "||demdex.net^$third-party",
+      "list": "404ad-tracking",
+      "line": 74,
+      "priority": 10,
+      "shadow": false,
+      "riskScore": 0,
+      "riskBand": "low",
+      "riskFactors": [
+        "matches all subresource types",
+        "third-party only",
+        "anchored to a specific host"
+      ]
+    },
+    "46": {
+      "irId": 46,
+      "raw": "||deviceatlas.com^$third-party",
+      "list": "404ad-tracking",
+      "line": 70,
+      "priority": 10,
+      "shadow": false,
+      "riskScore": 0,
+      "riskBand": "low",
+      "riskFactors": [
+        "matches all subresource types",
+        "third-party only",
+        "anchored to a specific host"
+      ]
+    },
+    "47": {
+      "irId": 47,
+      "raw": "||didomi.io^$third-party",
+      "list": "404ad-annoyances",
+      "line": 17,
+      "priority": 10,
+      "shadow": false,
+      "riskScore": 0,
+      "riskBand": "low",
+      "riskFactors": [
+        "matches all subresource types",
+        "third-party only",
+        "anchored to a specific host"
+      ]
+    },
+    "48": {
+      "irId": 48,
+      "raw": "||districtm.io^$third-party",
+      "list": "404ad-base",
+      "line": 33,
+      "priority": 10,
+      "shadow": false,
+      "riskScore": 0,
+      "riskBand": "low",
+      "riskFactors": [
+        "matches all subresource types",
+        "third-party only",
+        "anchored to a specific host"
+      ]
+    },
+    "49": {
+      "irId": 49,
+      "raw": "||doubleclick.net^$third-party",
+      "list": "404ad-base",
+      "line": 12,
+      "priority": 10,
+      "shadow": false,
+      "riskScore": 0,
+      "riskBand": "low",
+      "riskFactors": [
+        "matches all subresource types",
+        "third-party only",
+        "anchored to a specific host"
+      ]
+    },
+    "50": {
+      "irId": 50,
+      "raw": "||everesttech.net^$third-party",
+      "list": "404ad-tracking",
+      "line": 75,
+      "priority": 10,
+      "shadow": false,
+      "riskScore": 0,
+      "riskBand": "low",
+      "riskFactors": [
+        "matches all subresource types",
+        "third-party only",
+        "anchored to a specific host"
+      ]
+    },
+    "51": {
+      "irId": 51,
+      "raw": "||exponential.com^$third-party",
+      "list": "404ad-base",
+      "line": 62,
+      "priority": 10,
+      "shadow": false,
+      "riskScore": 0,
+      "riskBand": "low",
+      "riskFactors": [
+        "matches all subresource types",
+        "third-party only",
+        "anchored to a specific host"
+      ]
+    },
+    "52": {
+      "irId": 52,
+      "raw": "||facebook.com/tr/$xmlhttprequest,third-party",
+      "list": "404ad-tracking",
+      "line": 52,
+      "priority": 10,
+      "shadow": false,
+      "riskScore": 0,
+      "riskBand": "low",
+      "riskFactors": [
+        "targets XHR/fetch",
+        "third-party only",
+        "anchored to a specific host"
+      ]
+    },
+    "53": {
+      "irId": 53,
+      "raw": "||facebook.com/tr^$image,third-party",
+      "list": "404ad-tracking",
+      "line": 51,
+      "priority": 10,
+      "shadow": false,
+      "riskScore": 0,
+      "riskBand": "low",
+      "riskFactors": [
+        "third-party only",
+        "anchored to a specific host"
+      ]
+    },
+    "54": {
+      "irId": 54,
+      "raw": "||fingerprintjs.com^$third-party",
+      "list": "404ad-tracking",
+      "line": 66,
+      "priority": 10,
+      "shadow": false,
+      "riskScore": 0,
+      "riskBand": "low",
+      "riskFactors": [
+        "matches all subresource types",
+        "third-party only",
+        "anchored to a specific host"
+      ]
+    },
+    "55": {
+      "irId": 55,
+      "raw": "||flashtalking.com^$third-party",
+      "list": "404ad-base",
+      "line": 58,
+      "priority": 10,
+      "shadow": false,
+      "riskScore": 0,
+      "riskBand": "low",
+      "riskFactors": [
+        "matches all subresource types",
+        "third-party only",
+        "anchored to a specific host"
+      ]
+    },
+    "56": {
+      "irId": 56,
+      "raw": "||fpjs.io^$third-party",
+      "list": "404ad-tracking",
+      "line": 67,
+      "priority": 10,
+      "shadow": false,
+      "riskScore": 12,
+      "riskBand": "low",
+      "riskFactors": [
+        "matches all subresource types",
+        "third-party only",
+        "short pattern"
+      ]
+    },
+    "57": {
+      "irId": 57,
+      "raw": "||fullstory.com^",
+      "list": "404ad-tracking",
+      "line": 37,
+      "priority": 10,
+      "shadow": false,
+      "riskScore": 10,
+      "riskBand": "low",
+      "riskFactors": [
+        "matches all subresource types",
+        "any party",
+        "anchored to a specific host"
+      ]
+    },
+    "58": {
+      "irId": 58,
+      "raw": "||google-analytics.com/analytics.js$script,redirect=noopjs,third-party",
+      "list": "404ad-base",
+      "line": 97,
+      "priority": 30,
+      "shadow": false,
+      "riskScore": 15,
+      "riskBand": "low",
+      "riskFactors": [
+        "serves a neutered stub in place of the resource"
+      ]
+    },
+    "59": {
+      "irId": 59,
+      "raw": "||google-analytics.com^$third-party",
+      "list": "404ad-tracking",
+      "line": 8,
+      "priority": 10,
+      "shadow": false,
+      "riskScore": 0,
+      "riskBand": "low",
+      "riskFactors": [
+        "matches all subresource types",
+        "third-party only",
+        "long specific pattern",
+        "anchored to a specific host"
+      ]
+    },
+    "60": {
+      "irId": 60,
+      "raw": "||googleadservices.com^$third-party",
+      "list": "404ad-base",
+      "line": 14,
+      "priority": 10,
+      "shadow": false,
+      "riskScore": 0,
+      "riskBand": "low",
+      "riskFactors": [
+        "matches all subresource types",
+        "third-party only",
+        "long specific pattern",
+        "anchored to a specific host"
+      ]
+    },
+    "61": {
+      "irId": 61,
+      "raw": "||googlesyndication.com^$third-party",
+      "list": "404ad-base",
+      "line": 13,
+      "priority": 10,
+      "shadow": false,
+      "riskScore": 0,
+      "riskBand": "low",
+      "riskFactors": [
+        "matches all subresource types",
+        "third-party only",
+        "long specific pattern",
+        "anchored to a specific host"
+      ]
+    },
+    "62": {
+      "irId": 62,
+      "raw": "||googletagmanager.com/gtag/js$script,redirect=noopjs,third-party",
+      "list": "404ad-base",
+      "line": 96,
+      "priority": 30,
+      "shadow": false,
+      "riskScore": 15,
+      "riskBand": "low",
+      "riskFactors": [
+        "serves a neutered stub in place of the resource"
+      ]
+    },
+    "63": {
+      "irId": 63,
+      "raw": "||googletagservices.com^$third-party",
+      "list": "404ad-base",
+      "line": 15,
+      "priority": 10,
+      "shadow": false,
+      "riskScore": 0,
+      "riskBand": "low",
+      "riskFactors": [
+        "matches all subresource types",
+        "third-party only",
+        "long specific pattern",
+        "anchored to a specific host"
+      ]
+    },
+    "64": {
+      "irId": 64,
+      "raw": "||googlevideo.com/initplayback*&adformat$media",
+      "list": "404ad-youtube",
+      "line": 19,
+      "priority": 10,
+      "shadow": false,
+      "riskScore": 0,
+      "riskBand": "low",
+      "riskFactors": [
+        "any party",
+        "long specific pattern",
+        "anchored to a specific host"
+      ]
+    },
+    "65": {
+      "irId": 65,
+      "raw": "||googlevideo.com/videoplayback*&oad$media",
+      "list": "404ad-youtube",
+      "line": 18,
+      "priority": 10,
+      "shadow": false,
+      "riskScore": 0,
+      "riskBand": "low",
+      "riskFactors": [
+        "any party",
+        "long specific pattern",
+        "anchored to a specific host"
+      ]
+    },
+    "66": {
+      "irId": 66,
+      "raw": "||gumgud.com^$third-party",
+      "list": "404ad-base",
+      "line": 47,
+      "priority": 10,
+      "shadow": false,
+      "riskScore": 0,
+      "riskBand": "low",
+      "riskFactors": [
+        "matches all subresource types",
+        "third-party only",
+        "anchored to a specific host"
+      ]
+    },
+    "67": {
+      "irId": 67,
+      "raw": "||heap.io^$third-party",
+      "list": "404ad-tracking",
+      "line": 15,
+      "priority": 10,
+      "shadow": false,
+      "riskScore": 12,
+      "riskBand": "low",
+      "riskFactors": [
+        "matches all subresource types",
+        "third-party only",
+        "short pattern"
+      ]
+    },
+    "68": {
+      "irId": 68,
+      "raw": "||heapanalytics.com^$third-party",
+      "list": "404ad-tracking",
+      "line": 16,
+      "priority": 10,
+      "shadow": false,
+      "riskScore": 0,
+      "riskBand": "low",
+      "riskFactors": [
+        "matches all subresource types",
+        "third-party only",
+        "anchored to a specific host"
+      ]
+    },
+    "69": {
+      "irId": 69,
+      "raw": "||hilltopads.net^$third-party",
+      "list": "404ad-base",
+      "line": 66,
+      "priority": 10,
+      "shadow": false,
+      "riskScore": 0,
+      "riskBand": "low",
+      "riskFactors": [
+        "matches all subresource types",
+        "third-party only",
+        "anchored to a specific host"
+      ]
+    },
+    "70": {
+      "irId": 70,
+      "raw": "||hotjar.com^",
+      "list": "404ad-tracking",
+      "line": 35,
+      "priority": 10,
+      "shadow": false,
+      "riskScore": 10,
+      "riskBand": "low",
+      "riskFactors": [
+        "matches all subresource types",
+        "any party",
+        "anchored to a specific host"
+      ]
+    },
+    "71": {
+      "irId": 71,
+      "raw": "||hotjar.io^",
+      "list": "404ad-tracking",
+      "line": 36,
+      "priority": 10,
+      "shadow": false,
+      "riskScore": 10,
+      "riskBand": "low",
+      "riskFactors": [
+        "matches all subresource types",
+        "any party",
+        "anchored to a specific host"
+      ]
+    },
+    "72": {
+      "irId": 72,
+      "raw": "||ib.adnxs.com^",
+      "list": "404ad-base",
+      "line": 77,
+      "priority": 10,
+      "shadow": false,
+      "riskScore": 10,
+      "riskBand": "low",
+      "riskFactors": [
+        "matches all subresource types",
+        "any party",
+        "anchored to a specific host"
+      ]
+    },
+    "73": {
+      "irId": 73,
+      "raw": "||id5-sync.com^$third-party",
+      "list": "404ad-tracking",
+      "line": 72,
+      "priority": 10,
+      "shadow": false,
+      "riskScore": 0,
+      "riskBand": "low",
+      "riskFactors": [
+        "matches all subresource types",
+        "third-party only",
+        "anchored to a specific host"
+      ]
+    },
+    "74": {
+      "irId": 74,
+      "raw": "||indexww.com^$third-party",
+      "list": "404ad-base",
+      "line": 37,
+      "priority": 10,
+      "shadow": false,
+      "riskScore": 0,
+      "riskBand": "low",
+      "riskFactors": [
+        "matches all subresource types",
+        "third-party only",
+        "anchored to a specific host"
+      ]
+    },
+    "75": {
+      "irId": 75,
+      "raw": "||inmobi.com^$third-party",
+      "list": "404ad-base",
+      "line": 48,
+      "priority": 10,
+      "shadow": false,
+      "riskScore": 0,
+      "riskBand": "low",
+      "riskFactors": [
+        "matches all subresource types",
+        "third-party only",
+        "anchored to a specific host"
+      ]
+    },
+    "76": {
+      "irId": 76,
+      "raw": "||inspectlet.com^",
+      "list": "404ad-tracking",
+      "line": 40,
+      "priority": 10,
+      "shadow": false,
+      "riskScore": 10,
+      "riskBand": "low",
+      "riskFactors": [
+        "matches all subresource types",
+        "any party",
+        "anchored to a specific host"
+      ]
+    },
+    "77": {
+      "irId": 77,
+      "raw": "||iovation.com^$third-party",
+      "list": "404ad-tracking",
+      "line": 68,
+      "priority": 10,
+      "shadow": false,
+      "riskScore": 0,
+      "riskBand": "low",
+      "riskFactors": [
+        "matches all subresource types",
+        "third-party only",
+        "anchored to a specific host"
+      ]
+    },
+    "78": {
+      "irId": 78,
+      "raw": "||kissmetrics.com^$third-party",
+      "list": "404ad-tracking",
+      "line": 19,
+      "priority": 10,
+      "shadow": false,
+      "riskScore": 0,
+      "riskBand": "low",
+      "riskFactors": [
+        "matches all subresource types",
+        "third-party only",
+        "anchored to a specific host"
+      ]
+    },
+    "79": {
+      "irId": 79,
+      "raw": "||lijit.com^$third-party",
+      "list": "404ad-base",
+      "line": 36,
+      "priority": 10,
+      "shadow": false,
+      "riskScore": 0,
+      "riskBand": "low",
+      "riskFactors": [
+        "matches all subresource types",
+        "third-party only",
+        "anchored to a specific host"
+      ]
+    },
+    "80": {
+      "irId": 80,
+      "raw": "||logrocket.com^",
+      "list": "404ad-tracking",
+      "line": 43,
+      "priority": 10,
+      "shadow": false,
+      "riskScore": 10,
+      "riskBand": "low",
+      "riskFactors": [
+        "matches all subresource types",
+        "any party",
+        "anchored to a specific host"
+      ]
+    },
+    "81": {
+      "irId": 81,
+      "raw": "||luckyorange.com^",
+      "list": "404ad-tracking",
+      "line": 39,
+      "priority": 10,
+      "shadow": false,
+      "riskScore": 10,
+      "riskBand": "low",
+      "riskFactors": [
+        "matches all subresource types",
+        "any party",
+        "anchored to a specific host"
+      ]
+    },
+    "82": {
+      "irId": 82,
+      "raw": "||matomo.cloud^$third-party",
+      "list": "404ad-tracking",
+      "line": 17,
+      "priority": 10,
+      "shadow": false,
+      "riskScore": 0,
+      "riskBand": "low",
+      "riskFactors": [
+        "matches all subresource types",
+        "third-party only",
+        "anchored to a specific host"
+      ]
+    },
+    "83": {
+      "irId": 83,
+      "raw": "||media.net^$third-party",
+      "list": "404ad-base",
+      "line": 38,
+      "priority": 10,
+      "shadow": false,
+      "riskScore": 0,
+      "riskBand": "low",
+      "riskFactors": [
+        "matches all subresource types",
+        "third-party only",
+        "anchored to a specific host"
+      ]
+    },
+    "84": {
+      "irId": 84,
+      "raw": "||mgid.com^$third-party",
+      "list": "404ad-base",
+      "line": 29,
+      "priority": 10,
+      "shadow": false,
+      "riskScore": 0,
+      "riskBand": "low",
+      "riskFactors": [
+        "matches all subresource types",
+        "third-party only"
+      ]
+    },
+    "85": {
+      "irId": 85,
+      "raw": "||mixpanel.com^$third-party",
+      "list": "404ad-tracking",
+      "line": 13,
+      "priority": 10,
+      "shadow": false,
+      "riskScore": 0,
+      "riskBand": "low",
+      "riskFactors": [
+        "matches all subresource types",
+        "third-party only",
+        "anchored to a specific host"
+      ]
+    },
+    "86": {
+      "irId": 86,
+      "raw": "||moatads.com^$third-party",
+      "list": "404ad-base",
+      "line": 56,
+      "priority": 10,
+      "shadow": false,
+      "riskScore": 0,
+      "riskBand": "low",
+      "riskFactors": [
+        "matches all subresource types",
+        "third-party only",
+        "anchored to a specific host"
+      ]
+    },
+    "87": {
+      "irId": 87,
+      "raw": "||mouseflow.com^",
+      "list": "404ad-tracking",
+      "line": 38,
+      "priority": 10,
+      "shadow": false,
+      "riskScore": 10,
+      "riskBand": "low",
+      "riskFactors": [
+        "matches all subresource types",
+        "any party",
+        "anchored to a specific host"
+      ]
+    },
+    "88": {
+      "irId": 88,
+      "raw": "||newrelic.com/nr-*.js$script,third-party",
+      "list": "404ad-tracking",
+      "line": 26,
+      "priority": 10,
+      "shadow": false,
+      "riskScore": 0,
+      "riskBand": "low",
+      "riskFactors": [
+        "targets scripts",
+        "third-party only",
+        "long specific pattern",
+        "anchored to a specific host"
+      ]
+    },
+    "89": {
+      "irId": 89,
+      "raw": "||nr-data.net^$third-party",
+      "list": "404ad-tracking",
+      "line": 27,
+      "priority": 10,
+      "shadow": false,
+      "riskScore": 0,
+      "riskBand": "low",
+      "riskFactors": [
+        "matches all subresource types",
+        "third-party only",
+        "anchored to a specific host"
+      ]
+    },
+    "90": {
+      "irId": 90,
+      "raw": "||omtrdc.net^$third-party",
+      "list": "404ad-tracking",
+      "line": 77,
+      "priority": 10,
+      "shadow": false,
+      "riskScore": 0,
+      "riskBand": "low",
+      "riskFactors": [
+        "matches all subresource types",
+        "third-party only",
+        "anchored to a specific host"
+      ]
+    },
+    "91": {
+      "irId": 91,
+      "raw": "||onetrust.com^$third-party",
+      "list": "404ad-annoyances",
+      "line": 11,
+      "priority": 10,
+      "shadow": false,
+      "riskScore": 0,
+      "riskBand": "low",
+      "riskFactors": [
+        "matches all subresource types",
+        "third-party only",
+        "anchored to a specific host"
+      ]
+    },
+    "92": {
+      "irId": 92,
+      "raw": "||openx.net^$third-party",
+      "list": "404ad-base",
+      "line": 23,
+      "priority": 10,
+      "shadow": false,
+      "riskScore": 0,
+      "riskBand": "low",
+      "riskFactors": [
+        "matches all subresource types",
+        "third-party only",
+        "anchored to a specific host"
+      ]
+    },
+    "93": {
+      "irId": 93,
+      "raw": "||outbrain.com^$third-party",
+      "list": "404ad-base",
+      "line": 27,
+      "priority": 10,
+      "shadow": false,
+      "riskScore": 0,
+      "riskBand": "low",
+      "riskFactors": [
+        "matches all subresource types",
+        "third-party only",
+        "anchored to a specific host"
+      ]
+    },
+    "94": {
+      "irId": 94,
+      "raw": "||pagead2.googlesyndication.com^$third-party",
+      "list": "404ad-base",
+      "line": 17,
+      "priority": 10,
+      "shadow": false,
+      "riskScore": 0,
+      "riskBand": "low",
+      "riskFactors": [
+        "matches all subresource types",
+        "third-party only",
+        "long specific pattern",
+        "anchored to a specific host"
+      ]
+    },
+    "95": {
+      "irId": 95,
+      "raw": "||parsely.com^$third-party",
+      "list": "404ad-tracking",
+      "line": 25,
+      "priority": 10,
+      "shadow": false,
+      "riskScore": 0,
+      "riskBand": "low",
+      "riskFactors": [
+        "matches all subresource types",
+        "third-party only",
+        "anchored to a specific host"
+      ]
+    },
+    "96": {
+      "irId": 96,
+      "raw": "||plausible.io/api/event$xmlhttprequest,third-party",
+      "list": "404ad-tracking",
+      "line": 18,
+      "priority": 10,
+      "shadow": false,
+      "riskScore": 0,
+      "riskBand": "low",
+      "riskFactors": [
+        "targets XHR/fetch",
+        "third-party only",
+        "long specific pattern",
+        "anchored to a specific host"
+      ]
+    },
+    "97": {
+      "irId": 97,
+      "raw": "||popads.net^$third-party",
+      "list": "404ad-base",
+      "line": 64,
+      "priority": 10,
+      "shadow": false,
+      "riskScore": 0,
+      "riskBand": "low",
+      "riskFactors": [
+        "matches all subresource types",
+        "third-party only",
+        "anchored to a specific host"
+      ]
+    },
+    "98": {
+      "irId": 98,
+      "raw": "||prebid.org^$script,third-party",
+      "list": "404ad-base",
+      "line": 71,
+      "priority": 10,
+      "shadow": false,
+      "riskScore": 0,
+      "riskBand": "low",
+      "riskFactors": [
+        "targets scripts",
+        "third-party only",
+        "anchored to a specific host"
+      ]
+    },
+    "99": {
+      "irId": 99,
+      "raw": "||privacymanager.io^$third-party",
+      "list": "404ad-annoyances",
+      "line": 19,
+      "priority": 10,
+      "shadow": false,
+      "riskScore": 0,
+      "riskBand": "low",
+      "riskFactors": [
+        "matches all subresource types",
+        "third-party only",
+        "anchored to a specific host"
+      ]
+    },
+    "100": {
+      "irId": 100,
+      "raw": "||propellerads.com^$third-party",
+      "list": "404ad-base",
+      "line": 63,
+      "priority": 10,
+      "shadow": false,
+      "riskScore": 0,
+      "riskBand": "low",
+      "riskFactors": [
+        "matches all subresource types",
+        "third-party only",
+        "anchored to a specific host"
+      ]
+    },
+    "101": {
+      "irId": 101,
+      "raw": "||pubmatic.com^$third-party",
+      "list": "404ad-base",
+      "line": 22,
+      "priority": 10,
+      "shadow": false,
+      "riskScore": 0,
+      "riskBand": "low",
+      "riskFactors": [
+        "matches all subresource types",
+        "third-party only",
+        "anchored to a specific host"
+      ]
+    },
+    "102": {
+      "irId": 102,
+      "raw": "||px.ads.linkedin.com^$third-party",
+      "list": "404ad-tracking",
+      "line": 56,
+      "priority": 10,
+      "shadow": false,
+      "riskScore": 0,
+      "riskBand": "low",
+      "riskFactors": [
+        "matches all subresource types",
+        "third-party only",
+        "long specific pattern",
+        "anchored to a specific host"
+      ]
+    },
+    "103": {
+      "irId": 103,
+      "raw": "||quantcast.mgr.consensu.org^$third-party",
+      "list": "404ad-annoyances",
+      "line": 14,
+      "priority": 10,
+      "shadow": false,
+      "riskScore": 0,
+      "riskBand": "low",
+      "riskFactors": [
+        "matches all subresource types",
+        "third-party only",
+        "long specific pattern",
+        "anchored to a specific host"
+      ]
+    },
+    "104": {
+      "irId": 104,
+      "raw": "||quantserve.com^$third-party",
+      "list": "404ad-tracking",
+      "line": 20,
+      "priority": 10,
+      "shadow": false,
+      "riskScore": 0,
+      "riskBand": "low",
+      "riskFactors": [
+        "matches all subresource types",
+        "third-party only",
+        "anchored to a specific host"
+      ]
+    },
+    "105": {
+      "irId": 105,
+      "raw": "||quantummetric.com^",
+      "list": "404ad-tracking",
+      "line": 44,
+      "priority": 10,
+      "shadow": false,
+      "riskScore": 10,
+      "riskBand": "low",
+      "riskFactors": [
+        "matches all subresource types",
+        "any party",
+        "anchored to a specific host"
+      ]
+    },
+    "106": {
+      "irId": 106,
+      "raw": "||revcontent.com^$third-party",
+      "list": "404ad-base",
+      "line": 28,
+      "priority": 10,
+      "shadow": false,
+      "riskScore": 0,
+      "riskBand": "low",
+      "riskFactors": [
+        "matches all subresource types",
+        "third-party only",
+        "anchored to a specific host"
+      ]
+    },
+    "107": {
+      "irId": 107,
+      "raw": "||rubiconproject.com^$third-party",
+      "list": "404ad-base",
+      "line": 21,
+      "priority": 10,
+      "shadow": false,
+      "riskScore": 0,
+      "riskBand": "low",
+      "riskFactors": [
+        "matches all subresource types",
+        "third-party only",
+        "anchored to a specific host"
+      ]
+    },
+    "108": {
+      "irId": 108,
+      "raw": "||scorecardresearch.com^$third-party",
+      "list": "404ad-tracking",
+      "line": 21,
+      "priority": 10,
+      "shadow": false,
+      "riskScore": 0,
+      "riskBand": "low",
+      "riskFactors": [
+        "matches all subresource types",
+        "third-party only",
+        "long specific pattern",
+        "anchored to a specific host"
+      ]
+    },
+    "109": {
+      "irId": 109,
+      "raw": "||securepubads.g.doubleclick.net^$script",
+      "list": "404ad-base",
+      "line": 90,
+      "priority": 10,
+      "shadow": false,
+      "riskScore": 8,
+      "riskBand": "low",
+      "riskFactors": [
+        "targets scripts",
+        "any party",
+        "long specific pattern",
+        "anchored to a specific host"
+      ]
+    },
+    "110": {
+      "irId": 110,
+      "raw": "||segment.com/analytics.js$script,third-party",
+      "list": "404ad-tracking",
+      "line": 12,
+      "priority": 10,
+      "shadow": false,
+      "riskScore": 0,
+      "riskBand": "low",
+      "riskFactors": [
+        "targets scripts",
+        "third-party only",
+        "long specific pattern",
+        "anchored to a specific host"
+      ]
+    },
+    "111": {
+      "irId": 111,
+      "raw": "||segment.io^$third-party",
+      "list": "404ad-tracking",
+      "line": 11,
+      "priority": 10,
+      "shadow": false,
+      "riskScore": 0,
+      "riskBand": "low",
+      "riskFactors": [
+        "matches all subresource types",
+        "third-party only",
+        "anchored to a specific host"
+      ]
+    },
+    "112": {
+      "irId": 112,
+      "raw": "||sentry.io/api/*/envelope/$xmlhttprequest,third-party",
+      "list": "404ad-tracking",
+      "line": 29,
+      "priority": 10,
+      "shadow": false,
+      "riskScore": 0,
+      "riskBand": "low",
+      "riskFactors": [
+        "targets XHR/fetch",
+        "third-party only",
+        "long specific pattern",
+        "anchored to a specific host"
+      ]
+    },
+    "113": {
+      "irId": 113,
+      "raw": "||serving-sys.com^$third-party",
+      "list": "404ad-base",
+      "line": 57,
+      "priority": 10,
+      "shadow": false,
+      "riskScore": 0,
+      "riskBand": "low",
+      "riskFactors": [
+        "matches all subresource types",
+        "third-party only",
+        "anchored to a specific host"
+      ]
+    },
+    "114": {
+      "irId": 114,
+      "raw": "||sessioncam.com^",
+      "list": "404ad-tracking",
+      "line": 46,
+      "priority": 10,
+      "shadow": false,
+      "riskScore": 10,
+      "riskBand": "low",
+      "riskFactors": [
+        "matches all subresource types",
+        "any party",
+        "anchored to a specific host"
+      ]
+    },
+    "115": {
+      "irId": 115,
+      "raw": "||sharethrough.com^$third-party",
+      "list": "404ad-base",
+      "line": 32,
+      "priority": 10,
+      "shadow": false,
+      "riskScore": 0,
+      "riskBand": "low",
+      "riskFactors": [
+        "matches all subresource types",
+        "third-party only",
+        "anchored to a specific host"
+      ]
+    },
+    "116": {
+      "irId": 116,
+      "raw": "||sizmek.com^$third-party",
+      "list": "404ad-base",
+      "line": 59,
+      "priority": 10,
+      "shadow": false,
+      "riskScore": 0,
+      "riskBand": "low",
+      "riskFactors": [
+        "matches all subresource types",
+        "third-party only",
+        "anchored to a specific host"
+      ]
+    },
+    "117": {
+      "irId": 117,
+      "raw": "||smaato.net^$third-party",
+      "list": "404ad-base",
+      "line": 49,
+      "priority": 10,
+      "shadow": false,
+      "riskScore": 0,
+      "riskBand": "low",
+      "riskFactors": [
+        "matches all subresource types",
+        "third-party only",
+        "anchored to a specific host"
+      ]
+    },
+    "118": {
+      "irId": 118,
+      "raw": "||smartadserver.com^$third-party",
+      "list": "404ad-base",
+      "line": 30,
+      "priority": 10,
+      "shadow": false,
+      "riskScore": 0,
+      "riskBand": "low",
+      "riskFactors": [
+        "matches all subresource types",
+        "third-party only",
+        "anchored to a specific host"
+      ]
+    },
+    "119": {
+      "irId": 119,
+      "raw": "||smartlook.com^",
+      "list": "404ad-tracking",
+      "line": 42,
+      "priority": 10,
+      "shadow": false,
+      "riskScore": 10,
+      "riskBand": "low",
+      "riskFactors": [
+        "matches all subresource types",
+        "any party",
+        "anchored to a specific host"
+      ]
+    },
+    "120": {
+      "irId": 120,
+      "raw": "||snap.licdn.com^$third-party",
+      "list": "404ad-tracking",
+      "line": 55,
+      "priority": 10,
+      "shadow": false,
+      "riskScore": 0,
+      "riskBand": "low",
+      "riskFactors": [
+        "matches all subresource types",
+        "third-party only",
+        "anchored to a specific host"
+      ]
+    },
+    "121": {
+      "irId": 121,
+      "raw": "||sourcepoint.mgr.consensu.org^$third-party",
+      "list": "404ad-annoyances",
+      "line": 18,
+      "priority": 10,
+      "shadow": false,
+      "riskScore": 0,
+      "riskBand": "low",
+      "riskFactors": [
+        "matches all subresource types",
+        "third-party only",
+        "long specific pattern",
+        "anchored to a specific host"
+      ]
+    },
+    "122": {
+      "irId": 122,
+      "raw": "||sovrn.com^$third-party",
+      "list": "404ad-base",
+      "line": 35,
+      "priority": 10,
+      "shadow": false,
+      "riskScore": 0,
+      "riskBand": "low",
+      "riskFactors": [
+        "matches all subresource types",
+        "third-party only",
+        "anchored to a specific host"
+      ]
+    },
+    "123": {
+      "irId": 123,
+      "raw": "||spotxchange.com^$third-party",
+      "list": "404ad-base",
+      "line": 41,
+      "priority": 10,
+      "shadow": false,
+      "riskScore": 0,
+      "riskBand": "low",
+      "riskFactors": [
+        "matches all subresource types",
+        "third-party only",
+        "anchored to a specific host"
+      ]
+    },
+    "124": {
+      "irId": 124,
+      "raw": "||springserve.com^$third-party",
+      "list": "404ad-base",
+      "line": 42,
+      "priority": 10,
+      "shadow": false,
+      "riskScore": 0,
+      "riskBand": "low",
+      "riskFactors": [
+        "matches all subresource types",
+        "third-party only",
+        "anchored to a specific host"
+      ]
+    },
+    "125": {
+      "irId": 125,
+      "raw": "||static.ads-twitter.com^$third-party",
+      "list": "404ad-tracking",
+      "line": 59,
+      "priority": 10,
+      "shadow": false,
+      "riskScore": 0,
+      "riskBand": "low",
+      "riskFactors": [
+        "matches all subresource types",
+        "third-party only",
+        "long specific pattern",
+        "anchored to a specific host"
+      ]
+    },
+    "126": {
+      "irId": 126,
+      "raw": "||stats.g.doubleclick.net^$third-party",
+      "list": "404ad-tracking",
+      "line": 10,
+      "priority": 10,
+      "shadow": false,
+      "riskScore": 0,
+      "riskBand": "low",
+      "riskFactors": [
+        "matches all subresource types",
+        "third-party only",
+        "long specific pattern",
+        "anchored to a specific host"
+      ]
+    },
+    "127": {
+      "irId": 127,
+      "raw": "||taboola.com^$third-party",
+      "list": "404ad-base",
+      "line": 26,
+      "priority": 10,
+      "shadow": false,
+      "riskScore": 0,
+      "riskBand": "low",
+      "riskFactors": [
+        "matches all subresource types",
+        "third-party only",
+        "anchored to a specific host"
+      ]
+    },
+    "128": {
+      "irId": 128,
+      "raw": "||tapjoy.com^$third-party",
+      "list": "404ad-base",
+      "line": 55,
+      "priority": 10,
+      "shadow": false,
+      "riskScore": 0,
+      "riskBand": "low",
+      "riskFactors": [
+        "matches all subresource types",
+        "third-party only",
+        "anchored to a specific host"
+      ]
+    },
+    "129": {
+      "irId": 129,
+      "raw": "||teads.tv^$third-party",
+      "list": "404ad-base",
+      "line": 40,
+      "priority": 10,
+      "shadow": false,
+      "riskScore": 0,
+      "riskBand": "low",
+      "riskFactors": [
+        "matches all subresource types",
+        "third-party only"
+      ]
+    },
+    "130": {
+      "irId": 130,
+      "raw": "||threatmetrix.com^$third-party",
+      "list": "404ad-tracking",
+      "line": 69,
+      "priority": 10,
+      "shadow": false,
+      "riskScore": 0,
+      "riskBand": "low",
+      "riskFactors": [
+        "matches all subresource types",
+        "third-party only",
+        "anchored to a specific host"
+      ]
+    },
+    "131": {
+      "irId": 131,
+      "raw": "||trustarc.com^$third-party",
+      "list": "404ad-annoyances",
+      "line": 15,
+      "priority": 10,
+      "shadow": false,
+      "riskScore": 0,
+      "riskBand": "low",
+      "riskFactors": [
+        "matches all subresource types",
+        "third-party only",
+        "anchored to a specific host"
+      ]
+    },
+    "132": {
+      "irId": 132,
+      "raw": "||undertone.com^$third-party",
+      "list": "404ad-base",
+      "line": 60,
+      "priority": 10,
+      "shadow": false,
+      "riskScore": 0,
+      "riskBand": "low",
+      "riskFactors": [
+        "matches all subresource types",
+        "third-party only",
+        "anchored to a specific host"
+      ]
+    },
+    "133": {
+      "irId": 133,
+      "raw": "||unityads.unity3d.com^$third-party",
+      "list": "404ad-base",
+      "line": 51,
+      "priority": 10,
+      "shadow": false,
+      "riskScore": 0,
+      "riskBand": "low",
+      "riskFactors": [
+        "matches all subresource types",
+        "third-party only",
+        "long specific pattern",
+        "anchored to a specific host"
+      ]
+    },
+    "134": {
+      "irId": 134,
+      "raw": "||usercentrics.eu^$third-party",
+      "list": "404ad-annoyances",
+      "line": 16,
+      "priority": 10,
+      "shadow": false,
+      "riskScore": 0,
+      "riskBand": "low",
+      "riskFactors": [
+        "matches all subresource types",
+        "third-party only",
+        "anchored to a specific host"
+      ]
+    },
+    "135": {
+      "irId": 135,
+      "raw": "||vungle.com^$third-party",
+      "list": "404ad-base",
+      "line": 52,
+      "priority": 10,
+      "shadow": false,
+      "riskScore": 0,
+      "riskBand": "low",
+      "riskFactors": [
+        "matches all subresource types",
+        "third-party only",
+        "anchored to a specific host"
+      ]
+    },
+    "136": {
+      "irId": 136,
+      "raw": "||yieldmo.com^$third-party",
+      "list": "404ad-base",
+      "line": 39,
+      "priority": 10,
+      "shadow": false,
+      "riskScore": 0,
+      "riskBand": "low",
+      "riskFactors": [
+        "matches all subresource types",
+        "third-party only",
+        "anchored to a specific host"
+      ]
+    },
+    "137": {
+      "irId": 137,
+      "raw": "||youtube.com/api/stats/ads$xmlhttprequest",
+      "list": "404ad-youtube",
+      "line": 13,
+      "priority": 10,
+      "shadow": false,
+      "riskScore": 6,
+      "riskBand": "low",
+      "riskFactors": [
+        "targets XHR/fetch",
+        "any party",
+        "long specific pattern",
+        "anchored to a specific host"
+      ]
+    },
+    "138": {
+      "irId": 138,
+      "raw": "||youtube.com/api/stats/qoe$xmlhttprequest",
+      "list": "404ad-youtube",
+      "line": 16,
+      "priority": 10,
+      "shadow": false,
+      "riskScore": 6,
+      "riskBand": "low",
+      "riskFactors": [
+        "targets XHR/fetch",
+        "any party",
+        "long specific pattern",
+        "anchored to a specific host"
+      ]
+    },
+    "139": {
+      "irId": 139,
+      "raw": "||youtube.com/get_midroll_info$xmlhttprequest",
+      "list": "404ad-youtube",
+      "line": 20,
+      "priority": 10,
+      "shadow": false,
+      "riskScore": 6,
+      "riskBand": "low",
+      "riskFactors": [
+        "targets XHR/fetch",
+        "any party",
+        "long specific pattern",
+        "anchored to a specific host"
+      ]
+    },
+    "140": {
+      "irId": 140,
+      "raw": "||youtube.com/pagead/$xmlhttprequest",
+      "list": "404ad-youtube",
+      "line": 14,
+      "priority": 10,
+      "shadow": false,
+      "riskScore": 16,
+      "riskBand": "low",
+      "riskFactors": [
+        "targets XHR/fetch",
+        "any party",
+        "anchored to a specific host"
+      ]
+    },
+    "141": {
+      "irId": 141,
+      "raw": "||youtube.com/ptracking$xmlhttprequest",
+      "list": "404ad-youtube",
+      "line": 15,
+      "priority": 10,
+      "shadow": false,
+      "riskScore": 6,
+      "riskBand": "low",
+      "riskFactors": [
+        "targets XHR/fetch",
+        "any party",
+        "long specific pattern",
+        "anchored to a specific host"
+      ]
+    },
+    "142": {
+      "irId": 142,
+      "raw": "||youtube.com/youtubei/v1/log_event$xmlhttprequest",
+      "list": "404ad-youtube",
+      "line": 17,
+      "priority": 10,
+      "shadow": false,
+      "riskScore": 6,
+      "riskBand": "low",
+      "riskFactors": [
+        "targets XHR/fetch",
+        "any party",
+        "long specific pattern",
+        "anchored to a specific host"
+      ]
+    },
+    "143": {
+      "irId": 143,
+      "raw": "||zedo.com^$third-party",
+      "list": "404ad-base",
+      "line": 61,
+      "priority": 10,
+      "shadow": false,
+      "riskScore": 0,
+      "riskBand": "low",
+      "riskFactors": [
+        "matches all subresource types",
+        "third-party only"
+      ]
+    },
+    "144": {
+      "irId": 144,
+      "raw": "$removeparam=_hsenc",
+      "list": "404ad-tracking",
+      "line": 100,
+      "priority": 5,
+      "shadow": false,
+      "riskScore": 5,
+      "riskBand": "low",
+      "riskFactors": [
+        "strips named query parameters"
+      ]
+    },
+    "145": {
+      "irId": 145,
+      "raw": "$removeparam=_hsmi",
+      "list": "404ad-tracking",
+      "line": 101,
+      "priority": 5,
+      "shadow": false,
+      "riskScore": 5,
+      "riskBand": "low",
+      "riskFactors": [
+        "strips named query parameters"
+      ]
+    },
+    "146": {
+      "irId": 146,
+      "raw": "$removeparam=_openstat",
+      "list": "404ad-tracking",
+      "line": 104,
+      "priority": 5,
+      "shadow": false,
+      "riskScore": 5,
+      "riskBand": "low",
+      "riskFactors": [
+        "strips named query parameters"
+      ]
+    },
+    "147": {
+      "irId": 147,
+      "raw": "$removeparam=dclid",
+      "list": "404ad-tracking",
+      "line": 91,
+      "priority": 5,
+      "shadow": false,
+      "riskScore": 5,
+      "riskBand": "low",
+      "riskFactors": [
+        "strips named query parameters"
+      ]
+    },
+    "148": {
+      "irId": 148,
+      "raw": "$removeparam=fbclid",
+      "list": "404ad-tracking",
+      "line": 94,
+      "priority": 5,
+      "shadow": false,
+      "riskScore": 5,
+      "riskBand": "low",
+      "riskFactors": [
+        "strips named query parameters"
+      ]
+    },
+    "149": {
+      "irId": 149,
+      "raw": "$removeparam=gbraid",
+      "list": "404ad-tracking",
+      "line": 92,
+      "priority": 5,
+      "shadow": false,
+      "riskScore": 5,
+      "riskBand": "low",
+      "riskFactors": [
+        "strips named query parameters"
+      ]
+    },
+    "150": {
+      "irId": 150,
+      "raw": "$removeparam=gclid",
+      "list": "404ad-tracking",
+      "line": 89,
+      "priority": 5,
+      "shadow": false,
+      "riskScore": 5,
+      "riskBand": "low",
+      "riskFactors": [
+        "strips named query parameters"
+      ]
+    },
+    "151": {
+      "irId": 151,
+      "raw": "$removeparam=gclsrc",
+      "list": "404ad-tracking",
+      "line": 90,
+      "priority": 5,
+      "shadow": false,
+      "riskScore": 5,
+      "riskBand": "low",
+      "riskFactors": [
+        "strips named query parameters"
+      ]
+    },
+    "152": {
+      "irId": 152,
+      "raw": "$removeparam=igshid",
+      "list": "404ad-tracking",
+      "line": 98,
+      "priority": 5,
+      "shadow": false,
+      "riskScore": 5,
+      "riskBand": "low",
+      "riskFactors": [
+        "strips named query parameters"
+      ]
+    },
+    "153": {
+      "irId": 153,
+      "raw": "$removeparam=mc_eid",
+      "list": "404ad-tracking",
+      "line": 99,
+      "priority": 5,
+      "shadow": false,
+      "riskScore": 5,
+      "riskBand": "low",
+      "riskFactors": [
+        "strips named query parameters"
+      ]
+    },
+    "154": {
+      "irId": 154,
+      "raw": "$removeparam=msclkid",
+      "list": "404ad-tracking",
+      "line": 95,
+      "priority": 5,
+      "shadow": false,
+      "riskScore": 5,
+      "riskBand": "low",
+      "riskFactors": [
+        "strips named query parameters"
+      ]
+    },
+    "155": {
+      "irId": 155,
+      "raw": "$removeparam=ttclid",
+      "list": "404ad-tracking",
+      "line": 97,
+      "priority": 5,
+      "shadow": false,
+      "riskScore": 5,
+      "riskBand": "low",
+      "riskFactors": [
+        "strips named query parameters"
+      ]
+    },
+    "156": {
+      "irId": 156,
+      "raw": "$removeparam=twclid",
+      "list": "404ad-tracking",
+      "line": 96,
+      "priority": 5,
+      "shadow": false,
+      "riskScore": 5,
+      "riskBand": "low",
+      "riskFactors": [
+        "strips named query parameters"
+      ]
+    },
+    "157": {
+      "irId": 157,
+      "raw": "$removeparam=utm_campaign",
+      "list": "404ad-tracking",
+      "line": 85,
+      "priority": 5,
+      "shadow": false,
+      "riskScore": 5,
+      "riskBand": "low",
+      "riskFactors": [
+        "strips named query parameters"
+      ]
+    },
+    "158": {
+      "irId": 158,
+      "raw": "$removeparam=utm_content",
+      "list": "404ad-tracking",
+      "line": 87,
+      "priority": 5,
+      "shadow": false,
+      "riskScore": 5,
+      "riskBand": "low",
+      "riskFactors": [
+        "strips named query parameters"
+      ]
+    },
+    "159": {
+      "irId": 159,
+      "raw": "$removeparam=utm_id",
+      "list": "404ad-tracking",
+      "line": 88,
+      "priority": 5,
+      "shadow": false,
+      "riskScore": 5,
+      "riskBand": "low",
+      "riskFactors": [
+        "strips named query parameters"
+      ]
+    },
+    "160": {
+      "irId": 160,
+      "raw": "$removeparam=utm_medium",
+      "list": "404ad-tracking",
+      "line": 84,
+      "priority": 5,
+      "shadow": false,
+      "riskScore": 5,
+      "riskBand": "low",
+      "riskFactors": [
+        "strips named query parameters"
+      ]
+    },
+    "161": {
+      "irId": 161,
+      "raw": "$removeparam=utm_source",
+      "list": "404ad-tracking",
+      "line": 83,
+      "priority": 5,
+      "shadow": false,
+      "riskScore": 5,
+      "riskBand": "low",
+      "riskFactors": [
+        "strips named query parameters"
+      ]
+    },
+    "162": {
+      "irId": 162,
+      "raw": "$removeparam=utm_term",
+      "list": "404ad-tracking",
+      "line": 86,
+      "priority": 5,
+      "shadow": false,
+      "riskScore": 5,
+      "riskBand": "low",
+      "riskFactors": [
+        "strips named query parameters"
+      ]
+    },
+    "163": {
+      "irId": 163,
+      "raw": "$removeparam=vero_id",
+      "list": "404ad-tracking",
+      "line": 102,
+      "priority": 5,
+      "shadow": false,
+      "riskScore": 5,
+      "riskBand": "low",
+      "riskFactors": [
+        "strips named query parameters"
+      ]
+    },
+    "164": {
+      "irId": 164,
+      "raw": "$removeparam=wbraid",
+      "list": "404ad-tracking",
+      "line": 93,
+      "priority": 5,
+      "shadow": false,
+      "riskScore": 5,
+      "riskBand": "low",
+      "riskFactors": [
+        "strips named query parameters"
+      ]
+    },
+    "165": {
+      "irId": 165,
+      "raw": "$removeparam=yclid",
+      "list": "404ad-tracking",
+      "line": 103,
+      "priority": 5,
+      "shadow": false,
+      "riskScore": 5,
+      "riskBand": "low",
+      "riskFactors": [
+        "strips named query parameters"
+      ]
+    },
+    "166": {
+      "irId": 166,
+      "raw": "*$ping,third-party",
+      "list": "404ad-tracking",
+      "line": 109,
+      "priority": 10,
+      "shadow": false,
+      "riskScore": 24,
+      "riskBand": "low",
+      "riskFactors": [
+        "third-party only",
+        "very short pattern",
+        "wildcard pattern"
+      ]
+    },
+    "167": {
+      "irId": 167,
+      "raw": "/ad-choices.$image,third-party",
+      "list": "404ad-base",
+      "line": 86,
+      "priority": 10,
+      "shadow": false,
+      "riskScore": 0,
+      "riskBand": "low",
+      "riskFactors": [
+        "third-party only"
+      ]
+    },
+    "168": {
+      "irId": 168,
+      "raw": "/adframe/*$subdocument,third-party",
+      "list": "404ad-base",
+      "line": 84,
+      "priority": 10,
+      "shadow": false,
+      "riskScore": 0,
+      "riskBand": "low",
+      "riskFactors": [
+        "targets subframes",
+        "third-party only"
+      ]
+    },
+    "169": {
+      "irId": 169,
+      "raw": "/adserver/*$script,third-party",
+      "list": "404ad-base",
+      "line": 85,
+      "priority": 10,
+      "shadow": false,
+      "riskScore": 4,
+      "riskBand": "low",
+      "riskFactors": [
+        "targets scripts",
+        "third-party only"
+      ]
+    },
+    "170": {
+      "irId": 170,
+      "raw": "/banners/ads/*$image,third-party",
+      "list": "404ad-base",
+      "line": 87,
+      "priority": 10,
+      "shadow": false,
+      "riskScore": 0,
+      "riskBand": "low",
+      "riskFactors": [
+        "third-party only"
+      ]
+    },
+    "171": {
+      "irId": 171,
+      "raw": "/pagead/conversion/*$script,third-party",
+      "list": "404ad-base",
+      "line": 89,
+      "priority": 10,
+      "shadow": false,
+      "riskScore": 4,
+      "riskBand": "low",
+      "riskFactors": [
+        "targets scripts",
+        "third-party only"
+      ]
+    },
+    "172": {
+      "irId": 172,
+      "raw": "/pagead/js/adsbygoogle.js$script",
+      "list": "404ad-base",
+      "line": 88,
+      "priority": 10,
+      "shadow": false,
+      "riskScore": 16,
+      "riskBand": "low",
+      "riskFactors": [
+        "targets scripts",
+        "any party",
+        "long specific pattern"
+      ]
+    },
+    "173": {
+      "irId": 173,
+      "raw": "||ads.linkedin.com^$third-party",
+      "list": "404ad-candidates",
+      "line": 11,
+      "priority": 1,
+      "shadow": true,
+      "riskScore": 0,
+      "riskBand": "low",
+      "riskFactors": [
+        "matches all subresource types",
+        "third-party only",
+        "anchored to a specific host"
+      ]
+    },
+    "174": {
+      "irId": 174,
+      "raw": "||adsafeprotected.com^$third-party",
+      "list": "404ad-candidates",
+      "line": 10,
+      "priority": 1,
+      "shadow": true,
+      "riskScore": 0,
+      "riskBand": "low",
+      "riskFactors": [
+        "matches all subresource types",
+        "third-party only",
+        "long specific pattern",
+        "anchored to a specific host"
+      ]
+    },
+    "175": {
+      "irId": 175,
+      "raw": "||analytics.yahoo.com^$third-party",
+      "list": "404ad-candidates",
+      "line": 12,
+      "priority": 1,
+      "shadow": true,
+      "riskScore": 0,
+      "riskBand": "low",
+      "riskFactors": [
+        "matches all subresource types",
+        "third-party only",
+        "long specific pattern",
+        "anchored to a specific host"
+      ]
+    },
+    "176": {
+      "irId": 176,
+      "raw": "||branch.io^$third-party",
+      "list": "404ad-candidates",
+      "line": 13,
+      "priority": 1,
+      "shadow": true,
+      "riskScore": 0,
+      "riskBand": "low",
+      "riskFactors": [
+        "matches all subresource types",
+        "third-party only",
+        "anchored to a specific host"
+      ]
+    },
+    "177": {
+      "irId": 177,
+      "raw": "||braze.com^$third-party",
+      "list": "404ad-candidates",
+      "line": 14,
+      "priority": 1,
+      "shadow": true,
+      "riskScore": 0,
+      "riskBand": "low",
+      "riskFactors": [
+        "matches all subresource types",
+        "third-party only",
+        "anchored to a specific host"
+      ]
+    },
+    "178": {
+      "irId": 178,
+      "raw": "||cdn.cookielaw.org^$third-party",
+      "list": "404ad-candidates",
+      "line": 16,
+      "priority": 1,
+      "shadow": true,
+      "riskScore": 0,
+      "riskBand": "low",
+      "riskFactors": [
+        "matches all subresource types",
+        "third-party only",
+        "anchored to a specific host"
+      ]
+    },
+    "179": {
+      "irId": 179,
+      "raw": "||clicktale.net^$third-party",
+      "list": "404ad-candidates",
+      "line": 15,
+      "priority": 1,
+      "shadow": true,
+      "riskScore": 0,
+      "riskBand": "low",
+      "riskFactors": [
+        "matches all subresource types",
+        "third-party only",
+        "anchored to a specific host"
+      ]
+    },
+    "180": {
+      "irId": 180,
+      "raw": "||impactradius-event.com^$third-party",
+      "list": "404ad-candidates",
+      "line": 17,
+      "priority": 1,
+      "shadow": true,
+      "riskScore": 0,
+      "riskBand": "low",
+      "riskFactors": [
+        "matches all subresource types",
+        "third-party only",
+        "long specific pattern",
+        "anchored to a specific host"
+      ]
+    },
+    "181": {
+      "irId": 181,
+      "raw": "||klaviyo.com^$script,third-party",
+      "list": "404ad-candidates",
+      "line": 18,
+      "priority": 1,
+      "shadow": true,
+      "riskScore": 0,
+      "riskBand": "low",
+      "riskFactors": [
+        "targets scripts",
+        "third-party only",
+        "anchored to a specific host"
+      ]
+    },
+    "182": {
+      "irId": 182,
+      "raw": "||onesignal.com^$third-party",
+      "list": "404ad-candidates",
+      "line": 19,
+      "priority": 1,
+      "shadow": true,
+      "riskScore": 0,
+      "riskBand": "low",
+      "riskFactors": [
+        "matches all subresource types",
+        "third-party only",
+        "anchored to a specific host"
+      ]
+    },
+    "183": {
+      "irId": 183,
+      "raw": "||pendo.io^$third-party",
+      "list": "404ad-candidates",
+      "line": 20,
+      "priority": 1,
+      "shadow": true,
+      "riskScore": 0,
+      "riskBand": "low",
+      "riskFactors": [
+        "matches all subresource types",
+        "third-party only"
+      ]
+    },
+    "184": {
+      "irId": 184,
+      "raw": "||pushwoosh.com^$third-party",
+      "list": "404ad-candidates",
+      "line": 21,
+      "priority": 1,
+      "shadow": true,
+      "riskScore": 0,
+      "riskBand": "low",
+      "riskFactors": [
+        "matches all subresource types",
+        "third-party only",
+        "anchored to a specific host"
+      ]
+    },
+    "185": {
+      "irId": 185,
+      "raw": "||rlcdn.com^$third-party",
+      "list": "404ad-candidates",
+      "line": 22,
+      "priority": 1,
+      "shadow": true,
+      "riskScore": 0,
+      "riskBand": "low",
+      "riskFactors": [
+        "matches all subresource types",
+        "third-party only",
+        "anchored to a specific host"
+      ]
+    },
+    "186": {
+      "irId": 186,
+      "raw": "||tealiumiq.com^$third-party",
+      "list": "404ad-candidates",
+      "line": 23,
+      "priority": 1,
+      "shadow": true,
+      "riskScore": 0,
+      "riskBand": "low",
+      "riskFactors": [
+        "matches all subresource types",
+        "third-party only",
+        "anchored to a specific host"
+      ]
+    },
+    "187": {
+      "irId": 187,
+      "raw": "||yandex.ru/metrika^$third-party",
+      "list": "404ad-candidates",
+      "line": 24,
+      "priority": 1,
+      "shadow": true,
+      "riskScore": 0,
+      "riskBand": "low",
+      "riskFactors": [
+        "matches all subresource types",
+        "third-party only",
+        "anchored to a specific host"
+      ]
+    },
+    "188": {
+      "irId": 188,
+      "raw": "/analytics-beacon/*$xmlhttprequest,third-party",
+      "list": "404ad-candidates",
+      "line": 25,
+      "priority": 1,
+      "shadow": true,
+      "riskScore": 2,
+      "riskBand": "low",
+      "riskFactors": [
+        "targets XHR/fetch",
+        "third-party only"
+      ]
+    },
+    "189": {
+      "irId": 189,
+      "raw": "/telemetry/collect$xmlhttprequest,third-party",
+      "list": "404ad-candidates",
+      "line": 26,
+      "priority": 1,
+      "shadow": true,
+      "riskScore": 2,
+      "riskBand": "low",
+      "riskFactors": [
+        "targets XHR/fetch",
+        "third-party only"
+      ]
+    },
+    "190": {
+      "irId": 190,
+      "raw": "@@||amazon-adsystem.com^$domain=amazon.com|amazon.co.uk|amazon.de",
+      "list": "404ad-base",
+      "line": 105,
+      "priority": 100,
+      "shadow": false,
+      "riskScore": 0,
+      "riskBand": "low",
+      "riskFactors": [
+        "exception rule"
+      ]
+    },
+    "191": {
+      "irId": 191,
+      "raw": "@@||doubleclick.net/instream/ad_status.js$script,domain=youtube.com",
+      "list": "404ad-base",
+      "line": 106,
+      "priority": 100,
+      "shadow": false,
+      "riskScore": 0,
+      "riskBand": "low",
+      "riskFactors": [
+        "exception rule"
+      ]
+    },
+    "192": {
+      "irId": 192,
+      "raw": "@@||googletagmanager.com/gtm.js$script,domain=accounts.google.com",
+      "list": "404ad-base",
+      "line": 104,
+      "priority": 100,
+      "shadow": false,
+      "riskScore": 0,
+      "riskBand": "low",
+      "riskFactors": [
+        "exception rule"
+      ]
+    },
+    "193": {
+      "irId": 193,
+      "raw": "@@||sentry.io^$domain=sentry.io",
+      "list": "404ad-tracking",
+      "line": 115,
+      "priority": 100,
+      "shadow": false,
+      "riskScore": 0,
+      "riskBand": "low",
+      "riskFactors": [
+        "exception rule"
+      ]
+    }
+  },
+  "cosmetic": {
+    "1": {
+      "irId": 1,
+      "raw": "youtube.com###masthead-ad",
+      "list": "404ad-youtube",
+      "line": 36,
+      "priority": 0,
+      "shadow": false,
+      "riskScore": 0,
+      "riskBand": "low",
+      "riskFactors": [
+        "scoped to specific sites"
+      ]
+    },
+    "2": {
+      "irId": 2,
+      "raw": "youtube.com###panels-full-bleed-container",
+      "list": "404ad-youtube",
+      "line": 38,
+      "priority": 0,
+      "shadow": false,
+      "riskScore": 0,
+      "riskBand": "low",
+      "riskFactors": [
+        "scoped to specific sites"
+      ]
+    },
+    "3": {
+      "irId": 3,
+      "raw": "youtube.com###player-ads",
+      "list": "404ad-youtube",
+      "line": 37,
+      "priority": 0,
+      "shadow": false,
+      "riskScore": 0,
+      "riskBand": "low",
+      "riskFactors": [
+        "scoped to specific sites"
+      ]
+    },
+    "4": {
+      "irId": 4,
+      "raw": "youtube.com##.ytd-merch-shelf-renderer",
+      "list": "404ad-youtube",
+      "line": 42,
+      "priority": 0,
+      "shadow": false,
+      "riskScore": 0,
+      "riskBand": "low",
+      "riskFactors": [
+        "scoped to specific sites"
+      ]
+    },
+    "5": {
+      "irId": 5,
+      "raw": "youtube.com##.ytp-ad-image-overlay",
+      "list": "404ad-youtube",
+      "line": 41,
+      "priority": 0,
+      "shadow": false,
+      "riskScore": 0,
+      "riskBand": "low",
+      "riskFactors": [
+        "scoped to specific sites"
+      ]
+    },
+    "6": {
+      "irId": 6,
+      "raw": "youtube.com##.ytp-ad-message-container",
+      "list": "404ad-youtube",
+      "line": 40,
+      "priority": 0,
+      "shadow": false,
+      "riskScore": 0,
+      "riskBand": "low",
+      "riskFactors": [
+        "scoped to specific sites"
+      ]
+    },
+    "7": {
+      "irId": 7,
+      "raw": "youtube.com##.ytp-ad-overlay-container",
+      "list": "404ad-youtube",
+      "line": 39,
+      "priority": 0,
+      "shadow": false,
+      "riskScore": 0,
+      "riskBand": "low",
+      "riskFactors": [
+        "scoped to specific sites"
+      ]
+    },
+    "8": {
+      "irId": 8,
+      "raw": "youtube.com##ytd-ad-slot-renderer",
+      "list": "404ad-youtube",
+      "line": 30,
+      "priority": 0,
+      "shadow": false,
+      "riskScore": 0,
+      "riskBand": "low",
+      "riskFactors": [
+        "scoped to specific sites"
+      ]
+    },
+    "9": {
+      "irId": 9,
+      "raw": "youtube.com##ytd-banner-promo-renderer",
+      "list": "404ad-youtube",
+      "line": 31,
+      "priority": 0,
+      "shadow": false,
+      "riskScore": 0,
+      "riskBand": "low",
+      "riskFactors": [
+        "scoped to specific sites"
+      ]
+    },
+    "10": {
+      "irId": 10,
+      "raw": "youtube.com##ytd-brand-video-shelf-renderer",
+      "list": "404ad-youtube",
+      "line": 33,
+      "priority": 0,
+      "shadow": false,
+      "riskScore": 0,
+      "riskBand": "low",
+      "riskFactors": [
+        "scoped to specific sites"
+      ]
+    },
+    "11": {
+      "irId": 11,
+      "raw": "youtube.com##ytd-brand-video-singleton-renderer",
+      "list": "404ad-youtube",
+      "line": 34,
+      "priority": 0,
+      "shadow": false,
+      "riskScore": 0,
+      "riskBand": "low",
+      "riskFactors": [
+        "scoped to specific sites"
+      ]
+    },
+    "12": {
+      "irId": 12,
+      "raw": "youtube.com##ytd-compact-promoted-video-renderer",
+      "list": "404ad-youtube",
+      "line": 28,
+      "priority": 0,
+      "shadow": false,
+      "riskScore": 0,
+      "riskBand": "low",
+      "riskFactors": [
+        "scoped to specific sites"
+      ]
+    },
+    "13": {
+      "irId": 13,
+      "raw": "youtube.com##ytd-display-ad-renderer",
+      "list": "404ad-youtube",
+      "line": 27,
+      "priority": 0,
+      "shadow": false,
+      "riskScore": 0,
+      "riskBand": "low",
+      "riskFactors": [
+        "scoped to specific sites"
+      ]
+    },
+    "14": {
+      "irId": 14,
+      "raw": "youtube.com##ytd-in-feed-ad-layout-renderer",
+      "list": "404ad-youtube",
+      "line": 29,
+      "priority": 0,
+      "shadow": false,
+      "riskScore": 0,
+      "riskBand": "low",
+      "riskFactors": [
+        "scoped to specific sites"
+      ]
+    },
+    "15": {
+      "irId": 15,
+      "raw": "youtube.com##ytd-promoted-sparkles-web-renderer",
+      "list": "404ad-youtube",
+      "line": 25,
+      "priority": 0,
+      "shadow": false,
+      "riskScore": 0,
+      "riskBand": "low",
+      "riskFactors": [
+        "scoped to specific sites"
+      ]
+    },
+    "16": {
+      "irId": 16,
+      "raw": "youtube.com##ytd-promoted-video-renderer",
+      "list": "404ad-youtube",
+      "line": 26,
+      "priority": 0,
+      "shadow": false,
+      "riskScore": 0,
+      "riskBand": "low",
+      "riskFactors": [
+        "scoped to specific sites"
+      ]
+    },
+    "17": {
+      "irId": 17,
+      "raw": "youtube.com##ytd-rich-item-renderer:has(ytd-ad-slot-renderer)",
+      "list": "404ad-youtube",
+      "line": 46,
+      "priority": 0,
+      "shadow": false,
+      "riskScore": 0,
+      "riskBand": "low",
+      "riskFactors": [
+        "scoped to specific sites",
+        "procedural selector (runtime cost)"
+      ]
+    },
+    "18": {
+      "irId": 18,
+      "raw": "youtube.com##ytd-rich-section-renderer:has(ytd-statement-banner-renderer)",
+      "list": "404ad-youtube",
+      "line": 45,
+      "priority": 0,
+      "shadow": false,
+      "riskScore": 0,
+      "riskBand": "low",
+      "riskFactors": [
+        "scoped to specific sites",
+        "procedural selector (runtime cost)"
+      ]
+    },
+    "19": {
+      "irId": 19,
+      "raw": "youtube.com##ytd-statement-banner-renderer",
+      "list": "404ad-youtube",
+      "line": 32,
+      "priority": 0,
+      "shadow": false,
+      "riskScore": 0,
+      "riskBand": "low",
+      "riskFactors": [
+        "scoped to specific sites"
+      ]
+    },
+    "20": {
+      "irId": 20,
+      "raw": "youtube.com##ytm-promoted-video-renderer",
+      "list": "404ad-youtube",
+      "line": 35,
+      "priority": 0,
+      "shadow": false,
+      "riskScore": 0,
+      "riskBand": "low",
+      "riskFactors": [
+        "scoped to specific sites"
+      ]
+    },
+    "21": {
+      "irId": 21,
+      "raw": "###CybotCookiebotDialog",
+      "list": "404ad-annoyances",
+      "line": 34,
+      "priority": 0,
+      "shadow": false,
+      "riskScore": 28,
+      "riskBand": "medium",
+      "riskFactors": [
+        "applies to every site"
+      ]
+    },
+    "22": {
+      "irId": 22,
+      "raw": "###ad-footer",
+      "list": "404ad-base",
+      "line": 137,
+      "priority": 0,
+      "shadow": false,
+      "riskScore": 28,
+      "riskBand": "medium",
+      "riskFactors": [
+        "applies to every site"
+      ]
+    },
+    "23": {
+      "irId": 23,
+      "raw": "###ad-sidebar",
+      "list": "404ad-base",
+      "line": 136,
+      "priority": 0,
+      "shadow": false,
+      "riskScore": 28,
+      "riskBand": "medium",
+      "riskFactors": [
+        "applies to every site"
+      ]
+    },
+    "24": {
+      "irId": 24,
+      "raw": "###ad-top",
+      "list": "404ad-base",
+      "line": 135,
+      "priority": 0,
+      "shadow": false,
+      "riskScore": 28,
+      "riskBand": "medium",
+      "riskFactors": [
+        "applies to every site"
+      ]
+    },
+    "25": {
+      "irId": 25,
+      "raw": "###adsense",
+      "list": "404ad-base",
+      "line": 138,
+      "priority": 0,
+      "shadow": false,
+      "riskScore": 28,
+      "riskBand": "medium",
+      "riskFactors": [
+        "applies to every site"
+      ]
+    },
+    "26": {
+      "irId": 26,
+      "raw": "###banner-ad",
+      "list": "404ad-base",
+      "line": 139,
+      "priority": 0,
+      "shadow": false,
+      "riskScore": 28,
+      "riskBand": "medium",
+      "riskFactors": [
+        "applies to every site"
+      ]
+    },
+    "27": {
+      "irId": 27,
+      "raw": "###cookiescript_injected",
+      "list": "404ad-annoyances",
+      "line": 33,
+      "priority": 0,
+      "shadow": false,
+      "riskScore": 28,
+      "riskBand": "medium",
+      "riskFactors": [
+        "applies to every site"
+      ]
+    },
+    "28": {
+      "irId": 28,
+      "raw": "###google_ads_frame",
+      "list": "404ad-base",
+      "line": 140,
+      "priority": 0,
+      "shadow": false,
+      "riskScore": 28,
+      "riskBand": "medium",
+      "riskFactors": [
+        "applies to every site"
+      ]
+    },
+    "29": {
+      "irId": 29,
+      "raw": "###onetrust-banner-sdk",
+      "list": "404ad-annoyances",
+      "line": 31,
+      "priority": 0,
+      "shadow": false,
+      "riskScore": 28,
+      "riskBand": "medium",
+      "riskFactors": [
+        "applies to every site"
+      ]
+    },
+    "30": {
+      "irId": 30,
+      "raw": "###onetrust-consent-sdk",
+      "list": "404ad-annoyances",
+      "line": 32,
+      "priority": 0,
+      "shadow": false,
+      "riskScore": 28,
+      "riskBand": "medium",
+      "riskFactors": [
+        "applies to every site"
+      ]
+    },
+    "31": {
+      "irId": 31,
+      "raw": "###sponsored-content",
+      "list": "404ad-base",
+      "line": 141,
+      "priority": 0,
+      "shadow": false,
+      "riskScore": 28,
+      "riskBand": "medium",
+      "riskFactors": [
+        "applies to every site"
+      ]
+    },
+    "32": {
+      "irId": 32,
+      "raw": "###taboola-below-article",
+      "list": "404ad-base",
+      "line": 142,
+      "priority": 0,
+      "shadow": false,
+      "riskScore": 28,
+      "riskBand": "medium",
+      "riskFactors": [
+        "applies to every site"
+      ]
+    },
+    "33": {
+      "irId": 33,
+      "raw": "###usercentrics-root",
+      "list": "404ad-annoyances",
+      "line": 35,
+      "priority": 0,
+      "shadow": false,
+      "riskScore": 28,
+      "riskBand": "medium",
+      "riskFactors": [
+        "applies to every site"
+      ]
+    },
+    "34": {
+      "irId": 34,
+      "raw": "##.ad-banner",
+      "list": "404ad-base",
+      "line": 112,
+      "priority": 0,
+      "shadow": false,
+      "riskScore": 28,
+      "riskBand": "medium",
+      "riskFactors": [
+        "applies to every site"
+      ]
+    },
+    "35": {
+      "irId": 35,
+      "raw": "##.ad-container",
+      "list": "404ad-base",
+      "line": 113,
+      "priority": 0,
+      "shadow": false,
+      "riskScore": 28,
+      "riskBand": "medium",
+      "riskFactors": [
+        "applies to every site"
+      ]
+    },
+    "36": {
+      "irId": 36,
+      "raw": "##.ad-placeholder",
+      "list": "404ad-base",
+      "line": 114,
+      "priority": 0,
+      "shadow": false,
+      "riskScore": 28,
+      "riskBand": "medium",
+      "riskFactors": [
+        "applies to every site"
+      ]
+    },
+    "37": {
+      "irId": 37,
+      "raw": "##.ad-slot",
+      "list": "404ad-base",
+      "line": 115,
+      "priority": 0,
+      "shadow": false,
+      "riskScore": 28,
+      "riskBand": "medium",
+      "riskFactors": [
+        "applies to every site"
+      ]
+    },
+    "38": {
+      "irId": 38,
+      "raw": "##.ad-wrapper",
+      "list": "404ad-base",
+      "line": 116,
+      "priority": 0,
+      "shadow": false,
+      "riskScore": 28,
+      "riskBand": "medium",
+      "riskFactors": [
+        "applies to every site"
+      ]
+    },
+    "39": {
+      "irId": 39,
+      "raw": "##.adsbygoogle",
+      "list": "404ad-base",
+      "line": 117,
+      "priority": 0,
+      "shadow": false,
+      "riskScore": 28,
+      "riskBand": "medium",
+      "riskFactors": [
+        "applies to every site"
+      ]
+    },
+    "40": {
+      "irId": 40,
+      "raw": "##.advert-container",
+      "list": "404ad-base",
+      "line": 119,
+      "priority": 0,
+      "shadow": false,
+      "riskScore": 28,
+      "riskBand": "medium",
+      "riskFactors": [
+        "applies to every site"
+      ]
+    },
+    "41": {
+      "irId": 41,
+      "raw": "##.advertisement",
+      "list": "404ad-base",
+      "line": 118,
+      "priority": 0,
+      "shadow": false,
+      "riskScore": 28,
+      "riskBand": "medium",
+      "riskFactors": [
+        "applies to every site"
+      ]
+    },
+    "42": {
+      "irId": 42,
+      "raw": "##.app-install-banner",
+      "list": "404ad-annoyances",
+      "line": 43,
+      "priority": 0,
+      "shadow": false,
+      "riskScore": 28,
+      "riskBand": "medium",
+      "riskFactors": [
+        "applies to every site"
+      ]
+    },
+    "43": {
+      "irId": 43,
+      "raw": "##.banner-ad",
+      "list": "404ad-base",
+      "line": 120,
+      "priority": 0,
+      "shadow": false,
+      "riskScore": 28,
+      "riskBand": "medium",
+      "riskFactors": [
+        "applies to every site"
+      ]
+    },
+    "44": {
+      "irId": 44,
+      "raw": "##.consent-modal",
+      "list": "404ad-annoyances",
+      "line": 30,
+      "priority": 0,
+      "shadow": false,
+      "riskScore": 28,
+      "riskBand": "medium",
+      "riskFactors": [
+        "applies to every site"
+      ]
+    },
+    "45": {
+      "irId": 45,
+      "raw": "##.cookie-banner",
+      "list": "404ad-annoyances",
+      "line": 24,
+      "priority": 0,
+      "shadow": false,
+      "riskScore": 28,
+      "riskBand": "medium",
+      "riskFactors": [
+        "applies to every site"
+      ]
+    },
+    "46": {
+      "irId": 46,
+      "raw": "##.cookie-consent",
+      "list": "404ad-annoyances",
+      "line": 25,
+      "priority": 0,
+      "shadow": false,
+      "riskScore": 28,
+      "riskBand": "medium",
+      "riskFactors": [
+        "applies to every site"
+      ]
+    },
+    "47": {
+      "irId": 47,
+      "raw": "##.cookie-notice",
+      "list": "404ad-annoyances",
+      "line": 26,
+      "priority": 0,
+      "shadow": false,
+      "riskScore": 28,
+      "riskBand": "medium",
+      "riskFactors": [
+        "applies to every site"
+      ]
+    },
+    "48": {
+      "irId": 48,
+      "raw": "##.cookie-policy-banner",
+      "list": "404ad-annoyances",
+      "line": 27,
+      "priority": 0,
+      "shadow": false,
+      "riskScore": 28,
+      "riskBand": "medium",
+      "riskFactors": [
+        "applies to every site"
+      ]
+    },
+    "49": {
+      "irId": 49,
+      "raw": "##.display-ad",
+      "list": "404ad-base",
+      "line": 121,
+      "priority": 0,
+      "shadow": false,
+      "riskScore": 28,
+      "riskBand": "medium",
+      "riskFactors": [
+        "applies to every site"
+      ]
+    },
+    "50": {
+      "irId": 50,
+      "raw": "##.email-capture-modal",
+      "list": "404ad-annoyances",
+      "line": 42,
+      "priority": 0,
+      "shadow": false,
+      "riskScore": 28,
+      "riskBand": "medium",
+      "riskFactors": [
+        "applies to every site"
+      ]
+    },
+    "51": {
+      "irId": 51,
+      "raw": "##.gdpr-banner",
+      "list": "404ad-annoyances",
+      "line": 28,
+      "priority": 0,
+      "shadow": false,
+      "riskScore": 28,
+      "riskBand": "medium",
+      "riskFactors": [
+        "applies to every site"
+      ]
+    },
+    "52": {
+      "irId": 52,
+      "raw": "##.gdpr-consent",
+      "list": "404ad-annoyances",
+      "line": 29,
+      "priority": 0,
+      "shadow": false,
+      "riskScore": 28,
+      "riskBand": "medium",
+      "riskFactors": [
+        "applies to every site"
+      ]
+    },
+    "53": {
+      "irId": 53,
+      "raw": "##.google-ad",
+      "list": "404ad-base",
+      "line": 122,
+      "priority": 0,
+      "shadow": false,
+      "riskScore": 28,
+      "riskBand": "medium",
+      "riskFactors": [
+        "applies to every site"
+      ]
+    },
+    "54": {
+      "irId": 54,
+      "raw": "##.leaderboard-ad",
+      "list": "404ad-base",
+      "line": 123,
+      "priority": 0,
+      "shadow": false,
+      "riskScore": 28,
+      "riskBand": "medium",
+      "riskFactors": [
+        "applies to every site"
+      ]
+    },
+    "55": {
+      "irId": 55,
+      "raw": "##.native-ad",
+      "list": "404ad-base",
+      "line": 124,
+      "priority": 0,
+      "shadow": false,
+      "riskScore": 28,
+      "riskBand": "medium",
+      "riskFactors": [
+        "applies to every site"
+      ]
+    },
+    "56": {
+      "irId": 56,
+      "raw": "##.newsletter-modal",
+      "list": "404ad-annoyances",
+      "line": 40,
+      "priority": 0,
+      "shadow": false,
+      "riskScore": 28,
+      "riskBand": "medium",
+      "riskFactors": [
+        "applies to every site"
+      ]
+    },
+    "57": {
+      "irId": 57,
+      "raw": "##.newsletter-signup-overlay",
+      "list": "404ad-annoyances",
+      "line": 41,
+      "priority": 0,
+      "shadow": false,
+      "riskScore": 28,
+      "riskBand": "medium",
+      "riskFactors": [
+        "applies to every site"
+      ]
+    },
+    "58": {
+      "irId": 58,
+      "raw": "##.outbrain-widget",
+      "list": "404ad-base",
+      "line": 125,
+      "priority": 0,
+      "shadow": false,
+      "riskScore": 28,
+      "riskBand": "medium",
+      "riskFactors": [
+        "applies to every site"
+      ]
+    },
+    "59": {
+      "irId": 59,
+      "raw": "##.paywall-overlay-dismissible",
+      "list": "404ad-annoyances",
+      "line": 46,
+      "priority": 0,
+      "shadow": false,
+      "riskScore": 28,
+      "riskBand": "medium",
+      "riskFactors": [
+        "applies to every site"
+      ]
+    },
+    "60": {
+      "irId": 60,
+      "raw": "##.promoted-content",
+      "list": "404ad-base",
+      "line": 126,
+      "priority": 0,
+      "shadow": false,
+      "riskScore": 28,
+      "riskBand": "medium",
+      "riskFactors": [
+        "applies to every site"
+      ]
+    },
+    "61": {
+      "irId": 61,
+      "raw": "##.push-notification-prompt",
+      "list": "404ad-annoyances",
+      "line": 45,
+      "priority": 0,
+      "shadow": false,
+      "riskScore": 28,
+      "riskBand": "medium",
+      "riskFactors": [
+        "applies to every site"
+      ]
+    },
+    "62": {
+      "irId": 62,
+      "raw": "##.sidebar-ad",
+      "list": "404ad-base",
+      "line": 127,
+      "priority": 0,
+      "shadow": false,
+      "riskScore": 28,
+      "riskBand": "medium",
+      "riskFactors": [
+        "applies to every site"
+      ]
+    },
+    "63": {
+      "irId": 63,
+      "raw": "##.skyscraper-ad",
+      "list": "404ad-base",
+      "line": 128,
+      "priority": 0,
+      "shadow": false,
+      "riskScore": 28,
+      "riskBand": "medium",
+      "riskFactors": [
+        "applies to every site"
+      ]
+    },
+    "64": {
+      "irId": 64,
+      "raw": "##.smart-app-banner",
+      "list": "404ad-annoyances",
+      "line": 44,
+      "priority": 0,
+      "shadow": false,
+      "riskScore": 28,
+      "riskBand": "medium",
+      "riskFactors": [
+        "applies to every site"
+      ]
+    },
+    "65": {
+      "irId": 65,
+      "raw": "##.sponsored-block",
+      "list": "404ad-base",
+      "line": 129,
+      "priority": 0,
+      "shadow": false,
+      "riskScore": 28,
+      "riskBand": "medium",
+      "riskFactors": [
+        "applies to every site"
+      ]
+    },
+    "66": {
+      "irId": 66,
+      "raw": "##.sponsored-link",
+      "list": "404ad-base",
+      "line": 130,
+      "priority": 0,
+      "shadow": false,
+      "riskScore": 28,
+      "riskBand": "medium",
+      "riskFactors": [
+        "applies to every site"
+      ]
+    },
+    "67": {
+      "irId": 67,
+      "raw": "##.taboola-widget",
+      "list": "404ad-base",
+      "line": 131,
+      "priority": 0,
+      "shadow": false,
+      "riskScore": 28,
+      "riskBand": "medium",
+      "riskFactors": [
+        "applies to every site"
+      ]
+    },
+    "68": {
+      "irId": 68,
+      "raw": "##.text-ad",
+      "list": "404ad-base",
+      "line": 132,
+      "priority": 0,
+      "shadow": false,
+      "riskScore": 28,
+      "riskBand": "medium",
+      "riskFactors": [
+        "applies to every site"
+      ]
+    },
+    "69": {
+      "irId": 69,
+      "raw": "##.top-banner-ad",
+      "list": "404ad-base",
+      "line": 133,
+      "priority": 0,
+      "shadow": false,
+      "riskScore": 28,
+      "riskBand": "medium",
+      "riskFactors": [
+        "applies to every site"
+      ]
+    },
+    "70": {
+      "irId": 70,
+      "raw": "##.video-ad-overlay",
+      "list": "404ad-base",
+      "line": 134,
+      "priority": 0,
+      "shadow": false,
+      "riskScore": 28,
+      "riskBand": "medium",
+      "riskFactors": [
+        "applies to every site"
+      ]
+    },
+    "71": {
+      "irId": 71,
+      "raw": "youtube.com##+js(404ad-yt-player)",
+      "list": "404ad-youtube",
+      "line": 52,
+      "priority": 0,
+      "shadow": false,
+      "riskScore": 23,
+      "riskBand": "low",
+      "riskFactors": [
+        "runs a scriptlet in the page",
+        "scoped to specific sites"
+      ]
+    },
+    "72": {
+      "irId": 72,
+      "raw": "youtube.com##+js(set-constant, playerResponse.adPlacements, undefined)",
+      "list": "404ad-youtube",
+      "line": 54,
+      "priority": 0,
+      "shadow": false,
+      "riskScore": 23,
+      "riskBand": "low",
+      "riskFactors": [
+        "runs a scriptlet in the page",
+        "scoped to specific sites"
+      ]
+    },
+    "73": {
+      "irId": 73,
+      "raw": "youtube.com##+js(set-constant, ytInitialPlayerResponse.adPlacements, undefined)",
+      "list": "404ad-youtube",
+      "line": 53,
+      "priority": 0,
+      "shadow": false,
+      "riskScore": 23,
+      "riskBand": "low",
+      "riskFactors": [
+        "runs a scriptlet in the page",
+        "scoped to specific sites"
+      ]
+    },
+    "74": {
+      "irId": 74,
+      "raw": "#$#.ad-slot { display: none !important; min-height: 0 !important; }",
+      "list": "404ad-base",
+      "line": 145,
+      "priority": 0,
+      "shadow": false,
+      "riskScore": 38,
+      "riskBand": "medium",
+      "riskFactors": [
+        "injects a style declaration",
+        "applies to every site"
+      ]
+    },
+    "75": {
+      "irId": 75,
+      "raw": "#$#.sticky-ad-rail { display: none !important; position: static !important; }",
+      "list": "404ad-base",
+      "line": 146,
+      "priority": 0,
+      "shadow": false,
+      "riskScore": 38,
+      "riskBand": "medium",
+      "riskFactors": [
+        "injects a style declaration",
+        "applies to every site"
+      ]
+    },
+    "76": {
+      "irId": 76,
+      "raw": "#$#body { overflow: auto !important; position: static !important; }",
+      "list": "404ad-annoyances",
+      "line": 50,
+      "priority": 0,
+      "shadow": false,
+      "riskScore": 58,
+      "riskBand": "high",
+      "riskFactors": [
+        "injects a style declaration",
+        "applies to every site",
+        "no class or id anchor"
+      ]
+    },
+    "77": {
+      "irId": 77,
+      "raw": "#$#html { overflow: auto !important; }",
+      "list": "404ad-annoyances",
+      "line": 51,
+      "priority": 0,
+      "shadow": false,
+      "riskScore": 58,
+      "riskBand": "high",
+      "riskFactors": [
+        "injects a style declaration",
+        "applies to every site",
+        "no class or id anchor"
+      ]
+    }
+  }
+}

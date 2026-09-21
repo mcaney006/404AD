@@ -1,0 +1,54 @@
+[Adblock Plus 2.0]
+! Title: 404AD YouTube Adapter
+! Description: Network and cosmetic rules paired with the YouTube runtime
+! adapter in the extension. The adapter handles the player state machine; these
+! rules handle everything that is a plain request or a plain selector.
+
+! ---------------------------------------------------------------------------
+! Ad-serving endpoints used by the web player.
+! Note: /youtubei/v1/player is NOT blocked. It carries the playback config the
+! player needs; the runtime adapter strips the ad payload out of the response
+! object instead, which is why blocking it here would break playback entirely.
+! ---------------------------------------------------------------------------
+||youtube.com/api/stats/ads$xmlhttprequest
+||youtube.com/pagead/$xmlhttprequest
+||youtube.com/ptracking$xmlhttprequest
+||youtube.com/api/stats/qoe$xmlhttprequest
+||youtube.com/youtubei/v1/log_event$xmlhttprequest
+||googlevideo.com/videoplayback*&oad$media
+||googlevideo.com/initplayback*&adformat$media
+||youtube.com/get_midroll_info$xmlhttprequest
+
+! ---------------------------------------------------------------------------
+! Homepage, sidebar and feed promotions.
+! ---------------------------------------------------------------------------
+youtube.com##ytd-promoted-sparkles-web-renderer
+youtube.com##ytd-promoted-video-renderer
+youtube.com##ytd-display-ad-renderer
+youtube.com##ytd-compact-promoted-video-renderer
+youtube.com##ytd-in-feed-ad-layout-renderer
+youtube.com##ytd-ad-slot-renderer
+youtube.com##ytd-banner-promo-renderer
+youtube.com##ytd-statement-banner-renderer
+youtube.com##ytd-brand-video-shelf-renderer
+youtube.com##ytd-brand-video-singleton-renderer
+youtube.com##ytm-promoted-video-renderer
+youtube.com###masthead-ad
+youtube.com###player-ads
+youtube.com###panels-full-bleed-container
+youtube.com##.ytp-ad-overlay-container
+youtube.com##.ytp-ad-message-container
+youtube.com##.ytp-ad-image-overlay
+youtube.com##.ytd-merch-shelf-renderer
+
+! Shorts and membership upsells masquerading as content.
+youtube.com##ytd-rich-section-renderer:has(ytd-statement-banner-renderer)
+youtube.com##ytd-rich-item-renderer:has(ytd-ad-slot-renderer)
+
+! ---------------------------------------------------------------------------
+! Scriptlets. These run in the page and are what the runtime adapter installs
+! for the player itself; see src/adapters/youtube.ts.
+! ---------------------------------------------------------------------------
+youtube.com##+js(404ad-yt-player)
+youtube.com##+js(set-constant, ytInitialPlayerResponse.adPlacements, undefined)
+youtube.com##+js(set-constant, playerResponse.adPlacements, undefined)

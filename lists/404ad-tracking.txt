@@ -1,0 +1,115 @@
+[Adblock Plus 2.0]
+! Title: 404AD Tracking
+! Description: Analytics, telemetry, session replay and fingerprinting.
+
+! ---------------------------------------------------------------------------
+! Analytics and product telemetry.
+! ---------------------------------------------------------------------------
+||google-analytics.com^$third-party
+||analytics.google.com^$third-party
+||stats.g.doubleclick.net^$third-party
+||segment.io^$third-party
+||segment.com/analytics.js$script,third-party
+||mixpanel.com^$third-party
+||amplitude.com^$third-party
+||heap.io^$third-party
+||heapanalytics.com^$third-party
+||matomo.cloud^$third-party
+||plausible.io/api/event$xmlhttprequest,third-party
+||kissmetrics.com^$third-party
+||quantserve.com^$third-party
+||scorecardresearch.com^$third-party
+||comscore.com^$third-party
+||chartbeat.com^$third-party
+||chartbeat.net^$third-party
+||parsely.com^$third-party
+||newrelic.com/nr-*.js$script,third-party
+||nr-data.net^$third-party
+||bugsnag.com^$third-party
+||sentry.io/api/*/envelope/$xmlhttprequest,third-party
+
+! ---------------------------------------------------------------------------
+! Session replay. These record keystrokes and DOM mutations, so they are
+! blocked unconditionally rather than only third-party.
+! ---------------------------------------------------------------------------
+||hotjar.com^
+||hotjar.io^
+||fullstory.com^
+||mouseflow.com^
+||luckyorange.com^
+||inspectlet.com^
+||clarity.ms^
+||smartlook.com^
+||logrocket.com^
+||quantummetric.com^
+||contentsquare.net^
+||sessioncam.com^
+
+! ---------------------------------------------------------------------------
+! Social and advertising pixels.
+! ---------------------------------------------------------------------------
+||facebook.com/tr^$image,third-party
+||facebook.com/tr/$xmlhttprequest,third-party
+||analytics.tiktok.com^$third-party
+||ads-api.tiktok.com^$third-party
+||snap.licdn.com^$third-party
+||px.ads.linkedin.com^$third-party
+||ads.pinterest.com^$third-party
+||analytics.twitter.com^$third-party
+||static.ads-twitter.com^$third-party
+||bat.bing.com^$third-party
+||clarity.microsoft.com^$third-party
+
+! ---------------------------------------------------------------------------
+! Fingerprinting and device-graph services.
+! ---------------------------------------------------------------------------
+||fingerprintjs.com^$third-party
+||fpjs.io^$third-party
+||iovation.com^$third-party
+||threatmetrix.com^$third-party
+||deviceatlas.com^$third-party
+||adsco.re^$third-party
+||id5-sync.com^$third-party
+||crwdcntrl.net^$third-party
+||demdex.net^$third-party
+||everesttech.net^$third-party
+||adobedtm.com^$script,third-party
+||omtrdc.net^$third-party
+
+! ---------------------------------------------------------------------------
+! Tracking parameters. Stripping a parameter leaves the navigation intact,
+! which is why these score far below a block in the risk model.
+! ---------------------------------------------------------------------------
+$removeparam=utm_source
+$removeparam=utm_medium
+$removeparam=utm_campaign
+$removeparam=utm_term
+$removeparam=utm_content
+$removeparam=utm_id
+$removeparam=gclid
+$removeparam=gclsrc
+$removeparam=dclid
+$removeparam=gbraid
+$removeparam=wbraid
+$removeparam=fbclid
+$removeparam=msclkid
+$removeparam=twclid
+$removeparam=ttclid
+$removeparam=igshid
+$removeparam=mc_eid
+$removeparam=_hsenc
+$removeparam=_hsmi
+$removeparam=vero_id
+$removeparam=yclid
+$removeparam=_openstat
+
+! ---------------------------------------------------------------------------
+! Beacons. Blocking `ping` costs a page nothing.
+! ---------------------------------------------------------------------------
+*$ping,third-party
+||beacon.krxd.net^$third-party
+||b.6sc.co^$third-party
+
+! Telemetry endpoints that browsers retry aggressively are worth a CSP rather
+! than a block, so the page never enters a failed-request loop.
+@@||sentry.io^$domain=sentry.io

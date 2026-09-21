@@ -1,0 +1,27 @@
+{
+  "$schema": "https://raw.githubusercontent.com/oxc-project/oxc/main/npm/oxlint/configuration_schema.json",
+  "categories": {
+    "correctness": "error",
+    "suspicious": "warn",
+    "perf": "warn"
+  },
+  "env": { "browser": true, "es2024": true },
+  "rules": {
+    "no-console": "off",
+    "typescript/no-explicit-any": "warn",
+    // Page-realm globals are named __404AD_* deliberately. The scriptlet
+    // runtime shares a namespace with arbitrary site code, and the dunder
+    // prefix is what keeps the two from colliding.
+    "eslint/no-underscore-dangle": "off",
+    // Every flagged sort runs on an array this code just built. `toSorted()`
+    // would allocate a second copy to avoid mutating something nobody holds.
+    "unicorn/no-array-sort": "off"
+  },
+  "ignorePatterns": [
+    "packages/extension/src/wasm/**",
+    "packages/extension/.output/**",
+    "packages/extension/.wxt/**",
+    "dist/**",
+    "target/**"
+  ]
+}

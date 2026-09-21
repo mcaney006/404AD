@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>404AD fixture</title>
+    <style>
+      .block { height: 40px; border: 1px solid #ccc; margin: 4px 0; }
+    </style>
+  </head>
+  <body>
+    <h1>404AD end-to-end fixture</h1>
+
+    <!-- Matches a generic cosmetic rule from 404ad-base. -->
+    <div class="block ad-banner" id="generic-ad">generic ad banner</div>
+    <div class="block advertisement" id="generic-advert">advertisement</div>
+    <div class="block adsbygoogle" id="generic-adsense">adsbygoogle</div>
+
+    <!-- Matches nothing. Must stay visible; hiding it would be a false positive. -->
+    <div class="block article-body" id="content">real page content</div>
+    <div class="block header-banner" id="not-an-ad">a banner that is not an ad</div>
+
+    <!-- Injected late, to exercise the incremental token pass. -->
+    <div id="late"></div>
+    <script>
+      setTimeout(() => {
+        const el = document.createElement('div');
+        el.className = 'block sponsored-link';
+        el.id = 'late-ad';
+        el.textContent = 'late sponsored link';
+        document.getElementById('late').append(el);
+      }, 150);
+    </script>
+  </body>
+</html>

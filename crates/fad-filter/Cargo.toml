@@ -1,0 +1,29 @@
+[package]
+name = "fad-filter"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "404AD canonical filter representation: parsing, normalization, dedup, indexing and optimization."
+
+[dependencies]
+aho-corasick = { workspace = true }
+bitflags = { workspace = true }
+idna = { workspace = true }
+indexmap = { workspace = true }
+regex-automata = { workspace = true }
+rustc-hash = { workspace = true }
+serde = { workspace = true }
+smallvec = { workspace = true }
+thiserror = { workspace = true }
+
+[dev-dependencies]
+criterion = "0.5"
+proptest = "1"
+serde_json = { workspace = true }
+postcard = { workspace = true }
+
+[[bench]]
+name = "cosmetic_index"
+harness = false

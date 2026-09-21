@@ -1,0 +1,34 @@
+[package]
+name = "fad-wasm"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "404AD WASM runtime: cosmetic index lookup and request diagnostics."
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+fad-dnr = { workspace = true }
+fad-filter = { workspace = true }
+postcard = { workspace = true }
+serde = { workspace = true }
+serde-wasm-bindgen = "0.6"
+wasm-bindgen = "0.2"
+
+# The wasm-opt that ships with Homebrew's binaryen predates some of the
+# features rustc now emits by default (bulk memory in particular), so the
+# post-processing pass has to be told to accept them. Without these flags
+# wasm-opt rejects a perfectly valid module with "error validating input".
+[package.metadata.wasm-pack.profile.release]
+wasm-opt = [
+    "-O3",
+    "--enable-bulk-memory",
+    "--enable-mutable-globals",
+    "--enable-nontrapping-float-to-int",
+    "--enable-sign-ext",
+    "--enable-reference-types",
+    "--enable-multivalue",
+]

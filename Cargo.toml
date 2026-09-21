@@ -1,0 +1,42 @@
+[workspace]
+resolver = "2"
+members = [
+    "crates/fad-filter",
+    "crates/fad-dnr",
+    "crates/fad-compiler",
+    "crates/fad-wasm",
+]
+# cargo-fuzz targets need a nightly toolchain and sanitizer instrumentation.
+# Excluding them keeps `cargo test --workspace` buildable on stable.
+exclude = ["fuzz"]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.82"
+license = "MIT"
+repository = "https://github.com/mcaney006/404AD"
+
+[workspace.dependencies]
+fad-filter = { path = "crates/fad-filter" }
+fad-dnr = { path = "crates/fad-dnr" }
+
+aho-corasick = "1.1"
+anyhow = "1"
+bitflags = { version = "2.6", features = ["serde"] }
+idna = "1.0"
+indexmap = { version = "2", features = ["serde"] }
+postcard = { version = "1", default-features = false, features = ["alloc"] }
+regex-automata = "0.4"
+rustc-hash = "2"
+serde = { version = "1", features = ["derive"] }
+serde_json = { version = "1", features = ["preserve_order"] }
+smallvec = { version = "1", features = ["serde", "union"] }
+thiserror = "2"
+
+[profile.release]
+opt-level = 3
+lto = true
+codegen-units = 1
+panic = "abort"
+strip = true

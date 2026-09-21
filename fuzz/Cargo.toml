@@ -1,0 +1,36 @@
+[package]
+name = "fad-fuzz"
+version = "0.0.0"
+edition = "2021"
+publish = false
+
+[package.metadata]
+cargo-fuzz = true
+
+[dependencies]
+libfuzzer-sys = "0.4"
+fad-filter = { path = "../crates/fad-filter" }
+fad-dnr = { path = "../crates/fad-dnr" }
+postcard = { version = "1", default-features = false, features = ["alloc"] }
+serde_json = "1"
+
+[[bin]]
+name = "parse_line"
+path = "fuzz_targets/parse_line.rs"
+test = false
+doc = false
+bench = false
+
+[[bin]]
+name = "compile_list"
+path = "fuzz_targets/compile_list.rs"
+test = false
+doc = false
+bench = false
+
+[[bin]]
+name = "cosmetic_index"
+path = "fuzz_targets/cosmetic_index.rs"
+test = false
+doc = false
+bench = false
