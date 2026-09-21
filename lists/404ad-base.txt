@@ -144,3 +144,219 @@
 ! Style rules reclaim the space a hidden slot leaves behind.
 #$#.ad-slot { display: none !important; min-height: 0 !important; }
 #$#.sticky-ad-rail { display: none !important; position: static !important; }
+
+! ---------------------------------------------------------------------------
+! Additional exchanges, SSPs and DSPs.
+! ---------------------------------------------------------------------------
+||advertising.com^$third-party
+||adtechus.com^$third-party
+||adsafeprotected.com^$third-party
+||doubleverify.com^$third-party
+||adotmob.com^$third-party
+||improvedigital.com^$third-party
+||emxdgt.com^$third-party
+||gumgum.com^$third-party
+||nativo.com^$third-party
+||ntv.io^$third-party
+||triplelift.com^$third-party
+||3lift.com^$third-party
+||conversantmedia.com^$third-party
+||adhigh.net^$third-party
+||adkernel.com^$third-party
+||adpushup.com^$third-party
+||adplugg.com^$third-party
+||adzerk.net^$third-party
+||kevel.co^$third-party
+||servenobid.com^$third-party
+||smartyads.com^$third-party
+||sonobi.com^$third-party
+||stickyadstv.com^$third-party
+||thebrighttag.com^$third-party
+||tremorhub.com^$third-party
+||unrulymedia.com^$third-party
+||yieldlab.net^$third-party
+||yieldlove.com^$third-party
+||yieldoptimizer.com^$third-party
+||adition.com^$third-party
+||adscale.de^$third-party
+||adspirit.de^$third-party
+||plista.com^$third-party
+||ligatus.com^$third-party
+||ad-delivery.net^$third-party
+||adsymptotic.com^$third-party
+||bidr.io^$third-party
+||adtelligent.com^$third-party
+||loopme.me^$third-party
+||mobfox.com^$third-party
+||startapp.com^$third-party
+||vidoomy.com^$third-party
+||viralize.tv^$third-party
+||connatix.com^$third-party
+||primis.tech^$third-party
+||onetag-sys.com^$third-party
+||richaudience.com^$third-party
+||adagio.io^$third-party
+||seedtag.com^$third-party
+||smilewanted.com^$third-party
+||themoneytizer.com^$third-party
+||freestar.io^$third-party
+||snigelweb.com^$third-party
+||playwire.com^$third-party
+||intergient.com^$third-party
+||ezoic.net^$third-party
+||ezodn.com^$third-party
+
+! ---------------------------------------------------------------------------
+! Video and audio ad servers.
+! ---------------------------------------------------------------------------
+||imasdk.googleapis.com/js/sdkloader/ima3.js$script,third-party
+||innovid.com^$third-party
+||jwpltx.com^$third-party
+||jwpsrv.com/library/*ads$script,third-party
+||brightcove.com/*/ads/$third-party
+||videoplaza.tv^$third-party
+||ad.71i.de^$third-party
+||adswizz.com^$third-party
+||megaphone.fm/adswizz$third-party
+||podtrac.com/pts/redirect$third-party
+
+! ---------------------------------------------------------------------------
+! Anti-adblock detection scripts. Blocked outright rather than third-party
+! only: these are routinely first-party proxied.
+! ---------------------------------------------------------------------------
+||blockadblock.com^
+||fuckadblock.js^
+||detectadblock.com^
+||adblockanalytics.com^
+||admiral.com^
+||getadmiral.com^
+||publir.com^
+||blockthrough.com^
+
+! ---------------------------------------------------------------------------
+! More neutered stubs. A stub keeps the page's own error path from firing,
+! which is why these score lower than a plain block in the risk model.
+! ---------------------------------------------------------------------------
+||googletagservices.com/tag/js/gpt.js$script,redirect=noopjs,third-party
+||securepubads.g.doubleclick.net/tag/js/gpt.js$script,redirect=noopjs
+||imasdk.googleapis.com/js/sdkloader/ima3.js$script,redirect=noopjs,third-party
+||static.criteo.net/js/ld/publishertag.js$script,redirect=noopjs,third-party
+||cdn.taboola.com/libtrc/*/loader.js$script,redirect=noopjs,third-party
+||widgets.outbrain.com/outbrain.js$script,redirect=noopjs,third-party
+||quantcast.mgr.consensu.org^$script,redirect=noopjs,third-party
+
+! ---------------------------------------------------------------------------
+! Ad-shaped image and iframe paths. Every one carries at least one path
+! separator and a resource-type restriction: a short generic pattern is the
+! single largest source of false positives.
+! ---------------------------------------------------------------------------
+/ad-banner/*$image,third-party
+/ad-frame.$subdocument,third-party
+/ad-iframe/*$subdocument,third-party
+/ads/banner*$image,third-party
+/ads/iframe/*$subdocument,third-party
+/adserve/*$image,third-party
+/advertisement/*$image,third-party
+/banner-ads/*$image,third-party
+/house-ads/*$image,third-party
+/sponsored-content/*$subdocument,third-party
+
+! ---------------------------------------------------------------------------
+! More exceptions. Each one exists because blocking the host breaks a paid or
+! authenticated flow, not because the host is benign.
+! ---------------------------------------------------------------------------
+@@||imasdk.googleapis.com/js/core/bridge*.html$subdocument,domain=youtube.com
+@@||googletagmanager.com/gtm.js$script,domain=checkout.stripe.com
+@@||adsafeprotected.com^$domain=hulu.com|peacocktv.com
+
+! ---------------------------------------------------------------------------
+! More generic cosmetic rules. Every one is anchored on a class or id token so
+! the runtime index can skip it unless that token is present in the document.
+! ---------------------------------------------------------------------------
+##.ad-blocker-notice
+##.ad-box
+##.ad-card
+##.ad-cell
+##.ad-column
+##.ad-embed
+##.ad-footer
+##.ad-header
+##.ad-inline
+##.ad-label
+##.ad-leaderboard
+##.ad-mpu
+##.ad-panel
+##.ad-region
+##.ad-rail
+##.ad-rectangle
+##.ad-row
+##.ad-space
+##.ad-sticky
+##.ad-tile
+##.ad-unit
+##.ad-zone
+##.ads-container
+##.adsense-block
+##.advert
+##.advert-slot
+##.advertising
+##.advertorial
+##.affiliate-banner
+##.billboard-ad
+##.dfp-ad
+##.footer-ad
+##.gpt-ad
+##.header-ad
+##.house-ad
+##.in-article-ad
+##.interstitial-ad
+##.mgid-widget
+##.mobile-ad
+##.outbrain-container
+##.partner-content
+##.paid-post
+##.popup-ad
+##.pre-roll-ad
+##.promoted-tweet
+##.revcontent-widget
+##.sidebar-advert
+##.sponsor-banner
+##.sponsored-card
+##.sponsored-post
+##.sponsored-story
+##.sticky-ad
+##.taboola-container
+##.video-ad-container
+##.wallpaper-ad
+###ad-banner
+###ad-block
+###ad-container
+###ad-content
+###ad-header
+###ad-leaderboard
+###ad-left
+###ad-middle
+###ad-right
+###ad-slot
+###ad-space
+###ad-unit
+###ad-wrapper
+###ads
+###adsense-block
+###advert
+###advertisement
+###dfp-ad
+###div-gpt-ad
+###google_ads_iframe
+###leaderboard-ad
+###mgid-widget
+###outbrain-widget
+###rev-content
+###sidebar-ads
+###sky-ad
+###top-ad
+
+! Style rules stop a removed slot from leaving a reserved hole behind.
+#$#.ad-container { display: none !important; min-height: 0 !important; height: 0 !important; }
+#$#.ad-wrapper { display: none !important; margin: 0 !important; padding: 0 !important; }
+#$#.sticky-ad { display: none !important; position: static !important; }

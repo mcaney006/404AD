@@ -113,3 +113,162 @@ $removeparam=_openstat
 ! Telemetry endpoints that browsers retry aggressively are worth a CSP rather
 ! than a block, so the page never enters a failed-request loop.
 @@||sentry.io^$domain=sentry.io
+
+! ---------------------------------------------------------------------------
+! Additional analytics and product telemetry.
+! ---------------------------------------------------------------------------
+||googletagmanager.com/gtm.js$script,third-party
+||posthog.com/static/array.js$script,third-party
+||pendo.io^$third-party
+||fullstory.org^$third-party
+||statcounter.com^$third-party
+||histats.com^$third-party
+||sitemeter.com^$third-party
+||woopra.com^$third-party
+||gosquared.com^$third-party
+||keen.io^$third-party
+||countly.com^$third-party
+||flurry.com^$third-party
+||localytics.com^$third-party
+||leanplum.com^$third-party
+||mparticle.com^$third-party
+||tealium.com^$third-party
+||ensighten.com^$third-party
+||krxd.net^$third-party
+||bluekai.com^$third-party
+||exelator.com^$third-party
+||agkn.com^$third-party
+||tapad.com^$third-party
+||rlcdn.com^$third-party
+||liveramp.com^$third-party
+||neustar.biz^$third-party
+||eyeota.net^$third-party
+||lotame.com^$third-party
+||mathtag.com^$third-party
+||simpli.fi^$third-party
+||zqtk.net^$third-party
+||nexac.com^$third-party
+||rfihub.com^$third-party
+||dotomi.com^$third-party
+||dpm.demdex.net^$third-party
+||sc-static.net^$third-party
+||snapchat.com/tr$image,third-party
+||amplitude.com/collect$xmlhttprequest,third-party
+||api.segment.io/v1/$xmlhttprequest,third-party
+||cdn.branch.io^$third-party
+||app.link^$third-party
+
+! ---------------------------------------------------------------------------
+! Error and performance reporting. These are useful to the site and invisible
+! to the user, so they are third-party scoped rather than blocked outright.
+! ---------------------------------------------------------------------------
+||rollbar.com^$third-party
+||raygun.io^$third-party
+||trackjs.com^$third-party
+||honeybadger.io^$third-party
+||airbrake.io^$third-party
+||datadoghq-browser-agent.com^$third-party
+||browser-intake-datadoghq.com^$third-party
+||speedcurve.com^$third-party
+||boomerang.js^$third-party
+
+! ---------------------------------------------------------------------------
+! More session replay. These record keystrokes and DOM mutations, so they are
+! blocked unconditionally rather than only third-party.
+! ---------------------------------------------------------------------------
+||glassboxdigital.io^
+||decibelinsight.net^
+||crazyegg.com^
+||mouseflow.net^
+||userreplay.net^
+||zuko.io^
+||vwo.com^
+||optimizely.com/js/$script
+||dynamicyield.com^
+
+! ---------------------------------------------------------------------------
+! Push-notification and re-engagement SDKs.
+! ---------------------------------------------------------------------------
+||pushengage.com^$third-party
+||izooto.com^$third-party
+||webpushr.com^$third-party
+||sendpulse.com^$third-party
+||vwo.io^$third-party
+||iterable.com^$third-party
+||airship.com^$third-party
+||urbanairship.com^$third-party
+
+! ---------------------------------------------------------------------------
+! More tracking parameters. Stripping a parameter leaves the navigation
+! intact, which is why these score 5 rather than 10 or higher.
+! ---------------------------------------------------------------------------
+$removeparam=utm_brand
+$removeparam=utm_social
+$removeparam=utm_name
+$removeparam=utm_cid
+$removeparam=utm_reader
+$removeparam=utm_viz_id
+$removeparam=utm_pubreferrer
+$removeparam=utm_swu
+$removeparam=li_fat_id
+$removeparam=epik
+$removeparam=s_kwcid
+$removeparam=ef_id
+$removeparam=hsa_cam
+$removeparam=hsa_grp
+$removeparam=hsa_ad
+$removeparam=hsa_src
+$removeparam=hsa_net
+$removeparam=hsa_acc
+$removeparam=hsa_kw
+$removeparam=hsa_tgt
+$removeparam=hsa_mt
+$removeparam=hsa_ver
+$removeparam=mkt_tok
+$removeparam=trk
+$removeparam=trkCampaign
+$removeparam=sc_campaign
+$removeparam=sc_channel
+$removeparam=sc_content
+$removeparam=sc_medium
+$removeparam=sc_outcome
+$removeparam=sc_geo
+$removeparam=cmpid
+$removeparam=ncid
+$removeparam=ocid
+$removeparam=wtmc
+$removeparam=spm
+$removeparam=scm
+$removeparam=ref_src
+$removeparam=ref_url
+$removeparam=guccounter
+$removeparam=guce_referrer
+$removeparam=guce_referrer_sig
+$removeparam=oly_anon_id
+$removeparam=oly_enc_id
+$removeparam=rb_clickid
+$removeparam=pk_campaign
+$removeparam=pk_kwd
+$removeparam=pk_source
+$removeparam=pk_medium
+$removeparam=piwik_campaign
+$removeparam=matomo_campaign
+$removeparam=at_medium
+$removeparam=at_campaign
+$removeparam=__hssc
+$removeparam=__hstc
+$removeparam=__hsfp
+$removeparam=hsCtaTracking
+$removeparam=vgo_ee
+$removeparam=ml_subscriber
+$removeparam=ml_subscriber_hash
+$removeparam=wickedid
+$removeparam=gad_source
+$removeparam=srsltid
+
+! ---------------------------------------------------------------------------
+! Cosmetic: tracking pixels that reserve layout space.
+! ---------------------------------------------------------------------------
+##.tracking-pixel
+##.analytics-pixel
+###tracking-iframe

@@ -25,3 +25,39 @@
 /analytics-beacon/*$xmlhttprequest,third-party
 /telemetry/collect$xmlhttprequest,third-party
 !#shadow off
+
+!#shadow on
+! --- Second batch. Promote by moving a line into a real list and recompiling.
+||adsrvr.org/track$third-party
+||bttrack.com^$third-party
+||crsspxl.com^$third-party
+||districtm.ca^$third-party
+||dotmetrics.net^$third-party
+||exponea.com^$third-party
+||gemius.pl^$third-party
+||hs-analytics.net^$third-party
+||inmoment.com^$third-party
+||kameleoon.eu^$third-party
+||kaltura.com/*/analytics$third-party
+||marketo.net^$third-party
+||nr-data.net/events$third-party
+||omappapi.com^$third-party
+||permutive.com^$third-party
+||piano.io^$third-party
+||quantcast.com/choice$third-party
+||sailthru.com^$third-party
+||salesforceliveagent.com^$third-party
+||sitecorecloud.io^$third-party
+||split.io^$third-party
+||statsigapi.net^$third-party
+||treasuredata.com^$third-party
+||usabilla.com^$third-party
+||userpilot.io^$third-party
+||wisepops.com^$third-party
+||yotpo.com^$third-party
+||zeotap.com^$third-party
+/collect/beacon$xmlhttprequest,third-party
+/event-collector/*$xmlhttprequest,third-party
+/metrics/ingest$xmlhttprequest,third-party
+/rum/collect$xmlhttprequest,third-party
+!#shadow off

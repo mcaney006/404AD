@@ -4,7 +4,11 @@
     <meta charset="utf-8" />
     <title>404AD fixture</title>
     <style>
-      .block { height: 40px; border: 1px solid #ccc; margin: 4px 0; }
+      .block {
+        height: 40px;
+        border: 1px solid #ccc;
+        margin: 4px 0;
+      }
     </style>
   </head>
   <body>
@@ -23,11 +27,11 @@
     <div id="late"></div>
     <script>
       setTimeout(() => {
-        const el = document.createElement('div');
-        el.className = 'block sponsored-link';
-        el.id = 'late-ad';
-        el.textContent = 'late sponsored link';
-        document.getElementById('late').append(el);
+        const el = document.createElement("div");
+        el.className = "block sponsored-link";
+        el.id = "late-ad";
+        el.textContent = "late sponsored link";
+        document.getElementById("late").append(el);
       }, 150);
     </script>
   </body>

@@ -33,6 +33,43 @@ interface PlayerLike {
 
 const AD_KEYS = ["adPlacements", "playerAds", "adSlots", "adBreakHeartbeatParams"] as const;
 
+/**
+ * Renderer types YouTube uses to represent an ad inside `ytInitialData`.
+ *
+ * Hiding these with CSS works, but leaves the item in the data model and leaves
+ * a gap where the grid still reserves space for it. Deleting the entry instead
+ * makes the feed behave as though the ad was never served.
+ */
+const AD_RENDERERS = new Set([
+  "actionCompanionAdRenderer",
+  "adSlotRenderer",
+  "adsEngagementPanelRenderer",
+  "bannerPromoRenderer",
+  "brandVideoShelfRenderer",
+  "brandVideoSingletonRenderer",
+  "carouselAdRenderer",
+  "compactPromotedItemRenderer",
+  "compactPromotedVideoRenderer",
+  "displayAdRenderer",
+  "inFeedAdLayoutRenderer",
+  "mealbarPromoRenderer",
+  "playerLegacyDesktopWatchAdsRenderer",
+  "primetimePromoRenderer",
+  "promotedSparklesTextSearchRenderer",
+  "promotedSparklesWebRenderer",
+  "promotedVideoRenderer",
+  "searchPyvRenderer",
+  "statementBannerRenderer",
+  "videoMastheadAdV3Renderer",
+]);
+
+/**
+ * `ytInitialData` is on the order of a megabyte. Walking it is worth it once
+ * per navigation and never worth it unboundedly, so the walk carries a node
+ * budget and stops rather than becoming the thing that makes the page slow.
+ */
+const PRUNE_NODE_BUDGET = 200_000;
+
 /** Remove every ad-bearing key from a player response, in place. */
 export function stripAdPayload(value: unknown): unknown {
   if (value === null || typeof value !== "object") return value;
@@ -48,6 +85,63 @@ export function stripAdPayload(value: unknown): unknown {
     }
   }
   return value;
+}
+
+/**
+ * Recursively drop array entries that are ad renderers.
+ *
+ * Only array elements are removed. An ad renderer always appears as one item in
+ * a list of items, so deleting the element is the surgical edit; deleting the
+ * key it hangs off would take the surrounding section with it.
+ */
+export function pruneAdRenderers(root: unknown): unknown {
+  let budget = PRUNE_NODE_BUDGET;
+
+  const isAdEntry = (value: unknown): boolean =>
+    value !== null &&
+    typeof value === "object" &&
+    Object.keys(value as object).some((key) => AD_RENDERERS.has(key));
+
+  const walk = (value: unknown): void => {
+    if (budget <= 0 || value === null || typeof value !== "object") return;
+    budget -= 1;
+
+    if (Array.isArray(value)) {
+      for (let i = value.length - 1; i >= 0; i -= 1) {
+        if (isAdEntry(value[i])) {
+          value.splice(i, 1);
+        } else {
+          walk(value[i]);
+        }
+      }
+      return;
+    }
+
+    const record = value as Record<string, unknown>;
+    for (const key of Object.keys(record)) {
+      // A renderer hanging directly off a key, rather than inside a list, is
+      // replaced with undefined so the surrounding structure survives.
+      if (AD_RENDERERS.has(key)) {
+        delete record[key];
+        continue;
+      }
+      walk(record[key]);
+    }
+  };
+
+  walk(root);
+  return root;
+}
+
+/** Does this payload look like the SPA's navigation data rather than a player config? */
+export function looksLikeInitialData(value: unknown): boolean {
+  if (value === null || typeof value !== "object") return false;
+  const record = value as Record<string, unknown>;
+  return (
+    "contents" in record ||
+    "onResponseReceivedActions" in record ||
+    "onResponseReceivedEndpoints" in record
+  );
 }
 
 export function looksLikePlayerResponse(value: unknown): boolean {
@@ -66,7 +160,9 @@ function patchJsonParse(): void {
   const original = JSON.parse;
   JSON.parse = function patchedParse(text: string, reviver?: Parameters<typeof JSON.parse>[1]) {
     const parsed = original.call(JSON, text, reviver);
-    return looksLikePlayerResponse(parsed) ? stripAdPayload(parsed) : parsed;
+    if (looksLikePlayerResponse(parsed)) return stripAdPayload(parsed);
+    if (looksLikeInitialData(parsed)) return pruneAdRenderers(parsed);
+    return parsed;
   };
 }
 
@@ -75,12 +171,19 @@ function patchFetch(): void {
   patchFetchWith(async (original, input, init) => {
     const response = await original.call(globalThis, input, init);
     const url = fetchUrl(input);
-    if (!url.includes("/youtubei/v1/player") && !url.includes("/youtubei/v1/next")) {
+    const AD_BEARING = [
+      "/youtubei/v1/player",
+      "/youtubei/v1/next",
+      "/youtubei/v1/browse",
+      "/youtubei/v1/search",
+      "/youtubei/v1/reel/reel_watch_sequence",
+    ];
+    if (!AD_BEARING.some((path) => url.includes(path))) {
       return response;
     }
     try {
       const clone = response.clone();
-      const payload = stripAdPayload(await clone.json());
+      const payload = pruneAdRenderers(stripAdPayload(await clone.json()));
       return new Response(JSON.stringify(payload), {
         status: response.status,
         statusText: response.statusText,
@@ -96,13 +199,24 @@ function patchFetch(): void {
 
 /** Part 1c: the first player response is inlined as a global, not fetched. */
 function patchInitialResponse(): void {
+  const host = globalThis as unknown as Record<string, unknown>;
+
   for (const key of ["ytInitialPlayerResponse", "ytInitialData"]) {
-    let stored: unknown;
+    // The value may already be there. The content script injects this runtime
+    // on the response to a message round trip, so an inline script near the top
+    // of the document can win the race. Cleaning what is already set closes it
+    // for everything except a page that reads the object in the very same
+    // inline script that assigns it.
+    let stored: unknown = host[key];
+    if (stored !== undefined) {
+      stored = pruneAdRenderers(stripAdPayload(stored));
+    }
+
     try {
       Object.defineProperty(globalThis, key, {
         get: () => stored,
         set: (value: unknown) => {
-          stored = stripAdPayload(value);
+          stored = pruneAdRenderers(stripAdPayload(value));
         },
         configurable: true,
       });

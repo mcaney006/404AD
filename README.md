@@ -77,13 +77,13 @@ network. Rust and WASM are the control plane; Chromium is the data plane.
 | Custom user filters | `packages/extension/src/core/userfilters.ts` |
 | Diagnostics and explainability | `crates/fad-filter/src/matcher.rs`, options → Overview |
 | Per-site controls | `packages/extension/src/core/sites.ts` |
-| YouTube runtime adapter | `packages/extension/src/adapters/youtube.ts` |
+| YouTube runtime adapter | `packages/extension/src/adapters/youtube.ts`, `lists/404ad-youtube.txt` |
 | Local-only adaptive statistics | `packages/extension/src/core/stats.ts` |
 | Shadow-mode rules | `lists/404ad-candidates.txt`, options → Shadow mode |
 | Breakage-risk scoring | `crates/fad-filter/src/risk.rs` |
 | Deterministic compilation | `fad-compile verify` |
 
-## Three ideas worth explaining
+## Ideas worth explaining
 
 ### Shadow mode is a real `allow` rule, not a simulation
 
@@ -119,6 +119,52 @@ The score does real work. A **custom filter** you write that scores High or abov
 compiled into shadow mode until you explicitly confirm it. You can still write
 `##div`; it just gets observed before it is enforced.
 
+### `:has()` is left to the browser
+
+Chromium has supported `:has()` natively since 105, and 404AD targets 120 or
+later. So `:has()` is not a procedural operator here: the compiler leaves it in
+the plain-CSS prefix, where the browser's own selector engine evaluates it, and
+it ships inside the injected stylesheet. Only the operators CSS genuinely cannot
+express — `:has-text()`, `:upward()`, `:matches-attr()`, `:min-text-length()` —
+reach the JavaScript engine.
+
+A procedural operator nested *inside* `:has()` reaches neither engine, so the
+compiler rejects it by name rather than shipping a rule that silently matches
+nothing.
+
+### The YouTube adapter does data-model surgery, not just CSS
+
+YouTube does not deliver video ads as separate blockable requests. The ad
+manifest arrives inside the same `/youtubei/v1/player` response that carries the
+playback configuration, and feed ads arrive as renderer objects inside
+`ytInitialData`. Blocking the request does not remove the ad, it removes the
+video.
+
+So `lists/404ad-youtube.txt` covers everything that genuinely is a request or a
+selector, and the adapter handles the rest in the page's own realm:
+
+1. **Payload stripping.** `adPlacements`, `playerAds`, `adSlots` and
+   `adBreakHeartbeatParams` are removed from every player response, whether it
+   arrives via `JSON.parse`, via `fetch`, or inlined as
+   `ytInitialPlayerResponse`. A value already inlined before the adapter loads
+   is cleaned on install rather than ignored.
+2. **Feed pruning.** Twenty ad renderer types are deleted from `ytInitialData`
+   and from `/browse`, `/search` and `/next` responses. Deleting the entry beats
+   hiding it: the grid stops reserving a slot, so there is no gap where the ad
+   was. The walk carries a node budget, because that payload is about a
+   megabyte and a recursive walk is exactly the kind of thing that becomes the
+   reason a page feels slow.
+3. **Player state machine.** When an ad reaches the player anyway, it marks
+   itself `.ad-showing`. The adapter clicks the skip control if one is
+   interactive, seeks past the ad otherwise, and restores the viewer's mute and
+   playback rate afterwards. That capture is module state, not watcher state:
+   YouTube fires `yt-navigate-finish` while an ad is still playing, and holding
+   it per-watcher lost the viewer's mute setting permanently on any SPA
+   navigation mid-ad.
+4. **Enforcement modal.** The "ad blockers violate YouTube's Terms" dialog is
+   removed *and* playback is resumed, because removing it without pressing play
+   leaves a stopped player, which reads as breakage.
+
 ### Generic cosmetic selectors are gated on tokens actually in the page
 
 A full list ships tens of thousands of generic selectors. A page contains a few hundred
@@ -148,7 +194,7 @@ the diagnostics map stays valid across rebuilds.
 
 ```bash
 bun run verify
-# deterministic: two independent compiles agree on all 12 artifacts (build 6563…)
+# deterministic: two independent compiles agree on all 12 artifacts
 ```
 
 ## Working on it
@@ -204,12 +250,19 @@ in `generated/build-report.json`, never silently dropped.
 | `declarativeNetRequest` | the network data plane |
 | `declarativeNetRequestFeedback` | rule-match reporting for statistics, shadow observations and diagnostics |
 | `storage` | settings, per-site rules and local counters |
-| `scripting` | injecting scriptlets into the page's main world |
-| `webNavigation` | the earliest reliable per-navigation hook for that injection |
 | `tabs` | resolving the active tab's host for the popup |
 | `<all_urls>` | filtering is not useful on a subset of the web |
 
-There is deliberately no `webRequest` and no `webRequestBlocking`.
+Four permissions. There is deliberately no `webRequest` and no
+`webRequestBlocking`, and no `scripting` or `webNavigation` either: scriptlets
+are injected by the content script as a `<script src=chrome-extension://…>`
+element carrying its config in a data attribute. That was not the first design.
+The first design used `chrome.scripting.executeScript` from the service worker
+on a `webNavigation` event, and it had a defect that only appears in a cold
+profile: the worker is not reliably awake when the event fires, so injection
+silently never happened. The end-to-end suite caught it. Moving injection onto
+the message round trip the content script already makes fixed the reliability
+problem and removed two permissions at the same time.
 
 `declarativeNetRequestFeedback` is only granted to unpacked and policy-installed
 extensions. Blocking works either way; statistics and shadow observations do not, and the

@@ -48,10 +48,6 @@ export default defineConfig({
       // extensions; every consumer degrades gracefully without it.
       'declarativeNetRequestFeedback',
       'storage',
-      // Injecting scriptlets into the page's main world.
-      'scripting',
-      // Earliest reliable hook for per-navigation scriptlet injection.
-      'webNavigation',
       'tabs',
     ],
     host_permissions: ['<all_urls>'],
@@ -75,8 +71,10 @@ export default defineConfig({
     },
     web_accessible_resources: [
       {
-        // The WASM binary is fetched by extension URL, never from the network.
-        resources: ['wasm/*', 'redirect/*'],
+        // The WASM binary is fetched by extension URL, never from the network,
+        // and the scriptlet runtime is loaded by the content script as a
+        // `<script src=…>` element rather than injected as a string.
+        resources: ['wasm/*', 'redirect/*', 'scriptlets-runtime.js'],
         matches: ['<all_urls>'],
       },
     ],

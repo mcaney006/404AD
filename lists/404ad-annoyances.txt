@@ -49,3 +49,94 @@
 ! locked, which is worse than the modal.
 #$#body { overflow: auto !important; position: static !important; }
 #$#html { overflow: auto !important; }
+
+! ---------------------------------------------------------------------------
+! More consent management platforms.
+! ---------------------------------------------------------------------------
+||cookieyes.com^$third-party
+||cookiescript.com^$third-party
+||cookiefirst.com^$third-party
+||termly.io^$third-party
+||iubenda.com^$third-party
+||osano.com^$third-party
+||secureprivacy.ai^$third-party
+||civicuk.com/cookie-control/$third-party
+||consentmanager.net^$third-party
+||clickio.com^$third-party
+||pubtech.ai^$third-party
+
+! ---------------------------------------------------------------------------
+! More cookie and consent UI.
+! ---------------------------------------------------------------------------
+##.cookie-bar
+##.cookie-disclaimer
+##.cookie-law
+##.cookie-overlay
+##.cookie-popup
+##.cookie-warning
+##.consent-banner
+##.consent-overlay
+##.privacy-banner
+##.privacy-notice-bar
+###cookie-banner
+###cookie-consent
+###cookie-law-info-bar
+###cookie-notice
+###gdpr-cookie-message
+###truste-consent-track
+###didomi-host
+###qc-cmp2-container
+###sp_message_container_1
+###cmpbox
+
+! ---------------------------------------------------------------------------
+! Newsletter, app-install and notification nags.
+! ---------------------------------------------------------------------------
+##.newsletter-overlay
+##.newsletter-popup
+##.subscribe-modal
+##.subscription-overlay
+##.email-signup-modal
+##.exit-intent-popup
+##.exit-intent-overlay
+##.push-permission-prompt
+##.notification-opt-in
+##.app-download-banner
+##.open-in-app-banner
+##.smart-banner
+##.install-prompt
+##.pwa-install-banner
+###newsletter-modal
+###subscribe-popup
+###app-banner
+###smartbanner
+
+! ---------------------------------------------------------------------------
+! Chat and survey widgets. These are legitimate support tooling on many sites,
+! so they stay in this DISABLED list rather than moving into the base one.
+! ---------------------------------------------------------------------------
+||intercom.io^$third-party
+||drift.com^$third-party
+||tawk.to^$third-party
+||livechatinc.com^$third-party
+||zopim.com^$third-party
+||qualtrics.com^$third-party
+||surveymonkey.com/jsapi$script,third-party
+||hotjar.io/survey$third-party
+##.chat-widget-launcher
+##.survey-invitation
+##.feedback-tab
+
+! ---------------------------------------------------------------------------
+! Social interruptions.
+! ---------------------------------------------------------------------------
+##.social-share-sticky
+##.floating-share-bar
+##.follow-us-popup
+##.related-posts-popup
+
+! Restore interaction after a modal is removed. Without this the page stays
+! scroll-locked, which is worse than the modal was.
+#$#body { overflow: auto !important; position: static !important; }
+#$#html { overflow: auto !important; }
+#$#body.modal-open { overflow: auto !important; padding-right: 0 !important; }

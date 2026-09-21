@@ -349,6 +349,41 @@
 		"adSlots",
 		"adBreakHeartbeatParams"
 	];
+	/**
+	* Renderer types YouTube uses to represent an ad inside `ytInitialData`.
+	*
+	* Hiding these with CSS works, but leaves the item in the data model and leaves
+	* a gap where the grid still reserves space for it. Deleting the entry instead
+	* makes the feed behave as though the ad was never served.
+	*/
+	var AD_RENDERERS = /* @__PURE__ */ new Set([
+		"actionCompanionAdRenderer",
+		"adSlotRenderer",
+		"adsEngagementPanelRenderer",
+		"bannerPromoRenderer",
+		"brandVideoShelfRenderer",
+		"brandVideoSingletonRenderer",
+		"carouselAdRenderer",
+		"compactPromotedItemRenderer",
+		"compactPromotedVideoRenderer",
+		"displayAdRenderer",
+		"inFeedAdLayoutRenderer",
+		"mealbarPromoRenderer",
+		"playerLegacyDesktopWatchAdsRenderer",
+		"primetimePromoRenderer",
+		"promotedSparklesTextSearchRenderer",
+		"promotedSparklesWebRenderer",
+		"promotedVideoRenderer",
+		"searchPyvRenderer",
+		"statementBannerRenderer",
+		"videoMastheadAdV3Renderer"
+	]);
+	/**
+	* `ytInitialData` is on the order of a megabyte. Walking it is worth it once
+	* per navigation and never worth it unboundedly, so the walk carries a node
+	* budget and stops rather than becoming the thing that makes the page slow.
+	*/
+	var PRUNE_NODE_BUDGET = 2e5;
 	/** Remove every ad-bearing key from a player response, in place. */
 	function stripAdPayload(value) {
 		if (value === null || typeof value !== "object") return value;
@@ -356,6 +391,42 @@
 		for (const key of AD_KEYS) if (key in record) delete record[key];
 		for (const nested of ["playerResponse", "response"]) if (record[nested] && typeof record[nested] === "object") stripAdPayload(record[nested]);
 		return value;
+	}
+	/**
+	* Recursively drop array entries that are ad renderers.
+	*
+	* Only array elements are removed. An ad renderer always appears as one item in
+	* a list of items, so deleting the element is the surgical edit; deleting the
+	* key it hangs off would take the surrounding section with it.
+	*/
+	function pruneAdRenderers(root) {
+		let budget = PRUNE_NODE_BUDGET;
+		const isAdEntry = (value) => value !== null && typeof value === "object" && Object.keys(value).some((key) => AD_RENDERERS.has(key));
+		const walk = (value) => {
+			if (budget <= 0 || value === null || typeof value !== "object") return;
+			budget -= 1;
+			if (Array.isArray(value)) {
+				for (let i = value.length - 1; i >= 0; i -= 1) if (isAdEntry(value[i])) value.splice(i, 1);
+				else walk(value[i]);
+				return;
+			}
+			const record = value;
+			for (const key of Object.keys(record)) {
+				if (AD_RENDERERS.has(key)) {
+					delete record[key];
+					continue;
+				}
+				walk(record[key]);
+			}
+		};
+		walk(root);
+		return root;
+	}
+	/** Does this payload look like the SPA's navigation data rather than a player config? */
+	function looksLikeInitialData(value) {
+		if (value === null || typeof value !== "object") return false;
+		const record = value;
+		return "contents" in record || "onResponseReceivedActions" in record || "onResponseReceivedEndpoints" in record;
 	}
 	function looksLikePlayerResponse(value) {
 		if (value === null || typeof value !== "object") return false;
@@ -367,7 +438,9 @@
 		const original = JSON.parse;
 		JSON.parse = function patchedParse(text, reviver) {
 			const parsed = original.call(JSON, text, reviver);
-			return looksLikePlayerResponse(parsed) ? stripAdPayload(parsed) : parsed;
+			if (looksLikePlayerResponse(parsed)) return stripAdPayload(parsed);
+			if (looksLikeInitialData(parsed)) return pruneAdRenderers(parsed);
+			return parsed;
 		};
 	}
 	/** Part 1b: strip ads from player responses fetched by the SPA. */
@@ -375,9 +448,15 @@
 		patchFetchWith(async (original, input, init) => {
 			const response = await original.call(globalThis, input, init);
 			const url = fetchUrl(input);
-			if (!url.includes("/youtubei/v1/player") && !url.includes("/youtubei/v1/next")) return response;
+			if (![
+				"/youtubei/v1/player",
+				"/youtubei/v1/next",
+				"/youtubei/v1/browse",
+				"/youtubei/v1/search",
+				"/youtubei/v1/reel/reel_watch_sequence"
+			].some((path) => url.includes(path))) return response;
 			try {
-				const payload = stripAdPayload(await response.clone().json());
+				const payload = pruneAdRenderers(stripAdPayload(await response.clone().json()));
 				return new Response(JSON.stringify(payload), {
 					status: response.status,
 					statusText: response.statusText,
@@ -390,13 +469,15 @@
 	}
 	/** Part 1c: the first player response is inlined as a global, not fetched. */
 	function patchInitialResponse() {
+		const host = globalThis;
 		for (const key of ["ytInitialPlayerResponse", "ytInitialData"]) {
-			let stored;
+			let stored = host[key];
+			if (stored !== void 0) stored = pruneAdRenderers(stripAdPayload(stored));
 			try {
 				Object.defineProperty(globalThis, key, {
 					get: () => stored,
 					set: (value) => {
-						stored = stripAdPayload(value);
+						stored = pruneAdRenderers(stripAdPayload(value));
 					},
 					configurable: true
 				});
@@ -514,10 +595,20 @@
 		...SCRIPTLETS,
 		"404ad-yt-player": youtubeAdapter
 	};
+	function readConfig() {
+		const raw = document.currentScript?.getAttribute("data-404ad-scriptlets");
+		if (!raw) return [];
+		try {
+			const parsed = JSON.parse(raw);
+			return Array.isArray(parsed) ? parsed : [];
+		} catch {
+			return [];
+		}
+	}
 	var scriptlets_runtime_default = defineUnlistedScript(() => {
+		const entries = readConfig();
+		if (entries.length === 0) return;
 		const host = globalThis;
-		const entries = host.__404AD_SCRIPTLETS__;
-		if (!Array.isArray(entries) || entries.length === 0) return;
 		const applied = host.__404AD_APPLIED__ ?? /* @__PURE__ */ new Set();
 		host.__404AD_APPLIED__ = applied;
 		for (const entry of entries) {
@@ -536,7 +627,6 @@
 				console.warn(`404AD: scriptlet "${entry.name}" failed`, error);
 			}
 		}
-		delete host.__404AD_SCRIPTLETS__;
 	});
 	//#endregion
 	//#region \0virtual:wxt-unlisted-script-entrypoint?/Users/michael.jr/Developer/404AD/packages/extension/entrypoints/scriptlets-runtime.ts

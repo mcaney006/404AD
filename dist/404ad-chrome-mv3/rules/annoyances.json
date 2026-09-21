@@ -1,6 +1,30 @@
 [
   {
-    "id": 37,
+    "id": 69,
+    "priority": 10,
+    "action": {
+      "type": "block"
+    },
+    "condition": {
+      "urlFilter": "||civicuk.com/cookie-control/",
+      "isUrlFilterCaseSensitive": false,
+      "domainType": "thirdParty"
+    }
+  },
+  {
+    "id": 72,
+    "priority": 10,
+    "action": {
+      "type": "block"
+    },
+    "condition": {
+      "urlFilter": "||clickio.com^",
+      "isUrlFilterCaseSensitive": false,
+      "domainType": "thirdParty"
+    }
+  },
+  {
+    "id": 76,
     "priority": 10,
     "action": {
       "type": "block"
@@ -12,7 +36,19 @@
     }
   },
   {
-    "id": 40,
+    "id": 77,
+    "priority": 10,
+    "action": {
+      "type": "block"
+    },
+    "condition": {
+      "urlFilter": "||consentmanager.net^",
+      "isUrlFilterCaseSensitive": false,
+      "domainType": "thirdParty"
+    }
+  },
+  {
+    "id": 81,
     "priority": 10,
     "action": {
       "type": "block"
@@ -24,7 +60,19 @@
     }
   },
   {
-    "id": 41,
+    "id": 82,
+    "priority": 10,
+    "action": {
+      "type": "block"
+    },
+    "condition": {
+      "urlFilter": "||cookiefirst.com^",
+      "isUrlFilterCaseSensitive": false,
+      "domainType": "thirdParty"
+    }
+  },
+  {
+    "id": 83,
     "priority": 10,
     "action": {
       "type": "block"
@@ -36,7 +84,31 @@
     }
   },
   {
-    "id": 47,
+    "id": 84,
+    "priority": 10,
+    "action": {
+      "type": "block"
+    },
+    "condition": {
+      "urlFilter": "||cookiescript.com^",
+      "isUrlFilterCaseSensitive": false,
+      "domainType": "thirdParty"
+    }
+  },
+  {
+    "id": 85,
+    "priority": 10,
+    "action": {
+      "type": "block"
+    },
+    "condition": {
+      "urlFilter": "||cookieyes.com^",
+      "isUrlFilterCaseSensitive": false,
+      "domainType": "thirdParty"
+    }
+  },
+  {
+    "id": 96,
     "priority": 10,
     "action": {
       "type": "block"
@@ -48,7 +120,67 @@
     }
   },
   {
-    "id": 91,
+    "id": 102,
+    "priority": 10,
+    "action": {
+      "type": "block"
+    },
+    "condition": {
+      "urlFilter": "||drift.com^",
+      "isUrlFilterCaseSensitive": false,
+      "domainType": "thirdParty"
+    }
+  },
+  {
+    "id": 147,
+    "priority": 10,
+    "action": {
+      "type": "block"
+    },
+    "condition": {
+      "urlFilter": "||hotjar.io/survey",
+      "isUrlFilterCaseSensitive": false,
+      "domainType": "thirdParty"
+    }
+  },
+  {
+    "id": 158,
+    "priority": 10,
+    "action": {
+      "type": "block"
+    },
+    "condition": {
+      "urlFilter": "||intercom.io^",
+      "isUrlFilterCaseSensitive": false,
+      "domainType": "thirdParty"
+    }
+  },
+  {
+    "id": 162,
+    "priority": 10,
+    "action": {
+      "type": "block"
+    },
+    "condition": {
+      "urlFilter": "||iubenda.com^",
+      "isUrlFilterCaseSensitive": false,
+      "domainType": "thirdParty"
+    }
+  },
+  {
+    "id": 173,
+    "priority": 10,
+    "action": {
+      "type": "block"
+    },
+    "condition": {
+      "urlFilter": "||livechatinc.com^",
+      "isUrlFilterCaseSensitive": false,
+      "domainType": "thirdParty"
+    }
+  },
+  {
+    "id": 199,
     "priority": 10,
     "action": {
       "type": "block"
@@ -60,7 +192,19 @@
     }
   },
   {
-    "id": 99,
+    "id": 202,
+    "priority": 10,
+    "action": {
+      "type": "block"
+    },
+    "condition": {
+      "urlFilter": "||osano.com^",
+      "isUrlFilterCaseSensitive": false,
+      "domainType": "thirdParty"
+    }
+  },
+  {
+    "id": 215,
     "priority": 10,
     "action": {
       "type": "block"
@@ -72,7 +216,31 @@
     }
   },
   {
-    "id": 103,
+    "id": 219,
+    "priority": 10,
+    "action": {
+      "type": "block"
+    },
+    "condition": {
+      "urlFilter": "||pubtech.ai^",
+      "isUrlFilterCaseSensitive": false,
+      "domainType": "thirdParty"
+    }
+  },
+  {
+    "id": 222,
+    "priority": 10,
+    "action": {
+      "type": "block"
+    },
+    "condition": {
+      "urlFilter": "||qualtrics.com^",
+      "isUrlFilterCaseSensitive": false,
+      "domainType": "thirdParty"
+    }
+  },
+  {
+    "id": 224,
     "priority": 10,
     "action": {
       "type": "block"
@@ -84,7 +252,19 @@
     }
   },
   {
-    "id": 121,
+    "id": 238,
+    "priority": 10,
+    "action": {
+      "type": "block"
+    },
+    "condition": {
+      "urlFilter": "||secureprivacy.ai^",
+      "isUrlFilterCaseSensitive": false,
+      "domainType": "thirdParty"
+    }
+  },
+  {
+    "id": 262,
     "priority": 10,
     "action": {
       "type": "block"
@@ -96,7 +276,46 @@
     }
   },
   {
-    "id": 131,
+    "id": 274,
+    "priority": 10,
+    "action": {
+      "type": "block"
+    },
+    "condition": {
+      "urlFilter": "||surveymonkey.com/jsapi",
+      "isUrlFilterCaseSensitive": false,
+      "resourceTypes": [
+        "script"
+      ],
+      "domainType": "thirdParty"
+    }
+  },
+  {
+    "id": 278,
+    "priority": 10,
+    "action": {
+      "type": "block"
+    },
+    "condition": {
+      "urlFilter": "||tawk.to^",
+      "isUrlFilterCaseSensitive": false,
+      "domainType": "thirdParty"
+    }
+  },
+  {
+    "id": 281,
+    "priority": 10,
+    "action": {
+      "type": "block"
+    },
+    "condition": {
+      "urlFilter": "||termly.io^",
+      "isUrlFilterCaseSensitive": false,
+      "domainType": "thirdParty"
+    }
+  },
+  {
+    "id": 288,
     "priority": 10,
     "action": {
       "type": "block"
@@ -108,13 +327,25 @@
     }
   },
   {
-    "id": 134,
+    "id": 293,
     "priority": 10,
     "action": {
       "type": "block"
     },
     "condition": {
       "urlFilter": "||usercentrics.eu^",
+      "isUrlFilterCaseSensitive": false,
+      "domainType": "thirdParty"
+    }
+  },
+  {
+    "id": 326,
+    "priority": 10,
+    "action": {
+      "type": "block"
+    },
+    "condition": {
+      "urlFilter": "||zopim.com^",
       "isUrlFilterCaseSensitive": false,
       "domainType": "thirdParty"
     }

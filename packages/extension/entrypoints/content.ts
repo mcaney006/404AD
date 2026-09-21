@@ -1,5 +1,6 @@
 import { defineContentScript } from "wxt/utils/define-content-script";
 import { CosmeticInjector } from "../src/content/cosmetic";
+import { injectScriptlets } from "../src/content/scriptlets";
 import { ProceduralEngine } from "../src/content/procedural";
 import { notify, send } from "../src/core/messaging";
 
@@ -32,6 +33,10 @@ export default defineContentScript({
       // best-effort; network blocking is unaffected because Chromium owns it.
       return;
     }
+    // Scriptlets first: they patch page globals, and every millisecond of delay
+    // is another inline script that may already have read the value.
+    if (payload.scriptletsEnabled) injectScriptlets(payload.scriptlets);
+
     if (!payload.cosmeticEnabled) return;
 
     injector.hide(payload.specific);
@@ -126,6 +131,7 @@ export default defineContentScript({
       if (area !== "local" || !("sites" in changes || "settings" in changes)) return;
       void (async () => {
         const next = await send({ type: "document:resolve", host, tokens: [] });
+        if (next.scriptletsEnabled) injectScriptlets(next.scriptlets);
         if (!next.cosmeticEnabled) {
           injector.reset();
           procedural.reset();

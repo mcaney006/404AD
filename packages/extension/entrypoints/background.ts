@@ -26,7 +26,6 @@ import { DEFAULT_SETTINGS, loadSettings, saveSettings } from "../src/core/settin
 import { loadSites, resolveMode, setSiteMode, syncSessionRules } from "../src/core/sites";
 import { flush, recordBlock, recordShadow, reset, snapshot } from "../src/core/stats";
 import { applyUserFilters, clearUserFilters } from "../src/core/userfilters";
-import { injectScriptlets } from "../src/core/inject";
 
 /**
  * The 404AD service worker: the control plane.
@@ -108,43 +107,15 @@ export default defineBackground(() => {
     hiddenByTab.delete(tabId);
   });
 
-  chrome.webNavigation.onCommitted.addListener((details) => {
-    if (details.frameId === 0) {
-      clearTab(details.tabId);
-      hiddenByTab.delete(details.tabId);
+  chrome.tabs.onUpdated.addListener((tabId, changeInfo) => {
+    // A committed navigation resets this tab's counters. `onUpdated` is used
+    // rather than `webNavigation` because it needs no extra permission and the
+    // worker is already awake: the content script has just messaged it.
+    if (changeInfo.status === "loading" && changeInfo.url !== undefined) {
+      clearTab(tabId);
+      hiddenByTab.delete(tabId);
     }
-    void injectScriptletsFor(details.tabId, details.frameId, details.url);
   });
-
-  /**
-   * Inject scriptlets into the page's main world.
-   *
-   * `executeScript` with `injectImmediately` is the earliest reliable MV3 hook
-   * for main-world code whose payload is only known per-navigation. A static
-   * `registerContentScripts` entry runs earlier but cannot carry per-host
-   * arguments, and inline `<script>` injection is blocked by page CSP on
-   * exactly the sites that matter most.
-   */
-  async function injectScriptletsFor(tabId: number, frameId: number, url: string): Promise<void> {
-    if (!url.startsWith("http")) return;
-    try {
-      const settings = await loadSettings();
-      if (!settings.enabled || !settings.scriptlets) return;
-
-      const host = hostOf(url);
-      const mode = await resolveMode(host);
-      if (mode !== "default") return;
-
-      const { scriptlets } = await resolveDocument(host, []);
-      const active = scriptlets.filter((s) => !s.shadow);
-      if (active.length === 0) return;
-
-      await injectScriptlets(tabId, frameId, active);
-    } catch {
-      // A frame can vanish between `onCommitted` and `executeScript`. That is
-      // ordinary navigation, not a failure worth surfacing.
-    }
-  }
 
   // -------------------------------------------------------------------------
   // Message handling
@@ -172,7 +143,9 @@ export default defineBackground(() => {
         const cosmeticEnabled = !off && settings.cosmeticFiltering && mode === "default";
         const scriptletsEnabled = !off && settings.scriptlets && mode === "default";
 
-        if (!cosmeticEnabled) {
+        // Scriptlets and cosmetic filtering are separately switchable, so a
+        // request with cosmetic filtering off still has scriptlets to deliver.
+        if (!cosmeticEnabled && !scriptletsEnabled) {
           return {
             specific: [],
             generic: [],
@@ -192,8 +165,11 @@ export default defineBackground(() => {
 
         return {
           ...resolved,
-          scriptlets: keep(resolved.scriptlets),
-          procedural: keep(resolved.procedural),
+          specific: cosmeticEnabled ? resolved.specific : [],
+          generic: cosmeticEnabled ? resolved.generic : [],
+          styles: cosmeticEnabled ? resolved.styles : [],
+          procedural: cosmeticEnabled ? keep(resolved.procedural) : [],
+          scriptlets: scriptletsEnabled ? keep(resolved.scriptlets) : [],
           mode,
           cosmeticEnabled,
           scriptletsEnabled,

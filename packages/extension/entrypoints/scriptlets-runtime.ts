@@ -5,10 +5,10 @@ import { SCRIPTLETS, type Scriptlet } from "../src/scriptlets/library";
 /**
  * The main-world scriptlet runtime.
  *
- * Injected by the service worker with `chrome.scripting.executeScript`, after a
- * tiny companion injection has published the per-host configuration on
- * `globalThis.__404AD_SCRIPTLETS__`. This file is part of the packaged
- * extension; nothing here is generated, fetched or evaluated from a string.
+ * Loaded by the content script as a `<script src=chrome-extension://…>` element
+ * whose `data-404ad-scriptlets` attribute carries the per-host configuration.
+ * This file is part of the packaged extension: nothing here is generated,
+ * fetched from the network, or evaluated from a string.
  */
 
 interface Entry {
@@ -20,19 +20,33 @@ interface Entry {
 
 const REGISTRY: Record<string, Scriptlet> = {
   ...SCRIPTLETS,
-  // Site adapters are ordinary scriptlets so a filter list can enable, scope or
-  // cancel one with the same syntax as everything else.
+  // Site adapters are ordinary scriptlets, so a filter list can enable, scope
+  // or cancel one with exactly the same syntax as everything else.
   "404ad-yt-player": youtubeAdapter,
 };
 
-export default defineUnlistedScript(() => {
-  const host = globalThis as unknown as Record<string, unknown>;
-  const entries = host.__404AD_SCRIPTLETS__ as Entry[] | undefined;
-  if (!Array.isArray(entries) || entries.length === 0) return;
+function readConfig(): Entry[] {
+  // `document.currentScript` is the element the content script just appended,
+  // and is only valid while this script is executing.
+  const element = document.currentScript as HTMLScriptElement | null;
+  const raw = element?.getAttribute("data-404ad-scriptlets");
+  if (!raw) return [];
+  try {
+    const parsed: unknown = JSON.parse(raw);
+    return Array.isArray(parsed) ? (parsed as Entry[]) : [];
+  } catch {
+    return [];
+  }
+}
 
-  // A single-page navigation can re-inject the runtime. Running `set-constant`
-  // twice is harmless; running a MutationObserver-installing scriptlet twice
-  // is not, so every invocation is keyed and run at most once per realm.
+export default defineUnlistedScript(() => {
+  const entries = readConfig();
+  if (entries.length === 0) return;
+
+  const host = globalThis as unknown as Record<string, unknown>;
+  // A single-page navigation can inject the runtime again. Running
+  // `set-constant` twice is harmless; running a MutationObserver-installing
+  // scriptlet twice is not, so each invocation is keyed and runs at most once.
   const applied = (host.__404AD_APPLIED__ as Set<string> | undefined) ?? new Set<string>();
   host.__404AD_APPLIED__ = applied;
 
@@ -54,6 +68,4 @@ export default defineUnlistedScript(() => {
       console.warn(`404AD: scriptlet "${entry.name}" failed`, error);
     }
   }
-
-  delete host.__404AD_SCRIPTLETS__;
 });

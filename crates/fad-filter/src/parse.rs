@@ -211,13 +211,27 @@ fn parse_cosmetic(
 /// `.ad:has-text(Sponsored)` -> prefix `.ad`, one `HasText` operator.
 /// A selector with no procedural operator returns `(None, [])` and is used as-is.
 pub fn split_procedural(selector: &str) -> Result<(Option<String>, Vec<Procedural>), ParseError> {
-    const OPS: [&str; 5] = [
+    // `:has()` is not listed: Chromium evaluates it natively and 404AD targets
+    // 120 or later, so leaving it in the CSS prefix is both correct and faster.
+    const OPS: [&str; 4] = [
         ":has-text(",
-        ":has(",
         ":upward(",
         ":matches-attr(",
         ":min-text-length(",
     ];
+
+    // An operator that appears in the selector but never at the top level is
+    // nested inside `:has()` or a similar functional selector. Neither engine
+    // can run it there, so say so instead of shipping a rule that matches
+    // nothing. Checked before the split, because a wholly nested operator
+    // leaves no top-level operator to split on.
+    for op in OPS {
+        if selector.contains(op) && find_top_level(selector, op).is_none() {
+            return Err(ParseError::Unsupported(
+                "a procedural operator nested inside :has()",
+            ));
+        }
+    }
 
     let mut prefix_end = None;
     for op in OPS {
@@ -258,9 +272,6 @@ pub fn split_procedural(selector: &str) -> Result<(Option<String>, Vec<Procedura
                     }
                 }
             }
-            ":has(" => Procedural::Has {
-                selector: arg.to_string(),
-            },
             ":upward(" => match arg.parse::<u32>() {
                 Ok(n) => Procedural::Upward {
                     steps: Some(n),
@@ -290,6 +301,15 @@ pub fn split_procedural(selector: &str) -> Result<(Option<String>, Vec<Procedura
         };
         ops.push(parsed);
         rest = &rest[close + 1..];
+    }
+
+    // A procedural operator nested inside `:has()` reaches neither engine: the
+    // browser cannot run ours, and ours only splits at the top level. Rejecting
+    // it is honest; keeping it would ship a rule that silently matches nothing.
+    if OPS.iter().any(|op| prefix.contains(op)) {
+        return Err(ParseError::Unsupported(
+            "a procedural operator nested inside :has()",
+        ));
     }
 
     let prefix = if prefix.is_empty() {
@@ -740,6 +760,41 @@ mod tests {
         let s = cos("example.com##+js(set-constant, adsEnabled, false)");
         assert_eq!(s.kind, CosmeticKind::Scriptlet);
         assert_eq!(s.payload, "set-constant, adsEnabled, false");
+    }
+
+    #[test]
+    fn plain_has_stays_css_and_never_becomes_procedural() {
+        // Chromium evaluates `:has()` natively; routing it through the JS engine
+        // would be slower and would keep it out of the injected stylesheet.
+        let r = cos("example.com##ytd-rich-item-renderer:has(ytd-ad-slot-renderer)");
+        assert!(r.procedural.is_empty());
+        assert_eq!(r.css_prefix, None);
+        assert_eq!(
+            r.payload,
+            "ytd-rich-item-renderer:has(ytd-ad-slot-renderer)"
+        );
+    }
+
+    #[test]
+    fn has_combines_with_a_following_procedural_operator() {
+        let r = cos("example.com##li:has(.badge):has-text(Sponsored)");
+        // The prefix keeps native `:has()`, so querySelectorAll still narrows.
+        assert_eq!(r.css_prefix.as_deref(), Some("li:has(.badge)"));
+        assert_eq!(
+            r.procedural,
+            vec![Procedural::HasText {
+                needle: "Sponsored".into(),
+                regex: false
+            }]
+        );
+    }
+
+    #[test]
+    fn a_procedural_operator_nested_inside_has_is_rejected() {
+        assert_eq!(
+            parse_line("example.com##li:has(:has-text(Ad))", src(), false).unwrap_err(),
+            ParseError::Unsupported("a procedural operator nested inside :has()")
+        );
     }
 
     #[test]

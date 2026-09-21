@@ -1,54 +1,201 @@
 [Adblock Plus 2.0]
 ! Title: 404AD YouTube Adapter
 ! Description: Network and cosmetic rules paired with the YouTube runtime
-! adapter in the extension. The adapter handles the player state machine; these
-! rules handle everything that is a plain request or a plain selector.
+! adapter in packages/extension/src/adapters/youtube.ts.
+!
+! Division of labour, and the reason this list is not simply longer:
+!
+!   * Anything that is a plain request or a plain selector lives here.
+!   * Anything that requires reading or rewriting the player's own data model
+!     lives in the adapter, because YouTube does not deliver video ads as
+!     separate blockable requests. The ad manifest arrives inside the same
+!     /youtubei/v1/player response that carries playback configuration.
+!
+! That is why /youtubei/v1/player is NOT blocked below. Blocking it does not
+! remove the ad, it removes the video.
+!
+! Selectors use native :has(), which Chromium has supported since 105. The
+! compiler leaves those in the injected stylesheet rather than routing them
+! through the JS procedural engine.
 
-! ---------------------------------------------------------------------------
-! Ad-serving endpoints used by the web player.
-! Note: /youtubei/v1/player is NOT blocked. It carries the playback config the
-! player needs; the runtime adapter strips the ad payload out of the response
-! object instead, which is why blocking it here would break playback entirely.
-! ---------------------------------------------------------------------------
+! ===========================================================================
+! NETWORK
+! ===========================================================================
+
+! --- Ad and instream tracking endpoints ------------------------------------
 ||youtube.com/api/stats/ads$xmlhttprequest
 ||youtube.com/pagead/$xmlhttprequest
+||youtube.com/pagead/*$image
 ||youtube.com/ptracking$xmlhttprequest
-||youtube.com/api/stats/qoe$xmlhttprequest
-||youtube.com/youtubei/v1/log_event$xmlhttprequest
-||googlevideo.com/videoplayback*&oad$media
-||googlevideo.com/initplayback*&adformat$media
 ||youtube.com/get_midroll_info$xmlhttprequest
+||youtube.com/get_video_info*&adformat$xmlhttprequest
+||youtube.com/youtubei/v1/log_event$xmlhttprequest
+||youtube.com/youtubei/v1/att/get$xmlhttprequest
+||youtube.com/youtubei/v1/att/log$xmlhttprequest
+||s.youtube.com/api/stats/ads$xmlhttprequest
+||s.youtube.com/api/stats/atr$xmlhttprequest
+||youtube-nocookie.com/api/stats/ads$xmlhttprequest
+||youtube-nocookie.com/pagead/$xmlhttprequest
 
-! ---------------------------------------------------------------------------
-! Homepage, sidebar and feed promotions.
-! ---------------------------------------------------------------------------
-youtube.com##ytd-promoted-sparkles-web-renderer
-youtube.com##ytd-promoted-video-renderer
-youtube.com##ytd-display-ad-renderer
-youtube.com##ytd-compact-promoted-video-renderer
-youtube.com##ytd-in-feed-ad-layout-renderer
-youtube.com##ytd-ad-slot-renderer
-youtube.com##ytd-banner-promo-renderer
-youtube.com##ytd-statement-banner-renderer
-youtube.com##ytd-brand-video-shelf-renderer
-youtube.com##ytd-brand-video-singleton-renderer
-youtube.com##ytm-promoted-video-renderer
-youtube.com###masthead-ad
-youtube.com###player-ads
-youtube.com###panels-full-bleed-container
+! --- Ad media streams ------------------------------------------------------
+||googlevideo.com/videoplayback*&oad$media
+||googlevideo.com/videoplayback*&adformat$media
+||googlevideo.com/initplayback*&adformat$media
+||googlevideo.com/ptracking$xmlhttprequest
+
+! --- Google ad infrastructure reached from the player ----------------------
+||googleads.g.doubleclick.net/pagead/$third-party
+||static.doubleclick.net/instream/ad_status.js$script
+||googleadservices.com^$domain=youtube.com
+
+! --- Telemetry beacons -----------------------------------------------------
+! Quality-of-experience and CSI beacons. The player does not read the response,
+! so these never gate playback.
+||youtube.com/api/stats/qoe$xmlhttprequest
+||youtube.com/csi_204$xmlhttprequest
+||youtube.com/generate_204$xmlhttprequest
+||youtube.com/error_204$xmlhttprequest
+||youtube.com/gen_204$xmlhttprequest
+||youtube.com/youtubei/v1/feedback$xmlhttprequest
+
+! --- Exceptions ------------------------------------------------------------
+! The player reads ad_status.js to decide whether an ad slot resolved. Letting
+! it 200 is what keeps the adapter's payload stripping from looking to the
+! player like a stalled ad request.
+@@||doubleclick.net/instream/ad_status.js$script,domain=youtube.com|youtube-nocookie.com
+! Playback and resume position both ride on watchtime; blocking it loses your
+! place in long videos.
+@@||youtube.com/api/stats/watchtime$xmlhttprequest
+
+! ===========================================================================
+! COSMETIC — watch page player
+! ===========================================================================
+youtube.com##.ytp-ad-module
 youtube.com##.ytp-ad-overlay-container
+youtube.com##.ytp-ad-overlay-slot
+youtube.com##.ytp-ad-player-overlay
+youtube.com##.ytp-ad-player-overlay-layout
+youtube.com##.ytp-ad-player-overlay-instream-info
 youtube.com##.ytp-ad-message-container
 youtube.com##.ytp-ad-image-overlay
-youtube.com##.ytd-merch-shelf-renderer
+youtube.com##.ytp-ad-text-overlay
+youtube.com##.ytp-ad-progress-list
+youtube.com##.ytp-suggested-action
+youtube.com##.ytp-paid-content-overlay
+youtube.com###player-ads
+youtube.com###panels-full-bleed-container
+youtube.com##ytd-player-legacy-desktop-watch-ads-renderer
+youtube.com##ytd-action-companion-ad-renderer
+youtube.com##ytd-companion-slot-renderer
+youtube-nocookie.com##.ytp-ad-module
+youtube-nocookie.com##.ytp-ad-overlay-container
 
-! Shorts and membership upsells masquerading as content.
-youtube.com##ytd-rich-section-renderer:has(ytd-statement-banner-renderer)
+! ===========================================================================
+! COSMETIC — home feed
+! ===========================================================================
+youtube.com###masthead-ad
+youtube.com##ytd-ad-slot-renderer
+youtube.com##ytd-display-ad-renderer
+youtube.com##ytd-in-feed-ad-layout-renderer
+youtube.com##ytd-banner-promo-renderer
+youtube.com##ytd-banner-promo-renderer-background
+youtube.com##ytd-statement-banner-renderer
+youtube.com##ytd-video-masthead-ad-v3-renderer
+youtube.com##ytd-video-masthead-ad-advertiser-info-renderer
+youtube.com##ytd-primetime-promo-renderer
+youtube.com##ytd-brand-video-shelf-renderer
+youtube.com##ytd-brand-video-singleton-renderer
+youtube.com##ytd-inline-survey-renderer
+! Remove the grid cell as well, or the feed keeps a hole where the ad was.
 youtube.com##ytd-rich-item-renderer:has(ytd-ad-slot-renderer)
+youtube.com##ytd-rich-item-renderer:has(ytd-display-ad-renderer)
+youtube.com##ytd-rich-item-renderer:has(ytd-in-feed-ad-layout-renderer)
+youtube.com##ytd-rich-section-renderer:has(ytd-statement-banner-renderer)
+youtube.com##ytd-rich-section-renderer:has(ytd-brand-video-shelf-renderer)
+youtube.com##ytd-rich-section-renderer:has(ytd-inline-survey-renderer)
 
-! ---------------------------------------------------------------------------
-! Scriptlets. These run in the page and are what the runtime adapter installs
-! for the player itself; see src/adapters/youtube.ts.
-! ---------------------------------------------------------------------------
+! ===========================================================================
+! COSMETIC — search results
+! ===========================================================================
+youtube.com##ytd-promoted-sparkles-text-search-renderer
+youtube.com##ytd-promoted-sparkles-web-renderer
+youtube.com##ytd-promoted-video-renderer
+youtube.com##ytd-search-pyv-renderer
+youtube.com##ytd-carousel-ad-renderer
+youtube.com##ytd-item-section-renderer:has(ytd-search-pyv-renderer)
+youtube.com##ytd-item-section-renderer:has(ytd-promoted-sparkles-text-search-renderer)
+
+! ===========================================================================
+! COSMETIC — watch sidebar and playlists
+! ===========================================================================
+youtube.com##ytd-compact-promoted-video-renderer
+youtube.com##ytd-compact-promoted-item-renderer
+youtube.com##ytd-promoted-sparkles-web-renderer.ytd-watch-next-secondary-results-renderer
+youtube.com##ytd-playlist-panel-video-renderer[is-ad]
+youtube.com##ytd-merch-shelf-renderer
+youtube.com##ytd-ticket-shelf-renderer
+youtube.com##ytd-engagement-panel-section-list-renderer[target-id="engagement-panel-ads"]
+youtube.com##ytd-item-section-renderer:has(ytd-compact-promoted-video-renderer)
+
+! ===========================================================================
+! COSMETIC — Shorts
+! ===========================================================================
+youtube.com##ytd-reel-video-renderer:has(ytd-ad-slot-renderer)
+youtube.com##ytd-reel-video-renderer:has(ytd-display-ad-renderer)
+youtube.com##ytm-reel-item-renderer:has(ytm-promoted-video-renderer)
+youtube.com##.reel-player-overlay-renderer .ytp-ad-module
+
+! ===========================================================================
+! COSMETIC — Premium and membership upsells
+! ===========================================================================
+youtube.com##ytd-mealbar-promo-renderer
+youtube.com##yt-mealbar-promo-renderer
+youtube.com##ytd-popup-container:has(yt-mealbar-promo-renderer)
+youtube.com##tp-yt-paper-dialog:has(yt-mealbar-promo-renderer)
+youtube.com##ytd-button-renderer.ytd-premium-upsell-renderer
+youtube.com##ytmusic-mealbar-promo-renderer
+youtube.com##ytmusic-statement-banner-renderer
+youtube.com##ytmusic-popup-container:has(ytmusic-mealbar-promo-renderer)
+
+! ===========================================================================
+! COSMETIC — anti-adblock enforcement
+! ===========================================================================
+! The adapter also removes these and resumes playback, because removing the
+! dialog without pressing play leaves a stopped player, which reads as breakage.
+youtube.com##ytd-enforcement-message-view-model
+youtube.com##tp-yt-paper-dialog:has(ytd-enforcement-message-view-model)
+youtube.com##tp-yt-iron-overlay-backdrop:has(+ tp-yt-paper-dialog ytd-enforcement-message-view-model)
+
+! ===========================================================================
+! COSMETIC — mobile web
+! ===========================================================================
+youtube.com##ytm-promoted-video-renderer
+youtube.com##ytm-promoted-sparkles-web-renderer
+youtube.com##ytm-companion-slot
+youtube.com##ytm-item-section-renderer:has(ytm-promoted-video-renderer)
+youtube.com##.ad-container
+youtube.com##.video-ads
+
+! ===========================================================================
+! STYLE — reclaim the space a removed element leaves behind
+! ===========================================================================
+youtube.com#$#ytd-rich-grid-renderer { --ytd-rich-grid-row-margin: 0 !important; }
+youtube.com#$##player-ads { display: none !important; height: 0 !important; }
+
+! ===========================================================================
+! SCRIPTLETS
+! ===========================================================================
+! The runtime adapter. Strips ad payloads out of player responses and feed data,
+! drives the player state machine, and dismisses the enforcement modal.
 youtube.com##+js(404ad-yt-player)
+youtube-nocookie.com##+js(404ad-yt-player)
+
+! Belt and braces for the inlined bootstrap objects, in case the adapter's
+! property hook loses the race with an inline script.
 youtube.com##+js(set-constant, ytInitialPlayerResponse.adPlacements, undefined)
+youtube.com##+js(set-constant, ytInitialPlayerResponse.playerAds, undefined)
+youtube.com##+js(set-constant, ytInitialPlayerResponse.adSlots, undefined)
 youtube.com##+js(set-constant, playerResponse.adPlacements, undefined)
+
+! Drop the instrumentation timers the player installs for ad pacing.
+youtube.com##+js(json-prune, adPlacements, playerAds, adSlots, adBreakHeartbeatParams)

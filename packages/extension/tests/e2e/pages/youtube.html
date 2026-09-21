@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>404AD YouTube fixture</title>
+    <style>
+      ytd-rich-item-renderer,
+      ytd-ad-slot-renderer,
+      ytd-video-renderer,
+      ytd-promoted-video-renderer,
+      .ytp-ad-module,
+      #player-ads,
+      ytd-mealbar-promo-renderer,
+      ytd-enforcement-message-view-model {
+        display: block;
+        min-height: 24px;
+        border: 1px solid #ccc;
+        margin: 2px 0;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>watch</h1>
+
+    <div id="movie_player" class="html5-video-player">
+      <video class="html5-main-video"></video>
+      <div class="ytp-ad-module" id="player-ad-module">in-player ad module</div>
+    </div>
+    <div id="player-ads">companion ad slot</div>
+
+    <h2>home feed</h2>
+    <!-- A real video. Hiding this would be a false positive. -->
+    <ytd-rich-item-renderer id="feed-video">
+      <ytd-video-renderer>real video</ytd-video-renderer>
+    </ytd-rich-item-renderer>
+
+    <!-- An ad cell. The :has() rule must remove the whole cell, not just the
+         inner renderer, or the grid keeps a hole. -->
+    <ytd-rich-item-renderer id="feed-ad-cell">
+      <ytd-ad-slot-renderer id="feed-ad">sponsored</ytd-ad-slot-renderer>
+    </ytd-rich-item-renderer>
+
+    <h2>search</h2>
+    <ytd-promoted-video-renderer id="search-promo">promoted</ytd-promoted-video-renderer>
+
+    <h2>upsell</h2>
+    <ytd-mealbar-promo-renderer id="premium-upsell">Try Premium</ytd-mealbar-promo-renderer>
+
+    <h2>enforcement</h2>
+    <ytd-enforcement-message-view-model id="enforcement">
+      Ad blockers violate YouTube's Terms of Service
+    </ytd-enforcement-message-view-model>
+  </body>
+</html>

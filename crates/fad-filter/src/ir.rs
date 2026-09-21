@@ -258,12 +258,15 @@ pub enum CosmeticKind {
 }
 
 /// Procedural operators that CSS alone cannot express.
+///
+/// `:has()` is deliberately absent. Chromium has supported it natively since
+/// 105 and 404AD targets 120 or later, so a `:has()` selector is left in the
+/// plain-CSS prefix and evaluated by the browser's own selector engine. Routing
+/// it through JS would be slower and would hide it from the injected stylesheet.
 #[derive(Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Serialize, Deserialize)]
 pub enum Procedural {
     /// `:has-text(needle)` / `:has-text(/re/)`
     HasText { needle: String, regex: bool },
-    /// `:has(selector)` evaluated in JS for browsers without native `:has`.
-    Has { selector: String },
     /// `:upward(n)` or `:upward(selector)`
     Upward {
         steps: Option<u32>,

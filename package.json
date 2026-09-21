@@ -22,9 +22,9 @@
     "test:unit": "bun test packages/extension/src",
     "test:e2e": "bun run --cwd packages/extension test:e2e",
     "verify": "cargo run -q -p fad-compiler -- verify --lists lists",
-    "lint": "oxlint packages/extension/src packages/extension/entrypoints",
-    "fmt": "oxfmt packages/extension/src packages/extension/entrypoints",
-    "fmt:check": "oxfmt --check packages/extension/src packages/extension/entrypoints"
+    "lint": "oxlint packages/extension/src packages/extension/entrypoints packages/extension/tests",
+    "fmt": "oxfmt packages/extension/src packages/extension/entrypoints packages/extension/tests",
+    "fmt:check": "oxfmt --check packages/extension/src packages/extension/entrypoints packages/extension/tests"
   },
   "devDependencies": {
     "@happy-dom/global-registrator": "^20.14.5",

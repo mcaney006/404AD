@@ -1,7 +1,9 @@
 import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import {
   installPlayerWatcher,
+  looksLikeInitialData,
   looksLikePlayerResponse,
+  pruneAdRenderers,
   stripAdPayload,
   youtubeAdapter,
 } from "./youtube";
@@ -85,6 +87,84 @@ describe("stripAdPayload", () => {
   });
 });
 
+describe("pruneAdRenderers", () => {
+  test("drops ad entries from a feed and keeps real items", () => {
+    const data = {
+      contents: {
+        richGridRenderer: {
+          contents: [
+            { richItemRenderer: { content: { videoRenderer: { videoId: "a" } } } },
+            { richItemRenderer: { content: { adSlotRenderer: { id: "ad" } } } },
+            { richItemRenderer: { content: { videoRenderer: { videoId: "b" } } } },
+          ],
+        },
+      },
+    };
+    pruneAdRenderers(data);
+
+    const items = data.contents.richGridRenderer.contents;
+    // Deleting the entry beats hiding it: the grid stops reserving a slot.
+    expect(items).toHaveLength(3);
+    const inner = items.map((i) => Object.keys(i.richItemRenderer.content)[0]);
+    expect(inner).toEqual(["videoRenderer", undefined, "videoRenderer"]);
+  });
+
+  test("removes the array element when the ad renderer is the entry itself", () => {
+    const data = {
+      contents: [{ videoRenderer: {} }, { promotedVideoRenderer: {} }, { videoRenderer: {} }],
+    };
+    pruneAdRenderers(data);
+    expect(data.contents).toHaveLength(2);
+    expect(data.contents.every((c) => "videoRenderer" in c)).toBe(true);
+  });
+
+  test("strips a renderer hanging directly off a key without taking its parent", () => {
+    const data = { section: { title: "Up next", mealbarPromoRenderer: { x: 1 } } };
+    pruneAdRenderers(data);
+    expect(data.section.title).toBe("Up next");
+    expect("mealbarPromoRenderer" in data.section).toBe(false);
+  });
+
+  test("reaches arbitrarily nested feeds", () => {
+    const data = {
+      onResponseReceivedActions: [
+        {
+          appendAction: { items: [{ searchPyvRenderer: {} }, { videoRenderer: { videoId: "x" } }] },
+        },
+      ],
+    };
+    pruneAdRenderers(data);
+    expect(data.onResponseReceivedActions[0]?.appendAction.items).toHaveLength(1);
+  });
+
+  test("leaves a payload with no ads untouched", () => {
+    const data = { contents: [{ videoRenderer: { videoId: "a" } }] };
+    expect(pruneAdRenderers(structuredClone(data))).toEqual(data);
+  });
+
+  test("survives a deep structure without recursing forever", () => {
+    // A node budget is the only thing standing between a megabyte of feed data
+    // and a walk that becomes the reason the page feels slow.
+    let deep: Record<string, unknown> = { videoRenderer: {} };
+    for (let i = 0; i < 5_000; i += 1) deep = { child: deep };
+    expect(() => pruneAdRenderers(deep)).not.toThrow();
+  });
+
+  test("tolerates cycles and non-objects", () => {
+    expect(pruneAdRenderers(null)).toBeNull();
+    expect(pruneAdRenderers(7)).toBe(7);
+  });
+});
+
+describe("looksLikeInitialData", () => {
+  test("recognises navigation payloads and ignores player configs", () => {
+    expect(looksLikeInitialData({ contents: {} })).toBe(true);
+    expect(looksLikeInitialData({ onResponseReceivedActions: [] })).toBe(true);
+    expect(looksLikeInitialData({ streamingData: {} })).toBe(false);
+    expect(looksLikeInitialData("text")).toBe(false);
+  });
+});
+
 describe("looksLikePlayerResponse", () => {
   test("recognises player payloads and ignores unrelated JSON", () => {
     expect(looksLikePlayerResponse({ streamingData: {} })).toBe(true);
@@ -148,6 +228,42 @@ describe("adapter hooks", () => {
     } finally {
       JSON.parse = originalParse;
       host.fetch = originalFetch;
+    }
+  });
+
+  test("JSON.parse prunes ad renderers out of feed data", () => {
+    const originalParse = JSON.parse;
+    const originalFetch = host.fetch;
+    try {
+      youtubeAdapter();
+      const feed = JSON.parse(
+        JSON.stringify({
+          contents: [{ videoRenderer: { videoId: "a" } }, { adSlotRenderer: {} }],
+        }),
+      ) as { contents: unknown[] };
+      expect(feed.contents).toHaveLength(1);
+    } finally {
+      JSON.parse = originalParse;
+      host.fetch = originalFetch;
+    }
+  });
+
+  test("cleans a player response that was already inlined before install", () => {
+    // The runtime is injected on a message round trip, so an inline script can
+    // set this before the adapter exists. Only cleaning future writes would
+    // leave the most common case untouched.
+    const originalParse = JSON.parse;
+    const originalFetch = host.fetch;
+    host.ytInitialPlayerResponse = { streamingData: {}, adPlacements: [{ a: 1 }] };
+    try {
+      youtubeAdapter();
+      const value = host.ytInitialPlayerResponse as Record<string, unknown>;
+      expect(value.adPlacements).toBeUndefined();
+      expect(value.streamingData).toEqual({});
+    } finally {
+      JSON.parse = originalParse;
+      host.fetch = originalFetch;
+      delete host.ytInitialPlayerResponse;
     }
   });
 

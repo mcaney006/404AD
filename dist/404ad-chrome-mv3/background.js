@@ -1096,55 +1096,6 @@ var background = (function() {
 		});
 	}
 	//#endregion
-	//#region src/core/inject.ts
-	/**
-	* Main-world scriptlet injection.
-	*
-	* Scriptlets have to run in the page's own realm, before the page's scripts do,
-	* and they need per-host arguments. MV3 offers exactly one way to get all three:
-	*
-	*  1. `executeScript` with `func` + `args` to publish the configuration, and
-	*  2. `executeScript` with `files` to run the bundled runtime that reads it.
-	*
-	* Two calls rather than one because a `func` payload is serialized as source and
-	* therefore cannot close over imports, while a `files` payload cannot carry
-	* arguments. Splitting them keeps the runtime a normal, bundled, reviewable
-	* module instead of one giant stringified function.
-	*
-	* Neither step evaluates remote or generated code: the runtime is a file inside
-	* the packaged extension.
-	*/
-	var RUNTIME_FILE = "/scriptlets-runtime.js";
-	/** Published into the page realm for the runtime to pick up. */
-	function publishConfig(entries) {
-		Object.defineProperty(globalThis, "__404AD_SCRIPTLETS__", {
-			value: entries,
-			configurable: true,
-			enumerable: false,
-			writable: true
-		});
-	}
-	async function injectScriptlets(tabId, frameId, entries) {
-		if (entries.length === 0) return;
-		const target = {
-			tabId,
-			frameIds: [frameId]
-		};
-		await chrome.scripting.executeScript({
-			target,
-			world: "MAIN",
-			injectImmediately: true,
-			func: publishConfig,
-			args: [entries]
-		});
-		await chrome.scripting.executeScript({
-			target,
-			world: "MAIN",
-			injectImmediately: true,
-			files: [RUNTIME_FILE]
-		});
-	}
-	//#endregion
 	//#region entrypoints/background.ts
 	/**
 	* The 404AD service worker: the control plane.
@@ -1198,35 +1149,12 @@ var background = (function() {
 			clearTab(tabId);
 			hiddenByTab.delete(tabId);
 		});
-		chrome.webNavigation.onCommitted.addListener((details) => {
-			if (details.frameId === 0) {
-				clearTab(details.tabId);
-				hiddenByTab.delete(details.tabId);
+		chrome.tabs.onUpdated.addListener((tabId, changeInfo) => {
+			if (changeInfo.status === "loading" && changeInfo.url !== void 0) {
+				clearTab(tabId);
+				hiddenByTab.delete(tabId);
 			}
-			injectScriptletsFor(details.tabId, details.frameId, details.url);
 		});
-		/**
-		* Inject scriptlets into the page's main world.
-		*
-		* `executeScript` with `injectImmediately` is the earliest reliable MV3 hook
-		* for main-world code whose payload is only known per-navigation. A static
-		* `registerContentScripts` entry runs earlier but cannot carry per-host
-		* arguments, and inline `<script>` injection is blocked by page CSP on
-		* exactly the sites that matter most.
-		*/
-		async function injectScriptletsFor(tabId, frameId, url) {
-			if (!url.startsWith("http")) return;
-			try {
-				const settings = await loadSettings();
-				if (!settings.enabled || !settings.scriptlets) return;
-				const host = hostOf(url);
-				if (await resolveMode(host) !== "default") return;
-				const { scriptlets } = await resolveDocument(host, []);
-				const active = scriptlets.filter((s) => !s.shadow);
-				if (active.length === 0) return;
-				await injectScriptlets(tabId, frameId, active);
-			} catch {}
-		}
 		chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 			handle(message, sender).then((data) => sendResponse({
 				ok: true,
@@ -1245,7 +1173,7 @@ var background = (function() {
 					const off = !settings.enabled || mode === "off";
 					const cosmeticEnabled = !off && settings.cosmeticFiltering && mode === "default";
 					const scriptletsEnabled = !off && settings.scriptlets && mode === "default";
-					if (!cosmeticEnabled) return {
+					if (!cosmeticEnabled && !scriptletsEnabled) return {
 						specific: [],
 						generic: [],
 						styles: [],
@@ -1260,8 +1188,11 @@ var background = (function() {
 					const keep = (items) => settings.shadowMode ? items.filter((i) => !i.shadow) : items.filter((i) => !i.shadow);
 					return {
 						...resolved,
-						scriptlets: keep(resolved.scriptlets),
-						procedural: keep(resolved.procedural),
+						specific: cosmeticEnabled ? resolved.specific : [],
+						generic: cosmeticEnabled ? resolved.generic : [],
+						styles: cosmeticEnabled ? resolved.styles : [],
+						procedural: cosmeticEnabled ? keep(resolved.procedural) : [],
+						scriptlets: scriptletsEnabled ? keep(resolved.scriptlets) : [],
 						mode,
 						cosmeticEnabled,
 						scriptletsEnabled
