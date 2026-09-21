@@ -95,6 +95,10 @@ struct StateReport {
     parts: u64,
     bulk_bytes_skipped: u64,
     peak_buffer: usize,
+    open_streams: usize,
+    non_ump_responses: u64,
+    truncated_responses: u64,
+    rejected_headers: u64,
 }
 
 fn describe(evidence: &[Evidence]) -> Vec<EvidenceReport> {
@@ -131,7 +135,34 @@ impl TransportEngine {
         self.state.set_requested_video(video_id);
     }
 
+    /// Begin reading one SABR response, returning its stream id.
+    ///
+    /// One per response, always. UMP framing belongs to a response: the player
+    /// cancels requests mid-part and runs several in flight at once, so a
+    /// shared parser is consuming two framings out of one buffer.
+    #[wasm_bindgen(js_name = openStream)]
+    pub fn open_stream(&mut self) -> u32 {
+        self.state.open_stream()
+    }
+
+    /// Finish a response. Returns true when it ended on a part boundary.
+    #[wasm_bindgen(js_name = closeStream)]
+    pub fn close_stream(&mut self, stream: u32) -> bool {
+        self.state.close_stream(stream)
+    }
+
     /// Feed one network chunk. The only per-chunk call across the boundary.
+    #[wasm_bindgen(js_name = pushStream)]
+    pub fn push_stream(&mut self, stream: u32, chunk: &[u8]) -> Result<JsValue, JsValue> {
+        let outcome: PushOutcome = self
+            .state
+            .push_stream(stream, chunk)
+            .map_err(|e| JsValue::from_str(&format!("ump: {e}")))?;
+        to_js(&outcome)
+    }
+
+    /// Feed one network chunk on the default stream, for a caller reading one
+    /// response at a time.
     pub fn push(&mut self, chunk: &[u8]) -> Result<JsValue, JsValue> {
         let outcome: PushOutcome = self
             .state
@@ -149,6 +180,12 @@ impl TransportEngine {
         let signal = signal_from_name(signal)
             .ok_or_else(|| JsValue::from_str(&format!("unknown signal `{signal}`")))?;
         Ok(verdict_name(self.state.observe(signal)).to_string())
+    }
+
+    /// The viewer seeked. Starts a fresh epoch without charging it as evidence.
+    #[wasm_bindgen(js_name = notifySeek)]
+    pub fn notify_seek(&mut self) {
+        self.state.notify_seek();
     }
 
     pub fn verdict(&self) -> String {
@@ -222,6 +259,10 @@ impl TransportEngine {
             parts: stats.parts,
             bulk_bytes_skipped: stats.bulk_bytes_skipped,
             peak_buffer: stats.peak_buffer,
+            open_streams: self.state.open_streams(),
+            non_ump_responses: self.state.non_ump_responses(),
+            truncated_responses: self.state.truncated_responses(),
+            rejected_headers: self.state.rejected_headers(),
         })
     }
 

@@ -74,6 +74,10 @@ export interface TransportStateReport {
   parts: number;
   bulkBytesSkipped: number;
   peakBuffer: number;
+  openStreams: number;
+  nonUmpResponses: number;
+  truncatedResponses: number;
+  rejectedHeaders: number;
 }
 
 let engine: TransportEngine | null = null;
@@ -122,12 +126,18 @@ function videoElement(): HTMLVideoElement | null {
  * exactly as it would have, and 404AD reads the other. The page's playback path
  * is never in 404AD's critical path, so a slow or failed analysis cannot stall
  * the video.
+ *
+ * Each response gets its own engine stream. The player keeps several requests
+ * in flight and cancels them mid-part constantly, so these read loops interleave
+ * and end abruptly; a framing state shared between them would be reassembling
+ * two responses out of one buffer.
  */
 function observeBody(
   body: ReadableStream<Uint8Array>,
   active: TransportEngine,
 ): ReadableStream<Uint8Array> {
   const [toPage, toEngine] = body.tee();
+  const stream = active.openStream();
 
   void (async () => {
     const reader = toEngine.getReader();
@@ -141,7 +151,7 @@ function observeBody(
         total += value.byteLength;
         if (total > MAX_BYTES_PER_RESPONSE) break;
         try {
-          active.push(value);
+          active.pushStream(stream, value);
         } catch (error) {
           // A framing error means this response is not what we thought it was.
           // Stop analysing it; never let that touch playback.
@@ -153,6 +163,11 @@ function observeBody(
       // The page cancelled the request, which is ordinary.
     } finally {
       reader.releaseLock();
+      try {
+        active.closeStream(stream);
+      } catch {
+        // The engine may have been replaced by a navigation.
+      }
     }
   })();
 
@@ -273,12 +288,45 @@ function installSkipLoop(): () => void {
     if (!Number.isFinite(video.duration) || seconds >= video.duration) return;
 
     lastSkipTarget = seconds;
+    ourSeeks += 1;
     video.currentTime = seconds;
     if (video.paused) void video.play().catch(() => undefined);
   };
 
   const timer = setInterval(tick, TICK_MS);
   return () => clearInterval(timer);
+}
+
+/** Seeks 404AD performed itself, which must not be reported back to it. */
+let ourSeeks = 0;
+
+/**
+ * Tell the engine when the viewer scrubs.
+ *
+ * A scrub makes the server resume from somewhere else, which is indistinguishable
+ * from a new media epoch by anything the transport can measure. Left unreported,
+ * every drag of the scrubber charges a timeline discontinuity against the video.
+ *
+ * Captured on the document because media events do not bubble; the capture phase
+ * still reaches a listener there, and one listener survives the player element
+ * being replaced by a single-page navigation.
+ */
+function installSeekReporter(): () => void {
+  const onSeeking = (event: Event): void => {
+    if (!(event.target instanceof HTMLVideoElement)) return;
+    if (ourSeeks > 0) {
+      ourSeeks -= 1;
+      return;
+    }
+    try {
+      engine?.notifySeek();
+    } catch {
+      // Analysis is optional. Playback is not.
+    }
+  };
+
+  document.addEventListener("seeking", onSeeking, true);
+  return () => document.removeEventListener("seeking", onSeeking, true);
 }
 
 /**
@@ -294,6 +342,7 @@ export function installTransport(wasmUrl: string): void {
   installFetchHook(wasmUrl);
   installBufferGate();
   const stopLoop = installSkipLoop();
+  const stopSeeks = installSeekReporter();
 
   // A single-page navigation means a different video; nothing learned about the
   // previous stream is valid for the next one.
@@ -301,7 +350,14 @@ export function installTransport(wasmUrl: string): void {
     const videoId = currentVideoId();
     if (engine && videoId) engine.setRequestedVideo(videoId);
   });
-  globalThis.addEventListener("pagehide", () => stopLoop(), { once: true });
+  globalThis.addEventListener(
+    "pagehide",
+    () => {
+      stopLoop();
+      stopSeeks();
+    },
+    { once: true },
+  );
 
   // Exposed for the diagnostics panel, which reads it through the page bridge.
   Object.defineProperty(globalThis, "__404AD_TRANSPORT__", {
@@ -325,4 +381,5 @@ export function resetTransportForTests(): void {
   engine = null;
   loading = null;
   installed = false;
+  ourSeeks = 0;
 }

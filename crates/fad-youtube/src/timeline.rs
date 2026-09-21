@@ -20,7 +20,7 @@ use serde::{Deserialize, Serialize};
 
 pub type Micros = i64;
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
 pub enum MediaType {
     Audio,
     Video,
@@ -183,6 +183,12 @@ impl IntervalSet {
 pub struct Timeline {
     segments: Vec<Segment>,
     ads: IntervalSet,
+    /// Index of the first segment continuity may look back to.
+    ///
+    /// A seek partitions the timeline: media after it is discontinuous with
+    /// media before it by construction, and reporting that as a jump would
+    /// charge the viewer's own scrubbing as evidence of an ad.
+    barrier: usize,
 }
 
 /// How a segment sits against the one before it on the same track.
@@ -196,6 +202,12 @@ pub enum Continuity {
     Gap { delta_us: Micros },
     /// A backward jump: the timeline restarted or rewound.
     Overlap { delta_us: Micros },
+    /// This exact segment has already been seen on this track.
+    ///
+    /// A SABR redirect makes the client re-issue the request it had in flight,
+    /// so the same segments arrive twice. Reading that as a rewind turns an
+    /// ordinary CDN handoff into evidence of an ad.
+    Retransmission,
 }
 
 impl Timeline {
@@ -220,10 +232,37 @@ impl Timeline {
         &mut self.ads
     }
 
+    /// How far back a repeated segment is still recognised as a retransmission.
+    ///
+    /// ponytail: a bounded reverse scan rather than an index. 64 segments is
+    /// minutes of media, well past any redirect's replay, and the scan is
+    /// O(64) whatever the session length. Upgrade path: a `(format, sequence)`
+    /// set, if a stream ever replays further back than this.
+    const RETRANSMIT_WINDOW: usize = 64;
+
     /// Record a segment and report how it sits against its predecessor.
     pub fn observe(&mut self, segment: Segment) -> Continuity {
-        let previous = self
+        let replayed = self
             .segments
+            .iter()
+            .rev()
+            .take(Self::RETRANSMIT_WINDOW)
+            .any(|s| {
+                s.format_id == segment.format_id
+                    && s.sequence == segment.sequence
+                    // Position matters: a replay repeats the same bytes at the
+                    // same place, whereas an ad epoch restarts its numbering
+                    // somewhere else on the timeline.
+                    && s.start_us == segment.start_us
+            });
+        if replayed {
+            // Not recorded: the timeline already holds these bytes, and keeping
+            // the duplicate would leave the next segment comparing against a
+            // copy of its own predecessor.
+            return Continuity::Retransmission;
+        }
+
+        let previous = self.segments[self.barrier..]
             .iter()
             .rev()
             .find(|s| s.media_type == segment.media_type && s.format_id == segment.format_id);
@@ -245,6 +284,12 @@ impl Timeline {
         continuity
     }
 
+    /// Break continuity here: nothing after this point is compared with
+    /// anything before it.
+    pub fn seek_barrier(&mut self) {
+        self.barrier = self.segments.len();
+    }
+
     /// Total transport duration observed, i.e. the end of the last segment.
     pub fn transport_end_us(&self) -> Micros {
         self.segments.iter().map(Segment::end_us).max().unwrap_or(0)
@@ -260,12 +305,18 @@ impl Timeline {
     /// Keeping every segment of a six-hour stream would be a memory leak with
     /// extra steps.
     pub fn prune(&mut self, before_us: Micros) {
+        let dropped_before_barrier = self.segments[..self.barrier]
+            .iter()
+            .filter(|s| s.end_us() < before_us)
+            .count();
         self.segments.retain(|s| s.end_us() >= before_us);
+        self.barrier -= dropped_before_barrier;
     }
 
     pub fn reset(&mut self) {
         self.segments.clear();
         self.ads.clear();
+        self.barrier = 0;
     }
 }
 
@@ -287,6 +338,66 @@ mod tests {
             init_id: 1,
             request_epoch: 0,
         }
+    }
+
+    #[test]
+    fn the_same_segment_arriving_twice_is_a_retransmission_not_a_rewind() {
+        // A SABR redirect makes the client re-issue the request it had in
+        // flight, so the same segments arrive again. Read as a rewind, an
+        // ordinary CDN handoff became evidence of an ad.
+        let mut timeline = Timeline::new();
+        assert_eq!(timeline.observe(segment(0, 0, 5)), Continuity::First);
+        assert!(matches!(
+            timeline.observe(segment(1, 5, 5)),
+            Continuity::Continuous { .. }
+        ));
+        assert_eq!(
+            timeline.observe(segment(1, 5, 5)),
+            Continuity::Retransmission
+        );
+        assert_eq!(timeline.segments().len(), 2, "no duplicate is recorded");
+
+        // And the track carries on from where it really was.
+        assert!(matches!(
+            timeline.observe(segment(2, 10, 5)),
+            Continuity::Continuous { .. }
+        ));
+    }
+
+    #[test]
+    fn a_restarted_timeline_is_not_mistaken_for_a_retransmission() {
+        // Same format, same sequence numbers, different position: a new epoch
+        // rather than a replay, and the discontinuity has to survive.
+        let mut timeline = Timeline::new();
+        timeline.observe(segment(0, 0, 5));
+        timeline.observe(segment(1, 5, 5));
+        assert!(matches!(
+            timeline.observe(segment(0, 120, 5)),
+            Continuity::Gap { .. }
+        ));
+    }
+
+    #[test]
+    fn a_seek_barrier_survives_pruning() {
+        let mut timeline = Timeline::new();
+        for i in 0..6i64 {
+            timeline.observe(segment(i as u64, i * 5, 5));
+        }
+        timeline.seek_barrier();
+        timeline.observe(segment(100, 600, 5));
+
+        // History behind the cursor goes, including everything the barrier was
+        // counted against. The barrier has to move with it or the next
+        // comparison reaches back across the seek.
+        timeline.prune(20 * SEC);
+        assert!(matches!(
+            timeline.observe(segment(101, 605, 5)),
+            Continuity::Continuous { .. }
+        ));
+        assert!(matches!(
+            timeline.observe(segment(102, 900, 5)),
+            Continuity::Gap { .. }
+        ));
     }
 
     #[test]

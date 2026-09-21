@@ -230,8 +230,29 @@ printed and argued with. No model, no training, no opaque score.
 | media identity matches the request | 0.02 | 0.95 | −3.86 |
 
 No single circumstantial signal can decide. Five transport signals sum to about
-6.13 nats against a 6.86 threshold, which is the asymmetry doing its job. The
-DOM contributes evidence; it is never truth.
+6.13 nats against a 6.86 threshold, which is the tighter false-ad rate doing its
+job. The DOM contributes evidence; it is never truth.
+
+#### What a real stream does, and what the engine refuses to read into it
+
+A likelihood model is only as good as the events it counts, and most of what
+happens on a real SABR stream is routine. Each of these is handled explicitly,
+with a regression test naming it:
+
+| Real event | Read naively as | What 404AD does |
+| --- | --- | --- |
+| Response is not UMP at all (a range response, an error page) | fabricated segments | the first part header must name a known type, or the body is dropped unread |
+| Player cancels a request mid-part | the next response parsed as its tail | framing is per response; a cancelled one is counted, not carried |
+| Several responses in flight at once | two framings interleaved in one buffer | one parser per response |
+| SABR redirect to another CDN host | a new content epoch | a redirect changes hosts, not content |
+| The same segments replayed after that redirect | a timeline rewind | recognised as a retransmission |
+| An audio format alongside a video one | a mid-roll format switch | tracked per track, so only a replacement counts |
+| The viewer scrubs | a timeline discontinuity | the seek partitions the timeline and charges nothing |
+| A header that decodes to an impossible segment | an ad interval hours long | implausible headers are counted and dropped |
+| A classified epoch that runs away | every later segment refused | one ad interval can never exceed six minutes |
+
+The last two are the ones that matter most. Every other failure shows an ad;
+those two stop the video.
 
 #### Two clocks
 
@@ -258,7 +279,7 @@ them:
 
 | | Measured | Budget |
 | --- | --- | --- |
-| Transport parsing (10 min of 8 Mbps) | 572 MB in 94 ms, **6,072 MB/s** | > 50 MB/s |
+| Transport parsing (10 min of 8 Mbps) | 572 MB in 48 ms, **12,022 MB/s** | > 50 MB/s |
 | Bytes retained between chunks over 114 MB | **26 bytes** | < 8 KB |
 | Media bytes skipped, never buffered | **100%** | > 90% |
 | YouTube WASM module | **72 KB** | loaded only on first media request |
@@ -398,6 +419,7 @@ Fuzz the parser (needs `cargo install cargo-fuzz` and a nightly toolchain):
 scripts/fuzz.sh parse_line
 scripts/fuzz.sh compile_list
 scripts/fuzz.sh cosmetic_index
+scripts/fuzz.sh sabr_stream
 ```
 
 ## Filter lists

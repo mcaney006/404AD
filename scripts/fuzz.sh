@@ -3,7 +3,7 @@
 #
 #   scripts/fuzz.sh parse_line [-- libfuzzer args]
 #
-# Targets: parse_line, compile_list, cosmetic_index
+# Targets: parse_line, compile_list, cosmetic_index, sabr_stream
 #
 # cargo-fuzz needs a nightly toolchain for the sanitizer instrumentation, which
 # is why the fuzz crate is excluded from the workspace: a stable `cargo test

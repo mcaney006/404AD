@@ -17,8 +17,9 @@ pub enum WireType {
     Fixed64,
     LengthDelimited,
     Fixed32,
-    /// Groups are deprecated and never appear here, but they still have to be
-    /// recognised to be skipped.
+    /// Groups are deprecated, but a reverse-engineered message can still carry
+    /// one, and its body has to be walked past rather than read as if it were
+    /// top level.
     StartGroup,
     EndGroup,
 }
@@ -89,16 +90,21 @@ fn read_varint(bytes: &[u8]) -> Option<(u64, usize)> {
     None
 }
 
-/// Visit every field in a message.
+/// Visit every top-level field in a message.
 ///
 /// Returns `false` if the message is malformed, after visiting whatever was
 /// readable. A partially readable metadata part is more useful than none.
+///
+/// Fields nested inside a group are walked but not visited. Surfacing them as
+/// if they were top level is how a group carrying its own field 2 would be read
+/// as the message's own video id.
 pub fn scan<'a, F>(mut bytes: &'a [u8], mut visit: F) -> bool
 where
     // The lifetime is tied to the input so a caller can keep a borrowed field
     // rather than being forced to copy every string out of the closure.
     F: FnMut(u32, Value<'a>),
 {
+    let mut depth: u32 = 0;
     while !bytes.is_empty() {
         let Some((tag, tag_len)) = read_varint(bytes) else {
             return false;
@@ -117,7 +123,9 @@ where
                 let Some((value, len)) = read_varint(bytes) else {
                     return false;
                 };
-                visit(field, Value::Varint(value));
+                if depth == 0 {
+                    visit(field, Value::Varint(value));
+                }
                 bytes = &bytes[len..];
             }
             WireType::Fixed64 => {
@@ -125,7 +133,9 @@ where
                     return false;
                 }
                 let value = u64::from_le_bytes(bytes[..8].try_into().expect("checked"));
-                visit(field, Value::Fixed64(value));
+                if depth == 0 {
+                    visit(field, Value::Fixed64(value));
+                }
                 bytes = &bytes[8..];
             }
             WireType::Fixed32 => {
@@ -133,7 +143,9 @@ where
                     return false;
                 }
                 let value = u32::from_le_bytes(bytes[..4].try_into().expect("checked"));
-                visit(field, Value::Fixed32(value));
+                if depth == 0 {
+                    visit(field, Value::Fixed32(value));
+                }
                 bytes = &bytes[4..];
             }
             WireType::LengthDelimited => {
@@ -145,16 +157,38 @@ where
                 if rest.len() < len {
                     return false;
                 }
-                visit(field, Value::Bytes(&rest[..len]));
+                if depth == 0 {
+                    visit(field, Value::Bytes(&rest[..len]));
+                }
                 bytes = &rest[len..];
             }
-            WireType::StartGroup | WireType::EndGroup => {
-                visit(field, Value::Group);
+            WireType::StartGroup => {
+                if depth == 0 {
+                    visit(field, Value::Group);
+                }
+                // Guard against a nesting depth that only a hostile message
+                // would produce; the walk is iterative, so this is a sanity
+                // bound rather than a stack limit.
+                if depth == MAX_GROUP_DEPTH {
+                    return false;
+                }
+                depth += 1;
+            }
+            WireType::EndGroup => {
+                if depth == 0 {
+                    // A group that was never opened. The message is malformed
+                    // and everything after this tag is unanchored.
+                    return false;
+                }
+                depth -= 1;
             }
         }
     }
-    true
+    depth == 0
 }
+
+/// Nesting deeper than this is not a message 404AD needs to read.
+const MAX_GROUP_DEPTH: u32 = 16;
 
 /// Encode a field. Test and fixture support only.
 pub fn encode_varint_field(field: u32, value: u64, out: &mut Vec<u8>) {
@@ -166,6 +200,13 @@ pub fn encode_bytes_field(field: u32, value: &[u8], out: &mut Vec<u8>) {
     write_varint((u64::from(field) << 3) | 2, out);
     write_varint(value.len() as u64, out);
     out.extend_from_slice(value);
+}
+
+/// Encode a deprecated group wrapper. Test and fixture support only.
+pub fn encode_group(field: u32, body: &[u8], out: &mut Vec<u8>) {
+    write_varint((u64::from(field) << 3) | 3, out);
+    out.extend_from_slice(body);
+    write_varint((u64::from(field) << 3) | 4, out);
 }
 
 fn write_varint(mut value: u64, out: &mut Vec<u8>) {
@@ -239,6 +280,40 @@ mod tests {
         let ok = scan(&buf, |field, _| seen.push(field));
         assert!(!ok, "a truncated message is reported as malformed");
         assert_eq!(seen, vec![3], "but the readable prefix still came through");
+    }
+
+    #[test]
+    fn a_groups_own_fields_do_not_surface_as_the_messages_fields() {
+        // Regression: the scanner used to report the group marker and then read
+        // the group's body as top level, so a group carrying field 2 became the
+        // message's video id.
+        let mut body = Vec::new();
+        encode_bytes_field(2, b"NOT-THE-VIDEO", &mut body);
+        encode_varint_field(3, 999, &mut body);
+
+        let mut buf = Vec::new();
+        encode_group(7, &body, &mut buf);
+        encode_bytes_field(2, b"dQw4w9WgXcQ", &mut buf);
+
+        let parsed = fields(&buf);
+        assert_eq!(parsed.len(), 2, "{parsed:?}");
+        assert_eq!(parsed[0], (7, Value::Group));
+        assert_eq!(parsed[1].1.as_str().unwrap(), "dQw4w9WgXcQ");
+    }
+
+    #[test]
+    fn a_group_that_was_never_opened_is_malformed() {
+        let mut buf = Vec::new();
+        write_varint((7u64 << 3) | 4, &mut buf);
+        assert!(!scan(&buf, |_, _| {}));
+    }
+
+    #[test]
+    fn a_group_left_open_is_malformed() {
+        let mut buf = Vec::new();
+        write_varint((7u64 << 3) | 3, &mut buf);
+        encode_varint_field(1, 5, &mut buf);
+        assert!(!scan(&buf, |_, _| {}));
     }
 
     #[test]

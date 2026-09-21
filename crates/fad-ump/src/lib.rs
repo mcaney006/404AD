@@ -343,6 +343,18 @@ impl UmpParser {
         self.stream_offset
     }
 
+    /// The part currently being read, if a header has been parsed.
+    ///
+    /// Available before the payload completes, which is what lets a caller
+    /// decide whether a body is UMP at all without waiting out a multi-megabyte
+    /// media part first.
+    pub fn current_part(&self) -> Option<PartType> {
+        match self.state {
+            State::Header => None,
+            State::Payload { kind, .. } => Some(kind),
+        }
+    }
+
     /// True when the parser is between parts, i.e. the stream could end here.
     pub fn at_boundary(&self) -> bool {
         matches!(self.state, State::Header) && self.pending() == 0
@@ -544,6 +556,18 @@ mod tests {
             "peak buffer {} suggests the parser is accumulating",
             parser.stats().peak_buffer
         );
+    }
+
+    #[test]
+    fn the_current_part_is_known_before_its_payload_arrives() {
+        let mut parser = UmpParser::new();
+        assert_eq!(parser.current_part(), None);
+
+        let mut bytes = Vec::new();
+        encode_part(PartType::Media, &vec![0u8; 4096], &mut bytes);
+        // Header only: the payload is still in flight.
+        parser.push(&bytes[..3], |_| {}).unwrap();
+        assert_eq!(parser.current_part(), Some(PartType::Media));
     }
 
     #[test]

@@ -720,6 +720,14 @@
 			wasm.__wbg_transportengine_free(ptr, 0);
 		}
 		/**
+		* Finish a response. Returns true when it ended on a part boundary.
+		* @param {number} stream
+		* @returns {boolean}
+		*/
+		closeStream(stream) {
+			return wasm.transportengine_closeStream(this.__wbg_ptr, stream) !== 0;
+		}
+		/**
 		* Transport time mapped to the viewer's clock.
 		* @param {number} transport_us
 		* @returns {number}
@@ -732,6 +740,12 @@
 			this.__wbg_ptr = ret;
 			TransportEngineFinalization.register(this, this.__wbg_ptr, this);
 			return this;
+		}
+		/**
+		* The viewer seeked. Starts a fresh epoch without charging it as evidence.
+		*/
+		notifySeek() {
+			wasm.transportengine_notifySeek(this.__wbg_ptr);
 		}
 		/**
 		* Record an observation from the page.
@@ -770,6 +784,17 @@
 			}
 		}
 		/**
+		* Begin reading one SABR response, returning its stream id.
+		*
+		* One per response, always. UMP framing belongs to a response: the player
+		* cancels requests mid-part and runs several in flight at once, so a
+		* shared parser is consuming two framings out of one buffer.
+		* @returns {number}
+		*/
+		openStream() {
+			return wasm.transportengine_openStream(this.__wbg_ptr) >>> 0;
+		}
+		/**
 		* What to do with media at this transport timestamp, in microseconds.
 		* @param {number} transport_us
 		* @returns {any}
@@ -795,6 +820,27 @@
 		}
 		/**
 		* Feed one network chunk. The only per-chunk call across the boundary.
+		* @param {number} stream
+		* @param {Uint8Array} chunk
+		* @returns {any}
+		*/
+		pushStream(stream, chunk) {
+			try {
+				const retptr = wasm.__wbindgen_add_to_stack_pointer(-16);
+				const ptr0 = passArray8ToWasm0(chunk, wasm.__wbindgen_export);
+				const len0 = WASM_VECTOR_LEN;
+				wasm.transportengine_pushStream(retptr, this.__wbg_ptr, stream, ptr0, len0);
+				var r0 = getDataViewMemory0().getInt32(retptr + 0, true);
+				var r1 = getDataViewMemory0().getInt32(retptr + 4, true);
+				if (getDataViewMemory0().getInt32(retptr + 8, true)) throw takeObject(r1);
+				return takeObject(r0);
+			} finally {
+				wasm.__wbindgen_add_to_stack_pointer(16);
+			}
+		}
+		/**
+		* Feed one network chunk on the default stream, for a caller reading one
+		* response at a time.
 		* @param {Uint8Array} chunk
 		* @returns {any}
 		*/
@@ -1192,9 +1238,15 @@
 	* exactly as it would have, and 404AD reads the other. The page's playback path
 	* is never in 404AD's critical path, so a slow or failed analysis cannot stall
 	* the video.
+	*
+	* Each response gets its own engine stream. The player keeps several requests
+	* in flight and cancels them mid-part constantly, so these read loops interleave
+	* and end abruptly; a framing state shared between them would be reassembling
+	* two responses out of one buffer.
 	*/
 	function observeBody(body, active) {
 		const [toPage, toEngine] = body.tee();
+		const stream = active.openStream();
 		(async () => {
 			const reader = toEngine.getReader();
 			let total = 0;
@@ -1205,7 +1257,7 @@
 					total += value.byteLength;
 					if (total > MAX_BYTES_PER_RESPONSE) break;
 					try {
-						active.push(value);
+						active.pushStream(stream, value);
 					} catch (error) {
 						console.warn("404AD: transport parse stopped", error);
 						break;
@@ -1213,6 +1265,9 @@
 				}
 			} catch {} finally {
 				reader.releaseLock();
+				try {
+					active.closeStream(stream);
+				} catch {}
 			}
 		})();
 		return toPage;
@@ -1298,11 +1353,39 @@
 			if (Math.abs(seconds - lastSkipTarget) < .05) return;
 			if (!Number.isFinite(video.duration) || seconds >= video.duration) return;
 			lastSkipTarget = seconds;
+			ourSeeks += 1;
 			video.currentTime = seconds;
 			if (video.paused) video.play().catch(() => void 0);
 		};
 		const timer = setInterval(tick, TICK_MS);
 		return () => clearInterval(timer);
+	}
+	/** Seeks 404AD performed itself, which must not be reported back to it. */
+	var ourSeeks = 0;
+	/**
+	* Tell the engine when the viewer scrubs.
+	*
+	* A scrub makes the server resume from somewhere else, which is indistinguishable
+	* from a new media epoch by anything the transport can measure. Left unreported,
+	* every drag of the scrubber charges a timeline discontinuity against the video.
+	*
+	* Captured on the document because media events do not bubble; the capture phase
+	* still reaches a listener there, and one listener survives the player element
+	* being replaced by a single-page navigation.
+	*/
+	function installSeekReporter() {
+		const onSeeking = (event) => {
+			if (!(event.target instanceof HTMLVideoElement)) return;
+			if (ourSeeks > 0) {
+				ourSeeks -= 1;
+				return;
+			}
+			try {
+				engine?.notifySeek();
+			} catch {}
+		};
+		document.addEventListener("seeking", onSeeking, true);
+		return () => document.removeEventListener("seeking", onSeeking, true);
 	}
 	/**
 	* Install the transport engine.
@@ -1316,11 +1399,15 @@
 		installFetchHook(wasmUrl);
 		installBufferGate();
 		const stopLoop = installSkipLoop();
+		const stopSeeks = installSeekReporter();
 		globalThis.addEventListener("yt-navigate-finish", () => {
 			const videoId = currentVideoId();
 			if (engine && videoId) engine.setRequestedVideo(videoId);
 		});
-		globalThis.addEventListener("pagehide", () => stopLoop(), { once: true });
+		globalThis.addEventListener("pagehide", () => {
+			stopLoop();
+			stopSeeks();
+		}, { once: true });
 		Object.defineProperty(globalThis, "__404AD_TRANSPORT__", {
 			value: () => engine ? engine.state() : null,
 			configurable: true,
