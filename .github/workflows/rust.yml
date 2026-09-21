@@ -1,22 +1,100 @@
-name: Rust
+# The whole battery, not just the Rust third.
+#
+# `cargo test` alone already earned its place: it caught a parser panic on
+# non-ASCII filter text that local runs had never drawn a seed for. But a green
+# tick that says nothing about the extension, the transport engine in a real
+# browser, or whether compilation is still deterministic is worse than no tick,
+# because it reads as a pass.
+#
+# Only first-party actions are used. This repository ships no remote code at
+# runtime and there is no reason to trust more of it at build time.
+name: CI
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
   pull_request:
-    branches: [ "main" ]
+    branches: ["main"]
 
 env:
   CARGO_TERM_COLOR: always
 
 jobs:
-  build:
-
+  rust:
+    name: rust
     runs-on: ubuntu-latest
-
     steps:
-    - uses: actions/checkout@v4
-    - name: Build
-      run: cargo build --verbose
-    - name: Run tests
-      run: cargo test --verbose
+      - uses: actions/checkout@v4
+
+      - name: Cache cargo
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: cargo-${{ runner.os }}-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: cargo-${{ runner.os }}-
+
+      - run: cargo fmt --all --check
+      - run: cargo test --workspace --verbose
+
+      # The compiler proves its own output: two independent compiles of the
+      # shipped lists must agree on every artifact, byte for byte. This also
+      # runs the list quality gates, which are what keep a rule that blocks a
+      # whole document, or a generic selector with no anchor, out of the build.
+      - name: Compilation is deterministic and the lists pass their gates
+        run: cargo run -q -p fad-compiler -- verify --lists lists
+
+  extension:
+    name: extension
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+
+      - name: Cache cargo
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            ~/.cargo/bin/wasm-pack
+            target
+          key: ext-${{ runner.os }}-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: ext-${{ runner.os }}-
+
+      # Installed from source rather than a piped installer: the WASM is
+      # bundled into the package, so what builds it is part of the supply chain.
+      - name: Install wasm-pack
+        run: command -v wasm-pack || cargo install wasm-pack --locked
+
+      - run: bun install --frozen-lockfile
+
+      # wasm -> filters -> WXT -> dist/404ad-chrome-mv3 + the archive.
+      - run: bun run build
+
+      - run: bunx tsc --noEmit -p packages/extension/tsconfig.json
+      - run: bun run lint
+      - run: bun run fmt:check
+      - run: bun run test:unit
+
+      # `channel: "chromium"` in the fixtures selects the full browser rather
+      # than the headless shell, which has no extension support at all.
+      - name: Install Chromium
+        run: bunx playwright install --with-deps chromium
+
+      # Unpacked from the archive on purpose: what gets verified is what ships,
+      # not the tree it was built from.
+      - name: Verify the released archive
+        run: |
+          unzip -q dist/404ad-chrome-mv3-*.zip -d "$RUNNER_TEMP/404ad"
+          FAD_EXTENSION_PATH="$RUNNER_TEMP/404ad" bun run test:e2e
+
+      - name: Keep the failure trail
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: packages/extension/playwright-report/
+          retention-days: 7
